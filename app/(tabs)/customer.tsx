@@ -1,0 +1,256 @@
+import React, { useState } from 'react';
+import {
+    Alert,
+    FlatList,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import {
+    Button,
+    Card,
+    Dialog,
+    FAB,
+    Portal,
+    Text,
+    TextInput,
+    useTheme,
+} from 'react-native-paper';
+
+import { MaterialCard } from '@/components/MaterialCard';
+import { Customer, useCustomerContext } from '@/hooks/useCustomerContext';
+
+export default function CustomerScreen() {
+  const theme = useTheme();
+  const { customers, addCustomer, updateCustomer, deleteCustomer } = useCustomerContext();
+
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [customerName, setCustomerName] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const handleAddCustomer = () => {
+    setCustomerName('');
+    setMobileNumber('');
+    setEditingId(null);
+    setDialogVisible(true);
+  };
+
+  const handleEditCustomer = (customer: Customer) => {
+    setCustomerName(customer.name);
+    setMobileNumber(customer.mobileNumber);
+    setEditingId(customer.id);
+    setDialogVisible(true);
+  };
+
+  const handleSave = () => {
+    if (!customerName.trim() || !mobileNumber.trim()) {
+      Alert.alert('Error', 'Please enter both name and mobile number');
+      return;
+    }
+
+    if (!/^\+?1?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(mobileNumber.replace(/\s/g, ''))) {
+      Alert.alert('Error', 'Please enter a valid mobile number');
+      return;
+    }
+
+    if (editingId) {
+      updateCustomer(editingId, customerName.trim(), mobileNumber.trim());
+    } else {
+      addCustomer(customerName.trim(), mobileNumber.trim());
+    }
+
+    setDialogVisible(false);
+    setCustomerName('');
+    setMobileNumber('');
+    setEditingId(null);
+  };
+
+  const handleDeleteCustomer = (id: string, name: string) => {
+    Alert.alert(
+      'Delete Customer',
+      `Are you sure you want to delete "${name}"?`,
+      [
+        { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        {
+          text: 'Delete',
+          onPress: () => deleteCustomer(id),
+          style: 'destructive',
+        },
+      ]
+    );
+  };
+
+  const renderCustomerItem = ({ item }: { item: Customer }) => (
+    <Card style={[styles.customerCard, { backgroundColor: theme.colors.surface }]}>
+      <Card.Content>
+        <View style={styles.customerHeader}>
+          <View style={styles.customerInfo}>
+            <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
+              {item.name}
+            </Text>
+            <Text
+              variant="labelSmall"
+              style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}>
+              📱 {item.mobileNumber}
+            </Text>
+            <Text
+              variant="labelSmall"
+              style={{ color: theme.colors.onSurfaceVariant, marginTop: 2 }}>
+              Added: {item.createdAt.toLocaleDateString()}
+            </Text>
+          </View>
+          <View style={styles.customerActions}>
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: theme.colors.primary }]}
+              onPress={() => handleEditCustomer(item)}>
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 12 }}>
+                Edit
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: theme.colors.error }]}
+              onPress={() => handleDeleteCustomer(item.id, item.name)}>
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 12 }}>
+                Delete
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Card.Content>
+    </Card>
+  );
+
+  return (
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.header}>
+          <Text variant="headlineLarge" style={styles.title}>
+            Customers
+          </Text>
+          <Text variant="bodyMedium" style={styles.subtitle}>
+            Manage your customers
+          </Text>
+        </View>
+
+        {customers.length === 0 ? (
+          <MaterialCard title="No Customers" subtitle="Get started by adding one">
+            <Text variant="bodyMedium" style={{ textAlign: 'center', paddingVertical: 16 }}>
+              You haven't added any customers yet. Tap the + button to add one.
+            </Text>
+          </MaterialCard>
+        ) : (
+          <View style={styles.listContainer}>
+            <Text variant="labelLarge" style={{ paddingHorizontal: 16, marginBottom: 8 }}>
+              Total: {customers.length} {customers.length === 1 ? 'Customer' : 'Customers'}
+            </Text>
+            <FlatList
+              data={customers}
+              renderItem={renderCustomerItem}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={false}
+              ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 80 }}
+            />
+          </View>
+        )}
+      </ScrollView>
+
+      <FAB
+        icon="plus"
+        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+        onPress={handleAddCustomer}
+        label="Add Customer"
+      />
+
+      <Portal>
+        <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
+          <Dialog.Title>
+            {editingId ? 'Edit Customer' : 'Add New Customer'}
+          </Dialog.Title>
+          <Dialog.Content>
+            <TextInput
+              label="Customer Name"
+              value={customerName}
+              onChangeText={setCustomerName}
+              mode="outlined"
+              placeholder="Enter customer name"
+              style={styles.input}
+            />
+            <TextInput
+              label="Mobile Number"
+              value={mobileNumber}
+              onChangeText={setMobileNumber}
+              mode="outlined"
+              placeholder="+1 (555) 123-4567"
+              keyboardType="phone-pad"
+              style={styles.input}
+            />
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setDialogVisible(false)}>Cancel</Button>
+            <Button mode="contained" onPress={handleSave}>
+              {editingId ? 'Update' : 'Add'}
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  title: {
+    marginBottom: 4,
+  },
+  subtitle: {
+    marginBottom: 8,
+  },
+  listContainer: {
+    paddingVertical: 8,
+  },
+  customerCard: {
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 12,
+  },
+  customerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  customerInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  customerActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+  },
+  input: {
+    marginTop: 8,
+  },
+});
