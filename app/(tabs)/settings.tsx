@@ -3,11 +3,14 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { List, Menu, Switch, Text, TouchableRipple, useTheme } from 'react-native-paper';
 
 import { MaterialCard } from '@/components/MaterialCard';
+import { TeamMemberManager } from '@/components/TeamMemberManager';
+import { useTeamContext } from '@/context/TeamContext';
 import { useLanguage } from '@/hooks/useLanguage';
 
 export default function SettingsScreen() {
   const theme = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  const { currentUser } = useTeamContext();
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [biometric, setBiometric] = useState(false);
@@ -68,6 +71,10 @@ export default function SettingsScreen() {
           right={(props) => <Text {...props}>Disabled</Text>}
         />
       </MaterialCard>
+
+      {currentUser?.role === 'admin' && (
+        <TeamMemberManager />
+      )}
 
       <MaterialCard title="About" subtitle="App information">
         <List.Item

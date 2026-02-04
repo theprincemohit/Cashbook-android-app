@@ -10,6 +10,7 @@ export interface PassbookEntry {
   date: Date;
   balance: number;
   createdAt: Date;
+  createdBy: string; // User ID who created this transaction
 }
 
 export function usePassbookContext() {
@@ -24,6 +25,7 @@ export function usePassbookContext() {
       date: new Date('2026-01-15'),
       balance: 5000,
       createdAt: new Date('2026-01-15'),
+      createdBy: 'admin_001',
     },
     {
       id: '2',
@@ -35,6 +37,7 @@ export function usePassbookContext() {
       date: new Date('2026-01-16'),
       balance: 3500,
       createdAt: new Date('2026-01-16'),
+      createdBy: 'admin_001',
     },
     {
       id: '3',
@@ -46,6 +49,7 @@ export function usePassbookContext() {
       date: new Date('2026-01-10'),
       balance: 3000,
       createdAt: new Date('2026-01-10'),
+      createdBy: 'admin_001',
     },
   ]);
 
@@ -55,7 +59,8 @@ export function usePassbookContext() {
       businessName: string,
       type: 'debit' | 'credit',
       amount: number,
-      description: string
+      description: string,
+      createdBy: string = 'admin_001'
     ) => {
       const lastBalance =
         entries
@@ -74,6 +79,7 @@ export function usePassbookContext() {
         date: new Date(),
         balance: newBalance,
         createdAt: new Date(),
+        createdBy,
       };
 
       setEntries((prev) => [newEntry, ...prev]);

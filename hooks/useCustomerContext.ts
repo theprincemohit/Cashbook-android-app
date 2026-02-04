@@ -6,6 +6,7 @@ export interface Customer {
   mobileNumber: string;
   createdAt: Date;
   updatedAt: Date;
+  createdBy: string; // User ID who created this customer
 }
 
 export function useCustomerContext() {
@@ -16,6 +17,7 @@ export function useCustomerContext() {
       mobileNumber: '+1 (555) 123-4567',
       createdAt: new Date('2026-01-15'),
       updatedAt: new Date('2026-01-15'),
+      createdBy: 'admin_001',
     },
     {
       id: '2',
@@ -23,16 +25,18 @@ export function useCustomerContext() {
       mobileNumber: '+1 (555) 987-6543',
       createdAt: new Date('2026-01-10'),
       updatedAt: new Date('2026-01-10'),
+      createdBy: 'admin_001',
     },
   ]);
 
-  const addCustomer = useCallback((name: string, mobileNumber: string) => {
+  const addCustomer = useCallback((name: string, mobileNumber: string, createdBy: string = 'admin_001') => {
     const newCustomer: Customer = {
       id: Date.now().toString(),
       name,
       mobileNumber,
       createdAt: new Date(),
       updatedAt: new Date(),
+      createdBy,
     };
     setCustomers((prev) => [newCustomer, ...prev]);
     return newCustomer;

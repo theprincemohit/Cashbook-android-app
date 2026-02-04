@@ -123,6 +123,22 @@ export const hindiTranslations = {
   version: 'संस्करण',
   buildNumber: 'बिल्ड नंबर',
 
+  // Team Management
+  admin: 'प्रशासक',
+  teamMember: 'टीम सदस्य',
+  teamMembers: 'टीम सदस्य',
+  addTeamMember: 'टीम सदस्य जोड़ें',
+  removeTeamMember: 'टीम सदस्य हटाएं',
+  memberName: 'सदस्य का नाम',
+  enterMemberName: 'सदस्य का नाम दर्ज करें',
+  permissions: 'अनुमतियां',
+  canAddCustomers: 'ग्राहक जोड़ सकते हैं',
+  canAddTransactions: 'लेनदेन जोड़ सकते हैं',
+  canEditOwnOnly: 'अपनी वस्तुओं को संपादित कर सकते हैं',
+  noTeamMembers: 'अभी कोई टीम सदस्य नहीं हैं। एक जोड़ने के लिए + टैप करें।',
+  removeFromTeam: 'टीम से हटाएं?',
+  onlyAdminCanManageTeam: 'केवल प्रशासक',
+
   // Buttons & Actions
   ok: 'ठीक है',
   close: 'बंद करें',

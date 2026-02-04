@@ -123,6 +123,22 @@ export const englishTranslations = {
   version: 'Version',
   buildNumber: 'Build Number',
 
+  // Team Management
+  admin: 'Admin',
+  teamMember: 'Team Member',
+  teamMembers: 'Team Members',
+  addTeamMember: 'Add Team Member',
+  removeTeamMember: 'Remove Team Member',
+  memberName: 'Member Name',
+  enterMemberName: 'Enter member name',
+  permissions: 'Permissions',
+  canAddCustomers: 'Can Add Customers',
+  canAddTransactions: 'Can Add Transactions',
+  canEditOwnOnly: 'Can Edit Own Items',
+  noTeamMembers: 'No team members yet. Tap + to add one.',
+  removeFromTeam: 'Remove from team?',
+  onlyAdminCanManageTeam: 'Admin only',
+
   // Buttons & Actions
   ok: 'OK',
   close: 'Close',

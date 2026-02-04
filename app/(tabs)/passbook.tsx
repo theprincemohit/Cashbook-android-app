@@ -24,6 +24,7 @@ import {
 
 import { MaterialCard } from '@/components/MaterialCard';
 import { useLanguageContext } from '@/context/LanguageContext';
+import { useTeamContext } from '@/context/TeamContext';
 import { useBusinessContext } from '@/hooks/useBusinessContext';
 import { useCustomerContext } from '@/hooks/useCustomerContext';
 import { usePassbookContext } from '@/hooks/usePassbookContext';
@@ -31,6 +32,7 @@ import { usePassbookContext } from '@/hooks/usePassbookContext';
 export default function PassbookScreen() {
   const theme = useTheme();
   const { t } = useLanguageContext();
+  const { currentUser, canEdit } = useTeamContext();
   const { addEntry, deleteEntry, getBusinessEntries, getBusinessBalance } =
     usePassbookContext();
   const { businesses } = useBusinessContext();
@@ -94,7 +96,8 @@ export default function PassbookScreen() {
       selectedBusiness?.name || 'Unknown Business',
       transactionType,
       numAmount,
-      description.trim()
+      description.trim(),
+      currentUser?.id || 'admin_001'
     );
 
     setDialogVisible(false);
@@ -102,7 +105,11 @@ export default function PassbookScreen() {
     setDescription('');
   };
 
-  const handleDeleteEntry = (id: string, desc: string) => {
+  const handleDeleteEntry = (id: string, desc: string, createdBy: string) => {
+    if (!canEdit(createdBy)) {
+      Alert.alert(t('error'), 'You can only delete transactions you created');
+      return;
+    }
     Alert.alert(
       t('deleteTransaction'),
       `${t('areYouSureDelete')} "${desc}"?`,
@@ -205,13 +212,15 @@ export default function PassbookScreen() {
           </View>
         </View>
         <View style={styles.deleteButtonRow}>
-          <TouchableOpacity
-            style={[styles.deleteButton, { backgroundColor: theme.colors.error }]}
-            onPress={() => handleDeleteEntry(item.id, item.description)}>
-            <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 11 }}>
-              {t('delete')}
-            </Text>
-          </TouchableOpacity>
+          {canEdit(item.createdBy) && (
+            <TouchableOpacity
+              style={[styles.deleteButton, { backgroundColor: theme.colors.error }]}
+              onPress={() => handleDeleteEntry(item.id, item.description, item.createdBy)}>
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 11 }}>
+                {t('delete')}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </Card.Content>
     </Card>

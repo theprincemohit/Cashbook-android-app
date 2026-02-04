@@ -19,10 +19,14 @@ import {
 } from 'react-native-paper';
 
 import { MaterialCard } from '@/components/MaterialCard';
+import { useLanguageContext } from '@/context/LanguageContext';
+import { useTeamContext } from '@/context/TeamContext';
 import { Customer, useCustomerContext } from '@/hooks/useCustomerContext';
 
 export default function CustomerScreen() {
   const theme = useTheme();
+  const { t } = useLanguageContext();
+  const { currentUser, canEdit } = useTeamContext();
   const { customers, addCustomer, updateCustomer, deleteCustomer } = useCustomerContext();
 
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -38,6 +42,10 @@ export default function CustomerScreen() {
   };
 
   const handleEditCustomer = (customer: Customer) => {
+    if (!canEdit(customer.createdBy)) {
+      Alert.alert(t('error'), 'You can only edit customers you created');
+      return;
+    }
     setCustomerName(customer.name);
     setMobileNumber(customer.mobileNumber);
     setEditingId(customer.id);
@@ -67,14 +75,18 @@ export default function CustomerScreen() {
     setEditingId(null);
   };
 
-  const handleDeleteCustomer = (id: string, name: string) => {
+  const handleDeleteCustomer = (id: string, name: string, createdBy: string) => {
+    if (!canEdit(createdBy)) {
+      Alert.alert(t('error'), 'You can only delete customers you created');
+      return;
+    }
     Alert.alert(
-      'Delete Customer',
-      `Are you sure you want to delete "${name}"?`,
+      t('deleteCustomer'),
+      `${t('areYouSureDelete')} "${name}"?`,
       [
-        { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        { text: t('cancel'), onPress: () => {}, style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('delete'),
           onPress: () => deleteCustomer(id),
           style: 'destructive',
         },
@@ -102,20 +114,24 @@ export default function CustomerScreen() {
             </Text>
           </View>
           <View style={styles.customerActions}>
-            <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: theme.colors.primary }]}
-              onPress={() => handleEditCustomer(item)}>
-              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 12 }}>
-                Edit
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: theme.colors.error }]}
-              onPress={() => handleDeleteCustomer(item.id, item.name)}>
-              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 12 }}>
-                Delete
-              </Text>
-            </TouchableOpacity>
+            {canEdit(item.createdBy) && (
+              <>
+                <TouchableOpacity
+                  style={[styles.actionButton, { backgroundColor: theme.colors.primary }]}
+                  onPress={() => handleEditCustomer(item)}>
+                  <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 12 }}>
+                    {t('edit')}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.actionButton, { backgroundColor: theme.colors.error }]}
+                  onPress={() => handleDeleteCustomer(item.id, item.name, item.createdBy)}>
+                  <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 12 }}>
+                    {t('delete')}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
         </View>
       </Card.Content>
