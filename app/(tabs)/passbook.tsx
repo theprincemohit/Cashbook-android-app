@@ -1,24 +1,25 @@
 import React, { useMemo, useState } from 'react';
 import {
-    Alert,
-    FlatList,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import {
-    Button,
-    Card,
-    Chip,
-    Dialog,
-    FAB,
-    Menu,
-    Portal,
-    SegmentedButtons,
-    Text,
-    TextInput,
-    useTheme,
+  Appbar,
+  Button,
+  Card,
+  Chip,
+  Dialog,
+  FAB,
+  Menu,
+  Portal,
+  SegmentedButtons,
+  Text,
+  TextInput,
+  useTheme,
 } from 'react-native-paper';
 
 import { MaterialCard } from '@/components/MaterialCard';
@@ -114,6 +115,54 @@ export default function PassbookScreen() {
     );
   };
 
+  const menu = () => (
+     <Menu
+            visible={businessDropdownVisible}
+            onDismiss={() => setBusinessDropdownVisible(false)}
+            anchor={
+              <TouchableOpacity
+                style={[
+                  styles.dropdownButton,
+                  { backgroundColor: theme.colors.surface },
+                ]}
+                onPress={() => setBusinessDropdownVisible(true)}>
+                <Text
+                  variant="bodyMedium"
+                  style={{
+                    color: selectedBusinessId
+                      ? theme.colors.onSurface
+                      : theme.colors.onSurfaceVariant,
+                    flex: 1,
+                  }}>
+                  {selectedBusiness?.name}   ▼
+                </Text>
+                {/* <Text
+                  style={{
+                    color: theme.colors.onSurfaceVariant,
+                    fontSize: 18,
+                  }}>
+                  ▼
+                </Text> */}
+              </TouchableOpacity>
+            }>
+            {businesses.map((business) => (
+              <Menu.Item
+                key={business.id}
+                onPress={() => {
+                  setSelectedBusinessId(business.id);
+                  setBusinessDropdownVisible(false);
+                }}
+                title={business.name}
+                style={{
+                  backgroundColor:
+                    selectedBusinessId === business.id
+                      ? `${theme.colors.primary}20`
+                      : 'transparent',
+                }}
+              />
+            ))}
+          </Menu>
+  );
   const renderEntry = ({ item }: { item: any }) => (
     <Card style={[styles.entryCard, { backgroundColor: theme.colors.surface }]}>
       <Card.Content>
@@ -123,14 +172,15 @@ export default function PassbookScreen() {
               <Text variant="titleSmall" style={{ fontWeight: 'bold', flex: 1 }}>
                 {item.description}
               </Text>
-              <Chip
-                label={item.type.toUpperCase()}
+                <Chip
                 style={{
                   backgroundColor:
                     item.type === 'credit' ? '#4CAF50' : '#FF6B6B',
                 }}
                 textStyle={{ color: '#fff', fontSize: 10, fontWeight: 'bold' }}
-              />
+              >
+                {item.type.toUpperCase()}
+              </Chip>
             </View>
             <Text
               variant="labelSmall"
@@ -167,75 +217,18 @@ export default function PassbookScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Appbar.Header>
+      
+      <Appbar.Content title={menu()} />
+      <Appbar.Action icon="magnify" onPress={() => {}} />
+      <Appbar.Action icon="dots-vertical" onPress={() => {}} />
+    </Appbar.Header>
       <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <Text variant="headlineLarge" style={styles.title}>
-            Passbook
-          </Text>
-          <Text variant="bodyMedium" style={styles.subtitle}>
-            Track transactions
-          </Text>
-        </View>
-
-        {/* Business Selector */}
-        <View style={styles.businessSelector}>
-          <Text variant="labelMedium" style={{ marginBottom: 8 }}>
-            Select Business
-          </Text>
-          <Menu
-            visible={businessDropdownVisible}
-            onDismiss={() => setBusinessDropdownVisible(false)}
-            anchor={
-              <TouchableOpacity
-                style={[
-                  styles.dropdownButton,
-                  { borderColor: theme.colors.outline, backgroundColor: theme.colors.surface },
-                ]}
-                onPress={() => setBusinessDropdownVisible(true)}>
-                <Text
-                  variant="bodyMedium"
-                  style={{
-                    color: selectedBusinessId
-                      ? theme.colors.onSurface
-                      : theme.colors.onSurfaceVariant,
-                    flex: 1,
-                  }}>
-                  {selectedBusiness?.name || 'Select Business'}
-                </Text>
-                <Text
-                  style={{
-                    color: theme.colors.onSurfaceVariant,
-                    fontSize: 18,
-                  }}>
-                  ▼
-                </Text>
-              </TouchableOpacity>
-            }>
-            {businesses.map((business) => (
-              <Menu.Item
-                key={business.id}
-                onPress={() => {
-                  setSelectedBusinessId(business.id);
-                  setBusinessDropdownVisible(false);
-                }}
-                title={business.name}
-                style={{
-                  backgroundColor:
-                    selectedBusinessId === business.id
-                      ? `${theme.colors.primary}20`
-                      : 'transparent',
-                }}
-              />
-            ))}
-          </Menu>
-        </View>
-       
-
+        
         {/* Balance Card */}
         {selectedBusiness && (
           <MaterialCard
-            title={selectedBusiness.name}
-            subtitle="Current Balance">
+            >
             <View style={styles.balanceView}>
               <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
                 Balance
@@ -271,7 +264,7 @@ export default function PassbookScreen() {
               keyExtractor={(item) => item.id}
               scrollEnabled={false}
               ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 80 }}
+              contentContainerStyle={{ paddingHorizontal: 5, paddingBottom: 80 }}
             />
           </View>
         )}
@@ -280,12 +273,15 @@ export default function PassbookScreen() {
       <FAB
         icon="plus"
         style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+        color={theme.colors.onPrimary}
         onPress={handleAddEntry}
         label="Add Transaction"
       />
 
       <Portal>
-        <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
+        <Dialog 
+        style={{ backgroundColor: theme.colors.surface }}
+        visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
           <Dialog.Title>Add Transaction</Dialog.Title>
           <Dialog.Content>
             <View style={styles.customerSelectRow}>
@@ -478,7 +474,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 12,
-    borderWidth: 1,
+    // borderWidth: 1,
     borderRadius: 8,
     gap: 8,
   },

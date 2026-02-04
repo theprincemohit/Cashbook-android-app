@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import {
-    Alert,
-    FlatList,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import {
-    Button,
-    Card,
-    Dialog,
-    FAB,
-    Portal,
-    Text,
-    TextInput,
-    useTheme
+  Button,
+  Card,
+  Dialog,
+  FAB,
+  Portal,
+  Text,
+  TextInput,
+  useTheme
 } from 'react-native-paper';
 
 import { MaterialCard } from '@/components/MaterialCard';
@@ -147,12 +147,15 @@ export default function BusinessScreen() {
       <FAB
         icon="plus"
         style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+        color={theme.colors.onPrimary}
         onPress={handleAddBusiness}
         label="Add Business"
       />
 
       <Portal>
-        <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
+        <Dialog 
+        style={{ backgroundColor: theme.colors.surface }}
+        visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
           <Dialog.Title>
             {editingId ? 'Edit Business' : 'Create New Business'}
           </Dialog.Title>
