@@ -19,10 +19,12 @@ import {
 } from 'react-native-paper';
 
 import { MaterialCard } from '@/components/MaterialCard';
+import { useLanguageContext } from '@/context/LanguageContext';
 import { Business, useBusinessContext } from '@/hooks/useBusinessContext';
 
 export default function BusinessScreen() {
   const theme = useTheme();
+  const { t } = useLanguageContext();
   const { businesses, addBusiness, updateBusiness, deleteBusiness } =
     useBusinessContext();
 
@@ -44,7 +46,7 @@ export default function BusinessScreen() {
 
   const handleSave = () => {
     if (!businessName.trim()) {
-      Alert.alert('Error', 'Please enter a business name');
+      Alert.alert(t('error'), t('pleaseEnterName'));
       return;
     }
 
@@ -61,12 +63,12 @@ export default function BusinessScreen() {
 
   const handleDeleteBusiness = (id: string, name: string) => {
     Alert.alert(
-      'Delete Business',
-      `Are you sure you want to delete "${name}"?`,
+      t('deleteBusiness'),
+      `${t('areYouSureDelete')} "${name}"?`,
       [
-        { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        { text: t('cancel'), onPress: () => {}, style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('delete'),
           onPress: () => deleteBusiness(id),
           style: 'destructive',
         },
@@ -93,14 +95,14 @@ export default function BusinessScreen() {
               style={[styles.actionButton, { backgroundColor: theme.colors.primary }]}
               onPress={() => handleEditBusiness(item)}>
               <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 12 }}>
-                Edit
+                {t('edit')}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.actionButton, { backgroundColor: theme.colors.error }]}
               onPress={() => handleDeleteBusiness(item.id, item.name)}>
               <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 12 }}>
-                Delete
+                {t('delete')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -114,23 +116,23 @@ export default function BusinessScreen() {
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
           <Text variant="headlineLarge" style={styles.title}>
-            Businesses
+            {t('businessManagement')}
           </Text>
           <Text variant="bodyMedium" style={styles.subtitle}>
-            Manage your business accounts
+            {t('manageBusinessAccounts')}
           </Text>
         </View>
 
         {businesses.length === 0 ? (
-          <MaterialCard title="No Businesses" subtitle="Get started by creating one">
+          <MaterialCard title={t('noBusiness')} subtitle={t('getStartedBusiness')}>
             <Text variant="bodyMedium" style={{ textAlign: 'center', paddingVertical: 16 }}>
-              You haven't created any businesses yet. Tap the + button to add one.
+              {t('notCreatedBusiness')}
             </Text>
           </MaterialCard>
         ) : (
           <View style={styles.listContainer}>
             <Text variant="labelLarge" style={{ paddingHorizontal: 16, marginBottom: 8 }}>
-              Total: {businesses.length} {businesses.length === 1 ? 'Business' : 'Businesses'}
+              {t('totalBusiness')}: {businesses.length} {businesses.length === 1 ? t('business') : t('businessPlural')}
             </Text>
             <FlatList
               data={businesses}
@@ -149,7 +151,7 @@ export default function BusinessScreen() {
         style={[styles.fab, { backgroundColor: theme.colors.primary }]}
         color={theme.colors.onPrimary}
         onPress={handleAddBusiness}
-        label="Add Business"
+        label={t('addBusiness')}
       />
 
       <Portal>
@@ -157,22 +159,22 @@ export default function BusinessScreen() {
         style={{ backgroundColor: theme.colors.surface }}
         visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
           <Dialog.Title>
-            {editingId ? 'Edit Business' : 'Create New Business'}
+            {editingId ? t('editBusiness') : t('createNewBusiness')}
           </Dialog.Title>
           <Dialog.Content>
             <TextInput
-              label="Business Name"
+              label={t('businessName')}
               value={businessName}
               onChangeText={setBusinessName}
               mode="outlined"
-              placeholder="Enter business name"
+              placeholder={t('enterBusinessName')}
               style={styles.input}
             />
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setDialogVisible(false)}>Cancel</Button>
+            <Button onPress={() => setDialogVisible(false)}>{t('cancel')}</Button>
             <Button mode="contained" onPress={handleSave}>
-              {editingId ? 'Update' : 'Create'}
+              {editingId ? t('update') : t('create')}
             </Button>
           </Dialog.Actions>
         </Dialog>

@@ -23,12 +23,14 @@ import {
 } from 'react-native-paper';
 
 import { MaterialCard } from '@/components/MaterialCard';
+import { useLanguageContext } from '@/context/LanguageContext';
 import { useBusinessContext } from '@/hooks/useBusinessContext';
 import { useCustomerContext } from '@/hooks/useCustomerContext';
 import { usePassbookContext } from '@/hooks/usePassbookContext';
 
 export default function PassbookScreen() {
   const theme = useTheme();
+  const { t } = useLanguageContext();
   const { addEntry, deleteEntry, getBusinessEntries, getBusinessBalance } =
     usePassbookContext();
   const { businesses } = useBusinessContext();
@@ -77,13 +79,13 @@ export default function PassbookScreen() {
 
   const handleSave = () => {
     if (!amount.trim() || !description.trim() || !selectedCustomerId) {
-      Alert.alert('Error', 'Please enter all fields');
+      Alert.alert(t('error'), t('pleaseEnterAllFields'));
       return;
     }
 
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount <= 0) {
-      Alert.alert('Error', 'Please enter a valid amount');
+      Alert.alert(t('error'), 'Please enter a valid amount');
       return;
     }
 
@@ -102,12 +104,12 @@ export default function PassbookScreen() {
 
   const handleDeleteEntry = (id: string, desc: string) => {
     Alert.alert(
-      'Delete Entry',
-      `Are you sure you want to delete "${desc}"?`,
+      t('deleteTransaction'),
+      `${t('areYouSureDelete')} "${desc}"?`,
       [
-        { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        { text: t('cancel'), onPress: () => {}, style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('delete'),
           onPress: () => deleteEntry(id),
           style: 'destructive',
         },
@@ -207,7 +209,7 @@ export default function PassbookScreen() {
             style={[styles.deleteButton, { backgroundColor: theme.colors.error }]}
             onPress={() => handleDeleteEntry(item.id, item.description)}>
             <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 11 }}>
-              Delete
+              {t('delete')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -231,7 +233,7 @@ export default function PassbookScreen() {
             >
             <View style={styles.balanceView}>
               <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                Balance
+                {t('balance')}
               </Text>
               <Text
                 variant="headlineLarge"
@@ -245,18 +247,18 @@ export default function PassbookScreen() {
         {/* Transactions List */}
         {businessEntries.length === 0 ? (
           <MaterialCard
-            title="No Transactions"
-            subtitle="Get started by adding one">
+            title={t('noTransactions')}
+            subtitle={t('getStartedTransaction')}>
             <Text
               variant="bodyMedium"
               style={{ textAlign: 'center', paddingVertical: 16 }}>
-              No transactions yet for this business. Tap the + button to add one.
+              {t('noTransactionsBusiness')}
             </Text>
           </MaterialCard>
         ) : (
           <View style={styles.listContainer}>
             <Text variant="labelLarge" style={{ paddingHorizontal: 16, marginBottom: 8 }}>
-              Transactions: {businessEntries.length}
+              {t('transactions')}: {businessEntries.length}
             </Text>
             <FlatList
               data={businessEntries}
@@ -275,18 +277,18 @@ export default function PassbookScreen() {
         style={[styles.fab, { backgroundColor: theme.colors.primary }]}
         color={theme.colors.onPrimary}
         onPress={handleAddEntry}
-        label="Add Transaction"
+        label={t('addTransaction')}
       />
 
       <Portal>
         <Dialog 
         style={{ backgroundColor: theme.colors.surface }}
         visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
-          <Dialog.Title>Add Transaction</Dialog.Title>
+          <Dialog.Title>{t('addTransaction')}</Dialog.Title>
           <Dialog.Content>
             <View style={styles.customerSelectRow}>
               <Text variant="labelMedium" style={{ marginBottom: 8 }}>
-                Customer
+                {t('customer')}
               </Text>
               <Menu
                 visible={customerDropdownVisible}
@@ -306,7 +308,7 @@ export default function PassbookScreen() {
                           : theme.colors.onSurfaceVariant,
                         flex: 1,
                       }}>
-                      {selectedCustomer?.name || 'Select Customer'}
+                      {selectedCustomer?.name || t('selectCustomer')}
                     </Text>
                     <Text
                       style={{
@@ -338,7 +340,7 @@ export default function PassbookScreen() {
 
             <View style={styles.transactionTypeRow}>
               <Text variant="labelMedium" style={{ marginBottom: 8 }}>
-                Transaction Type
+                {t('entryType')}
               </Text>
               <SegmentedButtons
                 value={transactionType}
@@ -346,12 +348,12 @@ export default function PassbookScreen() {
                 buttons={[
                   {
                     value: 'credit',
-                    label: 'Credit (+)',
+                    label: t('credit'),
                     style: { flex: 1 },
                   },
                   {
                     value: 'debit',
-                    label: 'Debit (-)',
+                    label: t('debit'),
                     style: { flex: 1 },
                   },
                 ]}
@@ -359,7 +361,7 @@ export default function PassbookScreen() {
             </View>
 
             <TextInput
-              label="Amount"
+              label={t('entryAmount')}
               value={amount}
               onChangeText={setAmount}
               mode="outlined"
@@ -369,20 +371,20 @@ export default function PassbookScreen() {
             />
 
             <TextInput
-              label="Description"
+              label={t('description')}
               value={description}
               onChangeText={setDescription}
               mode="outlined"
-              placeholder="Enter transaction description"
+              placeholder={t('enterTransactionDescription')}
               style={styles.input}
               multiline
               numberOfLines={3}
             />
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setDialogVisible(false)}>Cancel</Button>
+            <Button onPress={() => setDialogVisible(false)}>{t('cancel')}</Button>
             <Button mode="contained" onPress={handleSave}>
-              Add
+              {t('add')}
             </Button>
           </Dialog.Actions>
         </Dialog>
