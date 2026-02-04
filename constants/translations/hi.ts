@@ -107,6 +107,11 @@ export const hindiTranslations = {
   updateTransaction: 'लेनदेन अपडेट करें',
   pleaseEnterAllFields: 'कृपया सभी फ़ील्ड भरें',
   pleaseEnterAll: 'कृपया सभी फ़ील्ड दर्ज करें',
+  name: 'नाम',
+  remarks: 'टिप्पणियां',
+  date: 'तारीख',
+  amount: 'राशि',
+  action: 'कार्रवाई',
 
   // Settings
   settingsManagement: 'सेटिंग्स',

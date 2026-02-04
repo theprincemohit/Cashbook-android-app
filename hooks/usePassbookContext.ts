@@ -92,6 +92,30 @@ export function usePassbookContext() {
     setEntries((prev) => prev.filter((entry) => entry.id !== id));
   }, []);
 
+  const updateEntry = useCallback(
+    (
+      id: string,
+      type: 'debit' | 'credit',
+      amount: number,
+      description: string
+    ) => {
+      setEntries((prev) => {
+        const updatedEntries = prev.map((entry) =>
+          entry.id === id
+            ? {
+                ...entry,
+                type,
+                amount,
+                description,
+              }
+            : entry
+        );
+        return updatedEntries;
+      });
+    },
+    []
+  );
+
   const getBusinessEntries = useCallback(
     (businessId: string) => {
       return entries
@@ -115,6 +139,7 @@ export function usePassbookContext() {
     entries,
     addEntry,
     deleteEntry,
+    updateEntry,
     getBusinessEntries,
     getBusinessBalance,
   };

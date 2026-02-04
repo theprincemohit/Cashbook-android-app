@@ -107,6 +107,11 @@ export const englishTranslations = {
   deleteTransaction: 'Delete Transaction',
   updateTransaction: 'Update Transaction',
   pleaseEnterAllFields: 'Please enter all fields',
+  name: 'Name',
+  remarks: 'Remarks',
+  date: 'Date',
+  amount: 'Amount',
+  action: 'Action',
 
   // Settings
   settingsManagement: 'Settings',

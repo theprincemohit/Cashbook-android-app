@@ -51,7 +51,7 @@ export default function HomeScreen() {
               {t('totalCredit')}
             </Text>
             <Text variant="titleMedium" style={{ color: '#4CAF50', fontWeight: 'bold' }}>
-              ${totalCredit.toFixed(2)}
+              ₹{totalCredit.toFixed(2)}
             </Text>
           </View>
           <View style={styles.divider} />
@@ -60,7 +60,7 @@ export default function HomeScreen() {
               {t('totalDebit')}
             </Text>
             <Text variant="titleMedium" style={{ color: '#FF6B6B', fontWeight: 'bold' }}>
-              ${totalDebit.toFixed(2)}
+              ₹{totalDebit.toFixed(2)}
             </Text>
           </View>
           <View style={styles.divider} />
@@ -74,7 +74,7 @@ export default function HomeScreen() {
                 color: totalBalance >= 0 ? '#4CAF50' : '#FF6B6B',
                 fontWeight: 'bold',
               }}>
-              ${totalBalance.toFixed(2)}
+              ₹{totalBalance.toFixed(2)}
             </Text>
           </View>
         </View>
@@ -104,7 +104,7 @@ export default function HomeScreen() {
           </View>
         </MaterialCard>
       )}
-      
+
       {/* Summary Cards Grid */}
       <View style={styles.gridContainer}>
         {/* Business Count Card */}
