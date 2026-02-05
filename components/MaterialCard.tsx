@@ -38,5 +38,6 @@ const styles = StyleSheet.create({
   card: {
     marginVertical: 8,
     marginHorizontal: 12,
+    backgroundColor: '#fff',
   },
 });

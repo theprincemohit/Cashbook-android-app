@@ -52,10 +52,19 @@ export default function TabLayout() {
           }}
         />
         <Drawer.Screen
+          name="add-transaction"
+          options={{
+            drawerLabel: 'Transaction',
+            title: 'Transaction',
+            headerShown: false,
+          }}
+        />
+        <Drawer.Screen
           name="passbook"
           options={{
             drawerLabel: 'Passbook',
             title: 'Passbook',
+            headerShown: false,
           }}
         />
         <Drawer.Screen

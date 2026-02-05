@@ -1,3 +1,6 @@
+import {
+  useNavigation,
+} from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -24,6 +27,7 @@ import { Business, useBusinessContext } from '@/hooks/useBusinessContext';
 
 export default function BusinessScreen() {
   const theme = useTheme();
+  const navigation = useNavigation();
   const { t } = useLanguageContext();
   const { businesses, addBusiness, updateBusiness, deleteBusiness } =
     useBusinessContext();
@@ -81,10 +85,14 @@ export default function BusinessScreen() {
       <Card.Content>
         <View style={styles.businessHeader}>
           <View style={styles.businessInfo}>
-            <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('passbook', { businessId: item.id })}>
+               <Text variant="titleMedium"  style={{ fontWeight: 'bold' }}>
               {item.name}
             </Text>
-            {/* <Text
+            </TouchableOpacity>
+           
+            {/* <Text onClick={() => navigation.navigate('/passbook')}
               variant="labelSmall"
               style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}>
               Added: {item.createdAt.toLocaleDateString()}
@@ -112,7 +120,7 @@ export default function BusinessScreen() {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.container, { backgroundColor:  '#eee' }]}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
           <Text variant="headlineLarge" style={styles.title}>

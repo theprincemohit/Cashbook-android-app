@@ -10,27 +10,24 @@ import {
 import React, { useMemo, useState } from 'react';
 import {
   Alert,
-  FlatList,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import {
   Appbar,
   Button,
-  Dialog,
-  FAB,
+  Chip,
   IconButton,
   Menu,
-  Portal,
   SegmentedButtons,
   Text,
   TextInput,
   useTheme
 } from 'react-native-paper';
 
-export default function PassbookScreen() {
+export default function AddTransactionScreen() {
   const theme = useTheme();
   const navigation = useNavigation();
   const { t } = useLanguageContext();
@@ -270,179 +267,42 @@ export default function PassbookScreen() {
     </Appbar.Header>
       <ScrollView style={styles.scrollView}>
 
-         {/* Balance Card */}
-          <MaterialCard title={t('transactionHistory')} subtitle="Financial Summary">
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                  {t('totalCredit')}
-                </Text>
-                <Text variant="titleMedium" style={{ color: '#4CAF50', fontWeight: 'bold' }}>
-                  ₹{currentBalance.toFixed(2)}
-                </Text>
-              </View>
-              <View style={styles.divider} />
-              <View style={styles.statItem}>
-                <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                  {t('totalDebit')}
-                </Text>
-                <Text variant="titleMedium" style={{ color: '#FF6B6B', fontWeight: 'bold' }}>
-                  ₹{currentBalance.toFixed(2)}
-                </Text>
-              </View>
-              <View style={styles.divider} />
-              <View style={styles.statItem}>
-                <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                  {t('balance')}
-                </Text>
-                <Text
-                  variant="titleMedium"
-                  style={{
-                    color: currentBalance >= 0 ? '#4CAF50' : '#FF6B6B',
-                    fontWeight: 'bold',
-                  }}>
-                  ₹{currentBalance.toFixed(2)}
-                </Text>
-              </View>
-            </View>
-          </MaterialCard>
-
-        {/* Transactions List */}
-        {businessEntries.length === 0 ? (
-          <MaterialCard
-            title={t('noTransactions')}
-            subtitle={t('getStartedTransaction')}>
-            <Text
-              variant="bodyMedium"
-              style={{ textAlign: 'center', paddingVertical: 16 }}>
-              {t('noTransactionsBusiness')}
-            </Text>
-          </MaterialCard>
-        ) : (
-          <View style={styles.listContainer}>
-            <Text variant="labelLarge" style={{ paddingHorizontal: 16, marginBottom: 12 }}>
-              {t('transactions')}: {businessEntries.length}
-            </Text>
-            {/* Table Header */}
-            <View style={[styles.tableHeader, { backgroundColor: theme.colors.primary }]}>
-              <Text style={[styles.tableHeaderCell, { flex: 1.2 }]} numberOfLines={1}>
-                {t('name')}
-              </Text>
-              <Text style={[styles.tableHeaderCell, { flex: 1.5 }]} numberOfLines={1}>
-                {t('remarks')}
-              </Text>
-              <Text style={[styles.tableHeaderCell, { flex: 0.9, textAlign: 'center' }]}>
-                {t('date')}
-              </Text>
-              <Text style={[styles.tableHeaderCell, { flex: 1, textAlign: 'right' }]}>
-                {t('amount')}
-              </Text>
-              <Text style={[styles.tableHeaderCell, { flex: 0.9, textAlign: 'center' }]}>
-                {t('action')}
-              </Text>
-            </View>
-            {/* Table Rows */}
-            <FlatList
-              data={businessEntries}
-              renderItem={renderEntry}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-              ItemSeparatorComponent={() => <View style={{ height: 0 }} />}
-              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 80 }}
+        <MaterialCard style={{paddingTop  : '25'}}>
+            <Chip color='#3c763d' style={{marginBottom: 16, color: '#3c763d', backgroundColor: '#dff0d8', borderColor: '#d6e9c6'}} icon="check" onPress={() => console.log('Pressed')}>Example Chip</Chip>
+             <TextInput
+              label={t('selectCustomer')}
+              value={selectedCustomer?.name || ''}
+              onChangeText={() => {}}
+              mode="outlined"
+              style={[styles.input, { marginBottom: 16 }]}
             />
-          </View>
-        )}
-      </ScrollView>
 
-      <FAB
-        icon="plus"
-        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
-        color={theme.colors.onPrimary}
-        onPress={handleAddEntry}
-        label={t('addTransaction')}
-      />
-
-      <Portal>
-        <Dialog 
-        style={{ backgroundColor: theme.colors.surface }}
-        visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
-          <Dialog.Title>{t('addTransaction')}</Dialog.Title>
-          <Dialog.Content>
-            <View style={styles.customerSelectRow}>
-              <Text variant="labelMedium" style={{ marginBottom: 8 }}>
-                {t('customer')}
-              </Text>
-              <Menu
-                visible={customerDropdownVisible}
-                onDismiss={() => setCustomerDropdownVisible(false)}
-                anchor={
-                  <TouchableOpacity
-                    style={[
-                      styles.dropdownButton,
-                      { borderColor: theme.colors.outline, backgroundColor: theme.colors.surface },
-                    ]}
-                    onPress={() => setCustomerDropdownVisible(true)}>
-                    <Text
-                      variant="bodyMedium"
-                      style={{
-                        color: selectedCustomerId
-                          ? theme.colors.onSurface
-                          : theme.colors.onSurfaceVariant,
-                        flex: 1,
-                      }}>
-                      {selectedCustomer?.name || t('selectCustomer')}
-                    </Text>
-                    <Text
-                      style={{
-                        color: theme.colors.onSurfaceVariant,
-                        fontSize: 18,
-                      }}>
-                      ▼
-                    </Text>
-                  </TouchableOpacity>
-                }>
-                {customers.map((customer) => (
-                  <Menu.Item
-                    key={customer.id}
-                    onPress={() => {
-                      setSelectedCustomerId(customer.id);
-                      setCustomerDropdownVisible(false);
-                    }}
-                    title={customer.name}
-                    style={{
-                      backgroundColor:
-                        selectedCustomerId === customer.id
-                          ? `${theme.colors.primary}20`
-                          : 'transparent',
-                    }}
-                  />
-                ))}
-              </Menu>
-            </View>
-
-            <View style={styles.transactionTypeRow}>
-              <Text variant="labelMedium" style={{ marginBottom: 8 }}>
-                {t('entryType')}
-              </Text>
-              <SegmentedButtons
+           <View style={styles.transactionTypeRow}>
+                <SegmentedButtons
                 value={transactionType}
                 onValueChange={(value) => setTransactionType(value as 'credit' | 'debit')}
                 buttons={[
                   {
                     value: 'credit',
+                    checkedColor: transactionType === 'credit' ? '#fff' : '#000',
                     label: t('credit'),
-                    style: { flex: 1 },
+                    style: { flex: 1, borderRadius: 5,
+                      backgroundColor: transactionType === 'credit' ? '#01865f' : 'transparent',
+                     },
                   },
                   {
                     value: 'debit',
+                    checkedColor: transactionType === 'debit' ? '#fff' : '#000',
                     label: t('debit'),
-                    style: { flex: 1 },
+                    style: { flex: 1, borderRadius: 5, 
+                      backgroundColor: transactionType === 'debit' ? '#c93b3b' : 'transparent',
+                     },
                   },
                 ]}
               />
             </View>
 
-            <TextInput
+                <TextInput
               label={t('entryAmount')}
               value={amount}
               onChangeText={setAmount}
@@ -462,78 +322,15 @@ export default function PassbookScreen() {
               multiline
               numberOfLines={3}
             />
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setDialogVisible(false)}>{t('cancel')}</Button>
-            <Button mode="contained" onPress={handleSave}>
+            <Button style={{marginTop: 16}} mode="contained" onPress={handleSave}>
               {t('add')}
             </Button>
-          </Dialog.Actions>
-        </Dialog>
+             <Button style={{marginTop: 16}} mode='outlined' onPress={() => setDialogVisible(false)}>{t('cancel')}</Button>
+            
+        </MaterialCard>
+      </ScrollView>
 
-        <Dialog 
-        style={{ backgroundColor: theme.colors.surface }}
-        visible={editDialogVisible} onDismiss={() => setEditDialogVisible(false)}>
-          <Dialog.Title>{t('editTransaction')}</Dialog.Title>
-          <Dialog.Content>
-            <View style={styles.transactionTypeRow}>
-              <Text variant="labelMedium" style={{ marginBottom: 8 }}>
-                {t('entryType')}
-              </Text>
-              <SegmentedButtons
-                value={transactionType}
-                onValueChange={(value) => setTransactionType(value as 'credit' | 'debit')}
-                buttons={[
-                  {
-                    value: 'credit',
-                    label: t('credit'),
-                    style: { flex: 1 },
-                  },
-                  {
-                    value: 'debit',
-                    label: t('debit'),
-                    style: { flex: 1 },
-                  },
-                ]}
-              />
-            </View>
-
-            <TextInput
-              label={t('entryAmount')}
-              value={amount}
-              onChangeText={setAmount}
-              mode="outlined"
-              placeholder="0.00"
-              keyboardType="decimal-pad"
-              style={styles.input}
-            />
-
-            <TextInput
-              label={t('description')}
-              value={description}
-              onChangeText={setDescription}
-              mode="outlined"
-              placeholder={t('enterTransactionDescription')}
-              style={styles.input}
-              multiline
-              numberOfLines={3}
-            />
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => {
-              setEditDialogVisible(false);
-              setEditingEntryId(null);
-              setAmount('');
-              setDescription('');
-            }}>
-              {t('cancel')}
-            </Button>
-            <Button mode="contained" onPress={handleUpdateEntry}>
-              {t('update')}
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      
     </View>
   );
 }
