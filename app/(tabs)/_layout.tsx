@@ -60,6 +60,14 @@ export default function TabLayout() {
           }}
         />
         <Drawer.Screen
+          name="select-party"
+          options={{
+            drawerLabel: 'Select Party',
+            title: 'Select Party',
+            headerShown: false,
+          }}
+        />
+        <Drawer.Screen
           name="passbook"
           options={{
             drawerLabel: 'Passbook',

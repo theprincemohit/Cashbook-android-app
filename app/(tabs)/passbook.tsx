@@ -320,9 +320,15 @@ export default function PassbookScreen() {
           </MaterialCard>
         ) : (
           <View style={styles.listContainer}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <Text variant="labelLarge" style={{ paddingHorizontal: 16, marginBottom: 12 }}>
-              {t('transactions')}: {businessEntries.length}
+              {t('transactions')}: {businessEntries.length} 
+               
             </Text>
+           <Button  onPress={() => navigation.navigate('add-transaction')}>
+              {t('addTransaction')}
+            </Button>
+            </View>
             {/* Table Header */}
             <View style={[styles.tableHeader, { backgroundColor: theme.colors.primary }]}>
               <Text style={[styles.tableHeaderCell, { flex: 1.2 }]} numberOfLines={1}>

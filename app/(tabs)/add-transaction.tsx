@@ -7,7 +7,7 @@ import { usePassbookContext } from '@/hooks/usePassbookContext';
 import {
   useNavigation,
 } from '@react-navigation/native';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   ScrollView,
@@ -27,7 +27,7 @@ import {
   useTheme
 } from 'react-native-paper';
 
-export default function AddTransactionScreen() {
+export default function AddTransactionScreen({ route }: any) {
   const theme = useTheme();
   const navigation = useNavigation();
   const { t } = useLanguageContext();
@@ -51,6 +51,7 @@ export default function AddTransactionScreen() {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
+  const [partyName, setPartyName] = useState('');
 
   const businessEntries = useMemo(
     () => getBusinessEntries(selectedBusinessId),
@@ -71,6 +72,15 @@ export default function AddTransactionScreen() {
     () => customers.find((c) => c.id === selectedCustomerId),
     [selectedCustomerId, customers]
   );
+
+   useEffect(() => {
+    if (route?.params?.postData) {
+      // Do something with the post data
+      console.log('Received data:', route.params.postData);
+      alert('New post: ' + route.params.postData);
+      setPartyName(route.params.postData);
+    }
+  }, [route?.params?.postData]);
 
   const handleAddEntry = () => {
     setAmount('');
@@ -271,8 +281,9 @@ export default function AddTransactionScreen() {
             <Chip color='#3c763d' style={{marginBottom: 16, color: '#3c763d', backgroundColor: '#dff0d8', borderColor: '#d6e9c6'}} icon="check" onPress={() => console.log('Pressed')}>Example Chip</Chip>
              <TextInput
               label={t('selectCustomer')}
-              value={selectedCustomer?.name || ''}
+              value={partyName || 'NA'}
               onChangeText={() => {}}
+              onFocus={() => navigation.navigate('select-party', { businessId: selectedBusinessId})}
               mode="outlined"
               style={[styles.input, { marginBottom: 16 }]}
             />
