@@ -80,7 +80,9 @@ export default function TabLayout() {
           options={{
             drawerLabel: 'Customers',
             title: 'Customers',
+            headerShown: false,
           }}
+          
         />
         <Drawer.Screen
           name="profile"

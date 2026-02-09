@@ -4,10 +4,10 @@ import {
   FlatList,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import {
+  Appbar,
   Button,
   Card,
   Dialog,
@@ -22,6 +22,7 @@ import { MaterialCard } from '@/components/MaterialCard';
 import { useLanguageContext } from '@/context/LanguageContext';
 import { useTeamContext } from '@/context/TeamContext';
 import { Customer, useCustomerContext } from '@/hooks/useCustomerContext';
+import { router } from 'expo-router';
 
 export default function CustomerScreen() {
   const theme = useTheme();
@@ -95,43 +96,28 @@ export default function CustomerScreen() {
   };
 
   const renderCustomerItem = ({ item }: { item: Customer }) => (
-    <Card style={[styles.customerCard, { backgroundColor: theme.colors.surface }]}>
+    <Card mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal:0, marginBottom: 0 }]}>
       <Card.Content>
-        <View style={styles.customerHeader}>
+        <View style={[styles.customerHeader, { padding:0 }]}>
           <View style={styles.customerInfo}>
             <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
               {item.name}
+              
             </Text>
-            <Text
-              variant="labelSmall"
-              style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}>
-              📱 {item.mobileNumber}
-            </Text>
-            <Text
-              variant="labelSmall"
-              style={{ color: theme.colors.onSurfaceVariant, marginTop: 2 }}>
-              Added: {item.createdAt.toLocaleDateString()}
+             <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
+              {item.createdAt.toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+              
             </Text>
           </View>
-          <View style={styles.customerActions}>
-            {canEdit(item.createdBy) && (
-              <>
-                <TouchableOpacity
-                  style={[styles.actionButton, { backgroundColor: theme.colors.primary }]}
-                  onPress={() => handleEditCustomer(item)}>
-                  <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 12 }}>
-                    {t('edit')}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.actionButton, { backgroundColor: theme.colors.error }]}
-                  onPress={() => handleDeleteCustomer(item.id, item.name, item.createdBy)}>
-                  <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 12 }}>
-                    {t('delete')}
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
+           <View style={styles.customerInfo}>
+            <Text variant="titleMedium" style={{ fontWeight: 'bold', textAlign: 'right' }}>
+              $10.00
+              
+            </Text>
+             <Text variant="titleMedium" style={{ fontWeight: 100, padding:0, backgroundColor: theme.colors.error, textAlign: 'center', fontSize: 8, color: "#fff" }}>
+              Credit
+              
+            </Text>
           </View>
         </View>
       </Card.Content>
@@ -139,17 +125,13 @@ export default function CustomerScreen() {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.container, { backgroundColor:  '#ecedee'  }]}>
+      <Appbar.Header>
+        <Appbar.BackAction onPress={() => router.back()} />
+        <Appbar.Content title="Customer" />
+      </Appbar.Header>
       <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <Text variant="headlineLarge" style={styles.title}>
-            Customers
-          </Text>
-          <Text variant="bodyMedium" style={styles.subtitle}>
-            Manage your customers
-          </Text>
-        </View>
-
+       
         {customers.length === 0 ? (
           <MaterialCard title="No Customers" subtitle="Get started by adding one">
             <Text variant="bodyMedium" style={{ textAlign: 'center', paddingVertical: 16 }}>
@@ -241,23 +223,20 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   customerCard: {
-    marginHorizontal: 16,
-    marginBottom: 12,
+  
+    
     borderRadius: 12,
   },
   customerHeader: {
     flexDirection: 'row',
+    flex: 1,
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
   customerInfo: {
-    flex: 1,
-    marginRight: 12,
+    
   },
-  customerActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
+ 
   actionButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
