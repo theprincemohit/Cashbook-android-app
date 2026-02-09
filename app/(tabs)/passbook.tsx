@@ -18,7 +18,6 @@ import {
   Appbar,
   Button,
   Dialog,
-  FAB,
   IconButton,
   Menu,
   Portal,
@@ -358,13 +357,7 @@ export default function PassbookScreen() {
         )}
       </ScrollView>
 
-      <FAB
-        icon="plus"
-        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
-        color={theme.colors.onPrimary}
-        onPress={handleAddEntry}
-        label={t('addTransaction')}
-      />
+      
 
       <Portal>
         <Dialog 
