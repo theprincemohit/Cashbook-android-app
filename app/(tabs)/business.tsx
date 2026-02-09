@@ -120,7 +120,7 @@ export default function BusinessScreen() {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor:  '#eee' }]}>
+    <View style={[styles.container, { backgroundColor:  '#ecedee' }]}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
           <Text variant="headlineLarge" style={styles.title}>

@@ -4,9 +4,7 @@ import { useTeamContext } from '@/context/TeamContext';
 import { useBusinessContext } from '@/hooks/useBusinessContext';
 import { useCustomerContext } from '@/hooks/useCustomerContext';
 import { usePassbookContext } from '@/hooks/usePassbookContext';
-import {
-  useNavigation,
-} from '@react-navigation/native';
+import { router } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import {
   Alert,
@@ -32,7 +30,6 @@ import {
 
 export default function PassbookScreen() {
   const theme = useTheme();
-  const navigation = useNavigation();
   const { t } = useLanguageContext();
   const { currentUser, canEdit } = useTeamContext();
   const { addEntry, deleteEntry, updateEntry, getBusinessEntries, getBusinessBalance } =
@@ -261,9 +258,9 @@ export default function PassbookScreen() {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: '#eee' }]}>
+    <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
       <Appbar.Header>
-      <Appbar.BackAction onPress={() => navigation.goBack()} />
+      <Appbar.BackAction onPress={() => router.back()} />
       <Appbar.Content title={menu()} />
       
       <Appbar.Action icon="dots-vertical" onPress={() => {}} />
@@ -325,7 +322,8 @@ export default function PassbookScreen() {
               {t('transactions')}: {businessEntries.length} 
                
             </Text>
-           <Button  onPress={() => navigation.navigate('add-transaction')}>
+           <Button  onPress={() => router.push({  pathname: '/add-transaction',
+            params: { businessId: selectedBusiness?.id} })} >
               {t('addTransaction')}
             </Button>
             </View>

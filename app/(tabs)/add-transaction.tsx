@@ -4,9 +4,8 @@ import { useTeamContext } from '@/context/TeamContext';
 import { useBusinessContext } from '@/hooks/useBusinessContext';
 import { useCustomerContext } from '@/hooks/useCustomerContext';
 import { usePassbookContext } from '@/hooks/usePassbookContext';
-import {
-  useNavigation,
-} from '@react-navigation/native';
+import { router, useLocalSearchParams } from "expo-router";
+
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
@@ -19,7 +18,6 @@ import {
   Appbar,
   Button,
   Chip,
-  IconButton,
   Menu,
   SegmentedButtons,
   Text,
@@ -29,14 +27,15 @@ import {
 
 export default function AddTransactionScreen({ route }: any) {
   const theme = useTheme();
-  const navigation = useNavigation();
   const { t } = useLanguageContext();
   const { currentUser, canEdit } = useTeamContext();
+  const { postdata, businessId } = useLocalSearchParams();
+
   const { addEntry, deleteEntry, updateEntry, getBusinessEntries, getBusinessBalance } =
     usePassbookContext();
   const { businesses } = useBusinessContext();
   const { customers } = useCustomerContext();
-
+  console.log('businessId from route params:', businessId);
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>(
     businesses[0]?.id || ''
   );
@@ -51,7 +50,7 @@ export default function AddTransactionScreen({ route }: any) {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
-  const [partyName, setPartyName] = useState('');
+  const [partyName, setPartyName] = useState(postdata || ''); // Initialize with postdata from route params 
 
   const businessEntries = useMemo(
     () => getBusinessEntries(selectedBusinessId),
@@ -73,14 +72,13 @@ export default function AddTransactionScreen({ route }: any) {
     [selectedCustomerId, customers]
   );
 
-   useEffect(() => {
-    if (route?.params?.postData) {
-      // Do something with the post data
-      console.log('Received data:', route.params.postData);
-      alert('New post: ' + route.params.postData);
-      setPartyName(route.params.postData);
+ 
+
+  useEffect(() => {
+    if (postdata) {
+      setPartyName(postdata);
     }
-  }, [route?.params?.postData]);
+  }, [postdata]);
 
   const handleAddEntry = () => {
     setAmount('');
@@ -116,62 +114,6 @@ export default function AddTransactionScreen({ route }: any) {
     setDescription('');
   };
 
-  const handleDeleteEntry = (id: string, desc: string, createdBy: string) => {
-    if (!canEdit(createdBy)) {
-      Alert.alert(t('error'), 'You can only delete transactions you created');
-      return;
-    }
-    Alert.alert(
-      t('deleteTransaction'),
-      `${t('areYouSureDelete')} "${desc}"?`,
-      [
-        { text: t('cancel'), onPress: () => {}, style: 'cancel' },
-        {
-          text: t('delete'),
-          onPress: () => deleteEntry(id),
-          style: 'destructive',
-        },
-      ]
-    );
-  };
-
-  const handleEditEntry = (entryId: string) => {
-    const entry = getBusinessEntries(selectedBusinessId).find((e) => e.id === entryId);
-    if (!entry) return;
-
-    setEditingEntryId(entryId);
-    setTransactionType(entry.type);
-    setAmount(entry.amount.toString());
-    setDescription(entry.description);
-    setEditDialogVisible(true);
-  };
-
-  const handleUpdateEntry = () => {
-    if (!amount.trim() || !description.trim()) {
-      Alert.alert(t('error'), t('pleaseEnterAllFields'));
-      return;
-    }
-
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount <= 0) {
-      Alert.alert(t('error'), 'Please enter a valid amount');
-      return;
-    }
-
-    if (editingEntryId) {
-      updateEntry(
-        editingEntryId,
-        transactionType,
-        numAmount,
-        description.trim()
-      );
-
-      setEditDialogVisible(false);
-      setEditingEntryId(null);
-      setAmount('');
-      setDescription('');
-    }
-  };
 
   const menu = () => (
      <Menu
@@ -221,74 +163,24 @@ export default function AddTransactionScreen({ route }: any) {
             ))}
           </Menu>
   );
-  const renderEntry = ({ item }: { item: any }) => (
-    <View style={[styles.tableRow, { backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.outline }]}>
-      <Text style={[styles.tableCell, { flex: 1.2 }]} numberOfLines={1}>
-        {item.name || 'Customer Name'}
-      </Text>
-      <Text style={[styles.tableCell, { flex: 1.5 }]} numberOfLines={1}>
-        {item.description}
-      </Text>
-      <Text style={[styles.tableCell, { flex: 0.9, textAlign: 'center' }]}>
-        {item.date.toLocaleDateString()}
-      </Text>
-      <Text
-        style={[
-          styles.tableCell,
-          {
-            flex: 1,
-            textAlign: 'right',
-            color: item.type === 'credit' ? '#4CAF50' : '#FF6B6B',
-            fontWeight: 'bold',
-          },
-        ]}>
-       {item.amount}
-      </Text>
-      <View style={[styles.tableCell, { flex: 1.2, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', gap: 4 }]}>
-        {canEdit(item.createdBy) && (
-          <>
-            <IconButton
-              icon="pencil"
-              iconColor={theme.colors.primary}
-              size={16}
-              style={styles.iconButton}
-              onPress={() => handleEditEntry(item.id)}
-            />
-            <IconButton
-              icon="delete"
-              iconColor={theme.colors.error}
-              size={16}
-              style={styles.iconButton}
-              onPress={() => handleDeleteEntry(item.id, item.description, item.createdBy)}
-            />
-          </>
-        )}
-      </View>
-    </View>
-  );
+  
 
   return (
-    <View style={[styles.container, { backgroundColor: '#eee' }]}>
+    <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
       <Appbar.Header>
-      <Appbar.BackAction onPress={() => navigation.goBack()} />
+      <Appbar.BackAction onPress={() => router.back()} />
       <Appbar.Content title={menu()} />
       
       <Appbar.Action icon="dots-vertical" onPress={() => {}} />
     </Appbar.Header>
       <ScrollView style={styles.scrollView}>
-
-        <MaterialCard style={{paddingTop  : '25'}}>
-            <Chip color='#3c763d' style={{marginBottom: 16, color: '#3c763d', backgroundColor: '#dff0d8', borderColor: '#d6e9c6'}} icon="check" onPress={() => console.log('Pressed')}>Example Chip</Chip>
-             <TextInput
-              label={t('selectCustomer')}
-              value={partyName || 'NA'}
-              onChangeText={() => {}}
-              onFocus={() => navigation.navigate('select-party', { businessId: selectedBusinessId})}
-              mode="outlined"
-              style={[styles.input, { marginBottom: 16 }]}
-            />
-
-           <View style={styles.transactionTypeRow}>
+        <MaterialCard style={{paddingTop  : 25, 
+          borderColor:transactionType === 'credit' ? '#01865f' : '#c93b3b', 
+          borderWidth: 2
+        }}>
+            <Chip  style={{marginBottom: 16, backgroundColor: '#dff0d8', borderColor: '#d6e9c6'}} icon="check" onPress={() => console.log('Pressed')}>Example Chip</Chip>
+             
+             <View style={styles.transactionTypeRow}>
                 <SegmentedButtons
                 value={transactionType}
                 onValueChange={(value) => setTransactionType(value as 'credit' | 'debit')}
@@ -312,7 +204,6 @@ export default function AddTransactionScreen({ route }: any) {
                 ]}
               />
             </View>
-
                 <TextInput
               label={t('entryAmount')}
               value={amount}
@@ -322,6 +213,21 @@ export default function AddTransactionScreen({ route }: any) {
               keyboardType="decimal-pad"
               style={styles.input}
             />
+
+             <TextInput
+              label={t('selectCustomer')}
+              value={partyName || 'NA'}
+              onChangeText={() => {}}
+              onFocus={() => router.push({
+                        pathname: "/select-party",
+                        params: { businessId: selectedBusinessId },
+                      })}
+              mode="outlined"
+              style={[styles.input]}
+            />
+
+           
+
 
             <TextInput
               label={t('description')}

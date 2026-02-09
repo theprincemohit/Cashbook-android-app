@@ -3,9 +3,7 @@ import { useTeamContext } from '@/context/TeamContext';
 import { useBusinessContext } from '@/hooks/useBusinessContext';
 import { useCustomerContext } from '@/hooks/useCustomerContext';
 import { usePassbookContext } from '@/hooks/usePassbookContext';
-import {
-  useNavigation,
-} from '@react-navigation/native';
+import { router } from "expo-router";
 import React, { useMemo, useState } from 'react';
 import {
   Alert,
@@ -38,7 +36,7 @@ export default function SelectPartyScreen() {
   ]
 },
 {
-  "recordID": "6b2237ee0df85980",
+  "recordID": "6b2237ee0df859801",
   "givenName": "John",
   "familyName": "Doe",
   "phoneNumbers": [
@@ -50,7 +48,6 @@ export default function SelectPartyScreen() {
 }
 ]
   const theme = useTheme();
-  const navigation = useNavigation();
   const { t } = useLanguageContext();
   const { currentUser, canEdit } = useTeamContext();
   const { addEntry, deleteEntry, updateEntry, getBusinessEntries, getBusinessBalance } =
@@ -134,14 +131,13 @@ export default function SelectPartyScreen() {
 
   const handleAddEntry = () => {
     setAmount('');
-    setDescription('');
     setTransactionType('credit');
     setSelectedCustomerId(customers[0]?.id || '');
     setDialogVisible(true);
   };
 
   const handleSave = () => {
-    if (!amount.trim() || !description.trim() || !selectedCustomerId) {
+    if (!amount.trim() || !partyName.trim() || !selectedCustomerId) {
       Alert.alert(t('error'), t('pleaseEnterAllFields'));
       return;
     }
@@ -157,13 +153,11 @@ export default function SelectPartyScreen() {
       selectedBusiness?.name || 'Unknown Business',
       transactionType,
       numAmount,
-      description.trim(),
       currentUser?.id || 'admin_001'
     );
 
     setDialogVisible(false);
     setAmount('');
-    setDescription('');
   };
 
   const handleDeleteEntry = (id: string, desc: string, createdBy: string) => {
@@ -204,13 +198,20 @@ export default function SelectPartyScreen() {
               style={styles.input}
               multiline
               numberOfLines={3}
-              left={<TextInput.Icon onPress={() => navigation.goBack()}  icon="arrow-left" />}
+              left={<TextInput.Icon onPress={() => router.back()}  icon="arrow-left" />}
             />} />
     </Appbar.Header>
       <ScrollView style={styles.scrollView}>
           <View>
             <View>
-                <Text onPress={() => navigation.navigate('add-transaction', { partyName })} style={styles.contactName}>{partyName}</Text>
+                <Text 
+                  onPress={() =>  router.push({
+          pathname: "/add-transaction",
+          params: { 'postdata' : partyName },
+        })}
+                  
+
+                  style={styles.contactName}>{partyName}</Text>
             
             <Divider />
             </View>
