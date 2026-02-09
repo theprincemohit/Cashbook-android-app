@@ -52,6 +52,14 @@ export default function TabLayout() {
           }}
         />
         <Drawer.Screen
+          name="AddForm"
+          options={{
+            drawerLabel: 'Add Form',
+            title: 'Add Form',
+            headerShown: false,
+          }}
+        />
+        <Drawer.Screen
           name="add-transaction"
           options={{
             drawerLabel: 'Transaction',

@@ -19,7 +19,6 @@ import {
   Button,
   Chip,
   Menu,
-  SegmentedButtons,
   Text,
   TextInput,
   useTheme
@@ -168,67 +167,25 @@ export default function AddTransactionScreen({ route }: any) {
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
       <Appbar.Header>
-      <Appbar.BackAction onPress={() => router.back()} />
-      <Appbar.Content title={menu()} />
-      
-      <Appbar.Action icon="dots-vertical" onPress={() => {}} />
+        <Appbar.BackAction onPress={() => router.back()} />
+           {/* Add/Edit Business or Passbook Form */}
+        <Appbar.Content title= "Add/Edit  Form"/> 
+        <Appbar.Action icon="dots-vertical" onPress={() => {}} />
     </Appbar.Header>
       <ScrollView style={styles.scrollView}>
-        <MaterialCard style={{paddingTop  : 25, 
-          borderColor:transactionType === 'credit' ? '#01865f' : '#c93b3b', 
-          borderWidth: 2
-        }}>
+        <MaterialCard style={{paddingTop  : 25}}>
             <Chip  style={{marginBottom: 16, backgroundColor: '#dff0d8', borderColor: '#d6e9c6'}} icon="check" onPress={() => console.log('Pressed')}>Example Chip</Chip>
              
-             <View style={styles.transactionTypeRow}>
-                <SegmentedButtons
-                value={transactionType}
-                onValueChange={(value) => setTransactionType(value as 'credit' | 'debit')}
-                buttons={[
-                  {
-                    value: 'credit',
-                    checkedColor: transactionType === 'credit' ? '#fff' : '#000',
-                    label: t('credit'),
-                    style: { flex: 1, borderRadius: 5,
-                      backgroundColor: transactionType === 'credit' ? '#01865f' : 'transparent',
-                     },
-                  },
-                  {
-                    value: 'debit',
-                    checkedColor: transactionType === 'debit' ? '#fff' : '#000',
-                    label: t('debit'),
-                    style: { flex: 1, borderRadius: 5, 
-                      backgroundColor: transactionType === 'debit' ? '#c93b3b' : 'transparent',
-                     },
-                  },
-                ]}
-              />
-            </View>
-                <TextInput
-              label={t('entryAmount')}
-              value={amount}
-              onChangeText={setAmount}
+            <TextInput
+              label={t('businesses')}
+              value={description}
+              onChangeText={setDescription}
               mode="outlined"
-              placeholder="0.00"
-              keyboardType="decimal-pad"
+              placeholder={t('enterBusinessName')}
               style={styles.input}
+              numberOfLines={1}
             />
-
-             <TextInput
-              label={t('selectCustomer')}
-              value={'partyName' || 'NA'}
-              onChangeText={() => {}}
-              onFocus={() => router.push({
-                        pathname: "/select-party",
-                        params: { businessId: selectedBusinessId },
-                      })}
-              mode="outlined"
-              style={[styles.input]}
-            />
-
-           
-
-
+             
             <TextInput
               label={t('description')}
               value={description}
@@ -237,10 +194,10 @@ export default function AddTransactionScreen({ route }: any) {
               placeholder={t('enterTransactionDescription')}
               style={styles.input}
               multiline
-              numberOfLines={3}
+              numberOfLines={5}
             />
             <Button style={{marginTop: 16}} mode="contained" onPress={handleSave}>
-              {t('add')}
+              {t('add')} / {t('update')}
             </Button>
              <Button style={{marginTop: 16}} mode='outlined' onPress={() => setDialogVisible(false)}>{t('cancel')}</Button>
             

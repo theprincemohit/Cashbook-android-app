@@ -23,7 +23,7 @@ export default function CustomerScreen() {
   const { customers } = useCustomerContext();
 
   const renderCustomerItem = ({ item }: { item: Customer }) => (
-    <Card mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal:0, marginBottom: 0 }]}>
+    <Card mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal:0, marginBottom: 0, borderRadius:0 }]}>
       <Card.Content>
         <View style={[styles.customerHeader, { padding:0 }]}>
           <View style={styles.customerInfo}>
@@ -32,7 +32,8 @@ export default function CustomerScreen() {
               
             </Text>
              <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
-              {item.createdAt.toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+              {item.createdAt.toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric"})}  |  
+                {item.createdAt.toLocaleTimeString("en-Us",{ hour: "2-digit", minute: "2-digit" })}
               
             </Text>
           </View>
@@ -67,16 +68,16 @@ export default function CustomerScreen() {
           </MaterialCard>
         ) : (
           <View style={styles.listContainer}>
-            <Text variant="labelLarge" style={{ paddingHorizontal: 16, marginBottom: 8 }}>
-              Total: {customers.length} {customers.length === 1 ? 'Customer' : 'Customers'}
+            <Text variant="labelMedium" style={{ paddingHorizontal: 16, marginBottom: 8 }}>
+              Total {customers.length === 1 ? 'Customer' : 'Customers'}: {customers.length} 
             </Text>
-            <FlatList
+             <FlatList
               data={customers}
               renderItem={renderCustomerItem}
               keyExtractor={(item) => item.id}
               scrollEnabled={false}
-              ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 80 }}
+              ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
+              contentContainerStyle={{ paddingHorizontal: 5 }}
             />
           </View>
         )}
