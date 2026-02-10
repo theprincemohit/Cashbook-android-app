@@ -92,8 +92,19 @@ export default function CustomerScreen() {
   return (
     <View style={[styles.container, { backgroundColor:  '#ecedee'  }]}>
       <Appbar.Header>
-        <Appbar.BackAction onPress={() => router.back()} />
+        <Appbar.BackAction onPress={() => router.push({
+                                    pathname: '/passbook',
+                                    params: { },
+                                  })} />
         <Appbar.Content title="Customer" />
+        <Appbar.Action icon="plus" onPress={() => router.push({
+                                    pathname: '/add-transaction',
+                                    params: { formId: 0,
+                                    formName: 'Transaction',
+                                    formAction: "Add",
+                                    formType: "Transaction"
+                                     },
+                                  })} />
       </Appbar.Header>
      
       <ScrollView style={styles.scrollView}>

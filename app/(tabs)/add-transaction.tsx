@@ -168,7 +168,10 @@ export default function AddTransactionScreen({ route }: any) {
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
       <Appbar.Header>
-      <Appbar.BackAction onPress={() => router.back()} />
+      <Appbar.BackAction  onPress={() => router.push({
+                                          pathname: '/customer',
+                                          params: { },
+                                        })} />
       <Appbar.Content title={menu()} />
       
       <Appbar.Action icon="dots-vertical" onPress={() => {}} />

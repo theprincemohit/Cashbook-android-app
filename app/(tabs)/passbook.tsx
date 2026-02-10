@@ -75,6 +75,14 @@ export default function PassbookScreen() {
        <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content title="Passbook" />
+        <Appbar.Action icon="plus" onPress={() => router.push({
+                                            pathname: '/AddForm',
+                                            params: { formId: 0, 
+                                            formName: 'Passbook',
+                                            formAction: "Add",
+                                            formType: "Passbook"
+                                             },
+                                          })} />
       </Appbar.Header>
       <ScrollView style={styles.scrollView}>
         {entries.length === 0 ? (

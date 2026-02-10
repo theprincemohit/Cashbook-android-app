@@ -34,27 +34,18 @@ export default function AddTransactionScreen({ route }: any) {
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>(
     businesses[0]?.id || ''
   );
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string>(
-    customers[0]?.id || ''
-  );
   const [businessDropdownVisible, setBusinessDropdownVisible] = useState(false);
-  const [dialogVisible, setDialogVisible] = useState(false);
   const [editDialogVisible, setEditDialogVisible] = useState(false);
   const [customerDropdownVisible, setCustomerDropdownVisible] = useState(false);
   const [transactionType, setTransactionType] = useState<'credit' | 'debit'>('credit');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
-  const [partyName, setPartyName] = useState(); 
+  const [formData, setFormData] = useState<{name?: string, description?: string} | null>(null); 
 
   const businessEntries = useMemo(
     () => getBusinessEntries(selectedBusinessId),
     [selectedBusinessId, getBusinessEntries]
-  );
-
-  const currentBalance = useMemo(
-    () => getBusinessBalance(selectedBusinessId),
-    [selectedBusinessId, getBusinessBalance]
   );
 
   const selectedBusiness = useMemo(
@@ -62,21 +53,13 @@ export default function AddTransactionScreen({ route }: any) {
     [selectedBusinessId, businesses]
   );
 
-  const selectedCustomer = useMemo(
-    () => customers.find((c) => c.id === selectedCustomerId),
-    [selectedCustomerId, customers]
-  );
-
   const handleAddEntry = () => {
-    setAmount('');
     setDescription('');
     setTransactionType('credit');
-    setSelectedCustomerId(customers[0]?.id || '');
-    setDialogVisible(true);
   };
 
   const handleSave = () => {
-    if (!amount.trim() || !description.trim() || !selectedCustomerId) {
+    if (!formData?.name?.trim() || !formData?.description?.trim()) {
       Alert.alert(t('error'), t('pleaseEnterAllFields'));
       return;
     }
@@ -95,8 +78,6 @@ export default function AddTransactionScreen({ route }: any) {
       description.trim(),
       currentUser?.id || 'admin_001'
     );
-
-    setDialogVisible(false);
     setAmount('');
     setDescription('');
   };
@@ -116,8 +97,8 @@ export default function AddTransactionScreen({ route }: any) {
              
             <TextInput
               label={t('businesses')}
-              value={''}
-              onChangeText={setDescription}
+              value={formData?.name || ''}
+              onChangeText={(text) => setFormData({...formData, name: text})}
               mode="outlined"
               placeholder={t('enterBusinessName')}
               style={styles.input}
@@ -126,8 +107,8 @@ export default function AddTransactionScreen({ route }: any) {
              
             <TextInput
               label={t('description')}
-              value={description}
-              onChangeText={setDescription}
+              value={formData?.description || ''}
+              onChangeText={(text) => setFormData({...formData, description: text})}
               mode="outlined"
               placeholder={t('enterTransactionDescription')}
               style={styles.input}
@@ -137,7 +118,7 @@ export default function AddTransactionScreen({ route }: any) {
             <Button style={{marginTop: 16}} mode="contained" onPress={handleSave}>
               {formAction === "update" ? t('update') : t('save')}
             </Button>
-             <Button style={{marginTop: 16}} mode='outlined' onPress={() => setDialogVisible(false)}>{t('cancel')}</Button>
+             <Button style={{marginTop: 16}} mode='outlined'>{t('cancel')}</Button>
             
         </MaterialCard>
       </ScrollView>

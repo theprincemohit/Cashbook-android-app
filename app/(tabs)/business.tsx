@@ -6,10 +6,11 @@ import {
   View
 } from 'react-native';
 import {
+  Button,
   Card,
   Icon,
   Text,
-  useTheme
+  useTheme,
 } from 'react-native-paper';
 
 import { MaterialCard } from '@/components/MaterialCard';
@@ -77,6 +78,16 @@ export default function BusinessScreen() {
           <Text variant="headlineLarge" style={styles.title}>
             {t('businessManagement')}
           </Text>
+           <Button icon="plus" mode="outlined" onPress={() =>  router.push({
+                                    pathname: '/AddForm',
+                                    params: { formId: 0, 
+                                    formName: 'Business',
+                                    formAction: "Add",
+                                    formType: "Business"
+                                     },
+                                  })}>
+              Add New Business
+            </Button>
          
         </View>
 
