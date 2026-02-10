@@ -169,7 +169,7 @@ export default function AddTransactionScreen({ route }: any) {
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
       <Appbar.Header>
       <Appbar.BackAction  onPress={() => router.push({
-                                          pathname: '/customer',
+                                          pathname: '/transaction',
                                           params: { },
                                         })} />
       <Appbar.Content title={menu()} />
@@ -219,7 +219,7 @@ export default function AddTransactionScreen({ route }: any) {
 
              <TextInput
               label={t('selectCustomer')}
-              value={'partyName' || 'NA'}
+              value=''
               onChangeText={() => {}}
               onFocus={() => router.push({
                         pathname: "/select-party",

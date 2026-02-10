@@ -62,8 +62,8 @@ export default function TabLayout() {
         <Drawer.Screen
           name="add-transaction"
           options={{
-            drawerLabel: 'Transaction',
-            title: 'Transaction',
+            drawerLabel: 'Add Transaction',
+            title: 'Add Transaction',
             headerShown: false,
           }}
         />
@@ -84,10 +84,10 @@ export default function TabLayout() {
           }}
         />
         <Drawer.Screen
-          name="customer"
+          name="transaction"
           options={{
-            drawerLabel: 'Customers',
-            title: 'Customers',
+            drawerLabel: 'Transactions',
+            title: 'Transactions',
             headerShown: false,
           }}
           

@@ -27,13 +27,10 @@ export default function PassbookScreen() {
   const renderBusinessItem = ({ item }: { item: any }) => (
     <Card  mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal:0, marginBottom: 0, borderRadius:0 }]}>
           <Card.Content>
-            
-            <View 
-            style={[styles.customerHeader, { padding:0 }]}
-            >
+            <View style={[styles.customerHeader, { padding:0 }]} >
               <View style={styles.customerInfo}>
                 <Text onPress={() =>  router.push({
-                                    pathname: "/customer",
+                                    pathname: "/transaction",
                                     params: { formId: item.id, 
                                     formName: item.name,
                                     formAction: "update",
@@ -43,22 +40,22 @@ export default function PassbookScreen() {
                   {item.name}
                   
                 </Text>
-                 <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
+                <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
                   {item.createdAt.toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric"})}  |  
-                    {item.createdAt.toLocaleTimeString("en-Us",{ hour: "2-digit", minute: "2-digit" })}
+                  {item.createdAt.toLocaleTimeString("en-Us",{ hour: "2-digit", minute: "2-digit" })}
                   
                 </Text>
               </View>
-               <View style={styles.customerInfo}>
-                <Text variant="titleMedium" style={{ fontWeight: 'bold', textAlign: 'right' }}>
-                  $10.00
-                  
-                </Text>
-                 <Text variant="titleMedium" style={{ fontWeight: 100, padding:0, backgroundColor: theme.colors.error, textAlign: 'center', fontSize: 8, color: "#fff" }}>
-                  Credit
-                  
-                </Text>
-              </View>
+                <View style={styles.customerInfo}>
+                  <Text variant="titleMedium" style={{ fontWeight: 'bold', textAlign: 'right' }}>
+                    $10.00
+                    
+                  </Text>
+                  <Text variant="titleMedium" style={{ fontWeight: 100, padding:0, backgroundColor: theme.colors.error, textAlign: 'center', fontSize: 8, color: "#fff" }}>
+                    Credit
+                    
+                  </Text>
+                </View>
               <View style={{}}>
                 <Icon
                   source="dots-vertical"
@@ -72,7 +69,7 @@ export default function PassbookScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor:  '#ecedee' }]}>
-       <Appbar.Header>
+      <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content title="Passbook" />
         <Appbar.Action icon="plus" onPress={() => router.push({

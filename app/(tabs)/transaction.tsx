@@ -17,7 +17,7 @@ import { useLanguageContext } from '@/context/LanguageContext';
 import { Customer, useCustomerContext } from '@/hooks/useCustomerContext';
 import { router } from 'expo-router';
 
-export default function CustomerScreen() {
+export default function TransactionScreen() {
   const theme = useTheme();
   const { t } = useLanguageContext();
   const { customers } = useCustomerContext();
@@ -96,7 +96,7 @@ export default function CustomerScreen() {
                                     pathname: '/passbook',
                                     params: { },
                                   })} />
-        <Appbar.Content title="Customer" />
+        <Appbar.Content title="Transaction" />
         <Appbar.Action icon="plus" onPress={() => router.push({
                                     pathname: '/add-transaction',
                                     params: { formId: 0,
