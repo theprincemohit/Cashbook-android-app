@@ -1,122 +1,73 @@
+import React from 'react';
 import {
-  useNavigation,
-} from '@react-navigation/native';
-import React, { useState } from 'react';
-import {
-  Alert,
   FlatList,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import {
-  Button,
   Card,
-  Dialog,
-  FAB,
-  Portal,
+  Icon,
   Text,
-  TextInput,
   useTheme
 } from 'react-native-paper';
 
 import { MaterialCard } from '@/components/MaterialCard';
 import { useLanguageContext } from '@/context/LanguageContext';
 import { Business, useBusinessContext } from '@/hooks/useBusinessContext';
+import { router } from 'expo-router';
 
 export default function BusinessScreen() {
   const theme = useTheme();
-  const navigation = useNavigation();
   const { t } = useLanguageContext();
   const { businesses, addBusiness, updateBusiness, deleteBusiness } =
     useBusinessContext();
 
-  const [dialogVisible, setDialogVisible] = useState(false);
-  const [businessName, setBusinessName] = useState('');
-  const [editingId, setEditingId] = useState<string | null>(null);
-
-  const handleAddBusiness = () => {
-    setBusinessName('');
-    setEditingId(null);
-    setDialogVisible(true);
-  };
-
-  const handleEditBusiness = (business: Business) => {
-    setBusinessName(business.name);
-    setEditingId(business.id);
-    setDialogVisible(true);
-  };
-
-  const handleSave = () => {
-    if (!businessName.trim()) {
-      Alert.alert(t('error'), t('pleaseEnterName'));
-      return;
-    }
-
-    if (editingId) {
-      updateBusiness(editingId, businessName.trim());
-    } else {
-      addBusiness(businessName.trim());
-    }
-
-    setDialogVisible(false);
-    setBusinessName('');
-    setEditingId(null);
-  };
-
-  const handleDeleteBusiness = (id: string, name: string) => {
-    Alert.alert(
-      t('deleteBusiness'),
-      `${t('areYouSureDelete')} "${name}"?`,
-      [
-        { text: t('cancel'), onPress: () => {}, style: 'cancel' },
-        {
-          text: t('delete'),
-          onPress: () => deleteBusiness(id),
-          style: 'destructive',
-        },
-      ]
-    );
-  };
 
   const renderBusinessItem = ({ item }: { item: Business }) => (
-    <Card style={[styles.businessCard, { backgroundColor: theme.colors.surface }]}>
-      <Card.Content>
-        <View style={styles.businessHeader}>
-          <View style={styles.businessInfo}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('passbook', { businessId: item.id })}>
-               <Text variant="titleMedium"  style={{ fontWeight: 'bold' }}>
-              {item.name}
-            </Text>
-            </TouchableOpacity>
-           
-            {/* <Text onClick={() => navigation.navigate('/passbook')}
-              variant="labelSmall"
-              style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}>
-              Added: {item.createdAt.toLocaleDateString()}
-            </Text> */}
-          </View>
-          <View style={styles.businessActions}>
-            <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: theme.colors.primary }]}
-              onPress={() => handleEditBusiness(item)}>
-              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 12 }}>
-                {t('edit')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: theme.colors.error }]}
-              onPress={() => handleDeleteBusiness(item.id, item.name)}>
-              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 12 }}>
-                {t('delete')}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Card.Content>
-    </Card>
+    <Card  mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal:0, marginBottom: 0, borderRadius:0 }]}>
+          <Card.Content>
+            
+            <View 
+            style={[styles.customerHeader, { padding:0 }]}
+            >
+              <View style={styles.customerInfo}>
+                <Text onPress={() =>  router.push({
+                                    pathname: '/passbook',
+                                    params: { formId: item.id, 
+                                    formName: item.name,
+                                    formAction: "update",
+                                    formType: "Business"
+                                     },
+                                  })} variant="titleMedium" style={{ fontWeight: 'bold' }}>
+                  {item.name}
+                  
+                </Text>
+                 <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
+                  {item.createdAt.toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric"})}  |  
+                    {item.createdAt.toLocaleTimeString("en-Us",{ hour: "2-digit", minute: "2-digit" })}
+                  
+                </Text>
+              </View>
+               <View style={styles.customerInfo}>
+                <Text variant="titleMedium" style={{ fontWeight: 'bold', textAlign: 'right' }}>
+                  $10.00
+                  
+                </Text>
+                 <Text variant="titleMedium" style={{ fontWeight: 100, padding:0, backgroundColor: theme.colors.error, textAlign: 'center', fontSize: 8, color: "#fff" }}>
+                  Credit
+                  
+                </Text>
+              </View>
+              <View style={{}}>
+                <Icon
+                  source="dots-vertical"
+                  size={20}
+                />
+              </View>
+            </View>
+          </Card.Content>
+        </Card>
   );
 
   return (
@@ -126,9 +77,7 @@ export default function BusinessScreen() {
           <Text variant="headlineLarge" style={styles.title}>
             {t('businessManagement')}
           </Text>
-          <Text variant="bodyMedium" style={styles.subtitle}>
-            {t('manageBusinessAccounts')}
-          </Text>
+         
         </View>
 
         {businesses.length === 0 ? (
@@ -139,54 +88,17 @@ export default function BusinessScreen() {
           </MaterialCard>
         ) : (
           <View style={styles.listContainer}>
-            <Text variant="labelLarge" style={{ paddingHorizontal: 16, marginBottom: 8 }}>
-              {t('totalBusiness')}: {businesses.length} {businesses.length === 1 ? t('business') : t('businessPlural')}
-            </Text>
             <FlatList
               data={businesses}
               renderItem={renderBusinessItem}
               keyExtractor={(item) => item.id}
               scrollEnabled={false}
-              ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 80 }}
+              ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
+              contentContainerStyle={{ paddingHorizontal: 5 }}
             />
           </View>
         )}
       </ScrollView>
-
-      <FAB
-        icon="plus"
-        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
-        color={theme.colors.onPrimary}
-        onPress={handleAddBusiness}
-        label={t('addBusiness')}
-      />
-
-      <Portal>
-        <Dialog 
-        style={{ backgroundColor: theme.colors.surface }}
-        visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
-          <Dialog.Title>
-            {editingId ? t('editBusiness') : t('createNewBusiness')}
-          </Dialog.Title>
-          <Dialog.Content>
-            <TextInput
-              label={t('businessName')}
-              value={businessName}
-              onChangeText={setBusinessName}
-              mode="outlined"
-              placeholder={t('enterBusinessName')}
-              style={styles.input}
-            />
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setDialogVisible(false)}>{t('cancel')}</Button>
-            <Button mode="contained" onPress={handleSave}>
-              {editingId ? t('update') : t('create')}
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
     </View>
   );
 }
@@ -243,5 +155,17 @@ const styles = StyleSheet.create({
   },
   input: {
     marginTop: 8,
+  },
+   customerCard: {
+    borderRadius: 12,
+  },
+  customerHeader: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  customerInfo: {
+    
   },
 });

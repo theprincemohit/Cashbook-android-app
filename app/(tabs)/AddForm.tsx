@@ -6,20 +6,17 @@ import { useCustomerContext } from '@/hooks/useCustomerContext';
 import { usePassbookContext } from '@/hooks/usePassbookContext';
 import { router, useLocalSearchParams } from "expo-router";
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Alert,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
   View
 } from 'react-native';
 import {
   Appbar,
   Button,
   Chip,
-  Menu,
-  Text,
   TextInput,
   useTheme
 } from 'react-native-paper';
@@ -28,13 +25,12 @@ export default function AddTransactionScreen({ route }: any) {
   const theme = useTheme();
   const { t } = useLanguageContext();
   const { currentUser, canEdit } = useTeamContext();
-  const { postdata, businessId } = useLocalSearchParams();
+  const { formId, formName, formAction, formType } = useLocalSearchParams();
 
   const { addEntry, deleteEntry, updateEntry, getBusinessEntries, getBusinessBalance } =
     usePassbookContext();
   const { businesses } = useBusinessContext();
   const { customers } = useCustomerContext();
-  console.log('businessId from route params:', businessId);
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>(
     businesses[0]?.id || ''
   );
@@ -49,7 +45,7 @@ export default function AddTransactionScreen({ route }: any) {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
-  const [partyName, setPartyName] = useState(postdata || ''); // Initialize with postdata from route params 
+  const [partyName, setPartyName] = useState(); 
 
   const businessEntries = useMemo(
     () => getBusinessEntries(selectedBusinessId),
@@ -70,14 +66,6 @@ export default function AddTransactionScreen({ route }: any) {
     () => customers.find((c) => c.id === selectedCustomerId),
     [selectedCustomerId, customers]
   );
-
- 
-
-  useEffect(() => {
-    if (postdata) {
-      setPartyName(postdata);
-    }
-  }, [postdata]);
 
   const handleAddEntry = () => {
     setAmount('');
@@ -112,56 +100,6 @@ export default function AddTransactionScreen({ route }: any) {
     setAmount('');
     setDescription('');
   };
-
-
-  const menu = () => (
-     <Menu
-            visible={businessDropdownVisible}
-            onDismiss={() => setBusinessDropdownVisible(false)}
-            anchor={
-              <TouchableOpacity
-                style={[
-                  styles.dropdownButton,
-                  { backgroundColor: theme.colors.surface },
-                ]}
-                onPress={() => setBusinessDropdownVisible(true)}>
-                <Text
-                  variant="bodyMedium"
-                  style={{
-                    color: selectedBusinessId
-                      ? theme.colors.onSurface
-                      : theme.colors.onSurfaceVariant,
-                    flex: 1,
-                  }}>
-                  {selectedBusiness?.name}   ▼
-                </Text>
-                {/* <Text
-                  style={{
-                    color: theme.colors.onSurfaceVariant,
-                    fontSize: 18,
-                  }}>
-                  ▼
-                </Text> */}
-              </TouchableOpacity>
-            }>
-            {businesses.map((business) => (
-              <Menu.Item
-                key={business.id}
-                onPress={() => {
-                  setSelectedBusinessId(business.id);
-                  setBusinessDropdownVisible(false);
-                }}
-                title={business.name}
-                style={{
-                  backgroundColor:
-                    selectedBusinessId === business.id
-                      ? `${theme.colors.primary}20`
-                      : 'transparent',
-                }}
-              />
-            ))}
-          </Menu>
-  );
   
 
   return (
@@ -169,7 +107,7 @@ export default function AddTransactionScreen({ route }: any) {
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
            {/* Add/Edit Business or Passbook Form */}
-        <Appbar.Content title= "Add/Edit  Form"/> 
+        <Appbar.Content title= {` ${formAction} ${formType}`} /> 
         <Appbar.Action icon="dots-vertical" onPress={() => {}} />
     </Appbar.Header>
       <ScrollView style={styles.scrollView}>
@@ -178,7 +116,7 @@ export default function AddTransactionScreen({ route }: any) {
              
             <TextInput
               label={t('businesses')}
-              value={description}
+              value={''}
               onChangeText={setDescription}
               mode="outlined"
               placeholder={t('enterBusinessName')}
@@ -197,7 +135,7 @@ export default function AddTransactionScreen({ route }: any) {
               numberOfLines={5}
             />
             <Button style={{marginTop: 16}} mode="contained" onPress={handleSave}>
-              {t('add')} / {t('update')}
+              {formAction === "update" ? t('update') : t('save')}
             </Button>
              <Button style={{marginTop: 16}} mode='outlined' onPress={() => setDialogVisible(false)}>{t('cancel')}</Button>
             

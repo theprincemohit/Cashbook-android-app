@@ -22,6 +22,43 @@ export default function CustomerScreen() {
   const { t } = useLanguageContext();
   const { customers } = useCustomerContext();
 
+  const SummaryCard = () => (
+          <MaterialCard title={t('transactionHistory')} subtitle="Financial Summary">
+            <View style={styles.statsRow}>
+              <View style={styles.statItem}>
+                <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                  {t('totalCredit')}
+                </Text>
+                <Text variant="titleMedium" style={{ color: '#4CAF50', fontWeight: 'bold' }}>
+                  ₹ 10.00
+                </Text>
+              </View>
+              <View style={styles.divider} />
+              <View style={styles.statItem}>
+                <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                  {t('totalDebit')}
+                </Text>
+                <Text variant="titleMedium" style={{ color: '#FF6B6B', fontWeight: 'bold' }}>
+                  ₹ 10.00
+                </Text>
+              </View>
+              <View style={styles.divider} />
+              <View style={styles.statItem}>
+                <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                  {t('balance')}
+                </Text>
+                <Text
+                  variant="titleMedium"
+                  style={{
+                    color: 10 >= 0 ? '#4CAF50' : '#FF6B6B',
+                    fontWeight: 'bold',
+                  }}>
+                  ₹ 10.00
+                </Text>
+              </View>
+            </View>
+          </MaterialCard>
+  )
   const renderCustomerItem = ({ item }: { item: Customer }) => (
     <Card mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal:0, marginBottom: 0, borderRadius:0 }]}>
       <Card.Content>
@@ -58,8 +95,9 @@ export default function CustomerScreen() {
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content title="Customer" />
       </Appbar.Header>
+     
       <ScrollView style={styles.scrollView}>
-       
+        <SummaryCard />
         {customers.length === 0 ? (
           <MaterialCard title="No Customers" subtitle="Get started by adding one">
             <Text variant="bodyMedium" style={{ textAlign: 'center', paddingVertical: 16 }}>
@@ -107,5 +145,24 @@ const styles = StyleSheet.create({
   },
   customerInfo: {
     
+  },
+   statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 8,
+  },
+  divider: {
+    width: 1,
+    height: 50,
+    backgroundColor: '#e0e0e0',
+  },
+  spacing: {
+    height: 24,
   },
 });

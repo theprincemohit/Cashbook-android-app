@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 export interface PassbookEntry {
   id: string;
   businessId: string;
-  businessName: string;
+  name: string;
   type: 'debit' | 'credit';
   amount: number;
   description: string;
@@ -18,7 +18,7 @@ export function usePassbookContext() {
     {
       id: '1',
       businessId: '1',
-      businessName: 'Tech Solutions Inc.',
+      name: 'Tech Solutions Inc.',
       type: 'credit',
       amount: 5000,
       description: 'Initial deposit',
@@ -30,7 +30,7 @@ export function usePassbookContext() {
     {
       id: '2',
       businessId: '1',
-      businessName: 'Tech Solutions Inc.',
+      name: 'Tech Solutions Inc.',
       type: 'debit',
       amount: 1500,
       description: 'Office supplies',
@@ -42,7 +42,7 @@ export function usePassbookContext() {
     {
       id: '3',
       businessId: '2',
-      businessName: 'Creative Services LLC',
+      name: 'Creative Services LLC',
       type: 'credit',
       amount: 3000,
       description: 'Project payment',
@@ -56,7 +56,7 @@ export function usePassbookContext() {
   const addEntry = useCallback(
     (
       businessId: string,
-      businessName: string,
+      name: string,
       type: 'debit' | 'credit',
       amount: number,
       description: string,
@@ -72,7 +72,7 @@ export function usePassbookContext() {
       const newEntry: PassbookEntry = {
         id: Date.now().toString(),
         businessId,
-        businessName,
+        name,
         type,
         amount,
         description,
