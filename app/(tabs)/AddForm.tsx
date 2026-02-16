@@ -1,47 +1,37 @@
 import { MaterialCard } from '@/components/MaterialCard';
+import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
-import { useTeamContext } from '@/context/TeamContext';
-import { useBusinessContext } from '@/hooks/useBusinessContext';
-import { useCustomerContext } from '@/hooks/useCustomerContext';
 import { usePassbookContext } from '@/hooks/usePassbookContext';
 import { router, useLocalSearchParams } from "expo-router";
 
 import React, { useMemo, useState } from 'react';
 import {
   Alert,
-  ScrollView,
   StyleSheet,
   View
 } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import {
   Appbar,
   Button,
-  Chip,
   TextInput,
   useTheme
 } from 'react-native-paper';
 
-export default function AddTransactionScreen({ route }: any) {
+export default function AddFormScreen({ route }: any) {
   const theme = useTheme();
-  const { t } = useLanguageContext();
-  const { currentUser, canEdit } = useTeamContext();
+  const { t } = useLanguageContext(); 
   const { formId, formName, formAction, formType } = useLocalSearchParams();
 
   const { addEntry, deleteEntry, updateEntry, getBusinessEntries, getBusinessBalance } =
     usePassbookContext();
-  const { businesses } = useBusinessContext();
-  const { customers } = useCustomerContext();
+  const { businesses, addBusiness } = useBusinessContext();
+ 
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>(
     businesses[0]?.id || ''
   );
-  const [businessDropdownVisible, setBusinessDropdownVisible] = useState(false);
-  const [editDialogVisible, setEditDialogVisible] = useState(false);
-  const [customerDropdownVisible, setCustomerDropdownVisible] = useState(false);
-  const [transactionType, setTransactionType] = useState<'credit' | 'debit'>('credit');
-  const [amount, setAmount] = useState('');
-  const [description, setDescription] = useState('');
-  const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<{name?: string, description?: string} | null>(null); 
+ 
+  const [formData, setFormData] = useState<{id?: number, name?: string, description?: string, formType?: string} | null>(null); 
 
   const businessEntries = useMemo(
     () => getBusinessEntries(selectedBusinessId),
@@ -53,47 +43,28 @@ export default function AddTransactionScreen({ route }: any) {
     [selectedBusinessId, businesses]
   );
 
-  const handleAddEntry = () => {
-    setDescription('');
-    setTransactionType('credit');
-  };
+
 
   const handleSave = () => {
     if (!formData?.name?.trim() || !formData?.description?.trim()) {
-      Alert.alert(t('error'), t('pleaseEnterAllFields'));
+      Alert.alert(t('pleaseEnterAllFields'));
       return;
     }
-
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount <= 0) {
-      Alert.alert(t('error'), 'Please enter a valid amount');
-      return;
-    }
-
-    addEntry(
-      selectedBusinessId,
-      selectedBusiness?.name || 'Unknown Business',
-      transactionType,
-      numAmount,
-      description.trim(),
-      currentUser?.id || 'admin_001'
-    );
-    setAmount('');
-    setDescription('');
-  };
-  
+    console.log('Saving Business:', formData);
+    addBusiness(formData?.name, formData?.description);
+    setFormData(null);
+   router.push('/business');  };
 
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
            {/* Add/Edit Business or Passbook Form */}
-        <Appbar.Content title= {` ${formAction} ${formType}`} /> 
+        <Appbar.Content title= {` ${formAction} ${formType} ${businesses.length}`} /> 
         <Appbar.Action icon="dots-vertical" onPress={() => {}} />
     </Appbar.Header>
       <ScrollView style={styles.scrollView}>
         <MaterialCard style={{paddingTop  : 25}}>
-            <Chip  style={{marginBottom: 16, backgroundColor: '#dff0d8', borderColor: '#d6e9c6'}} icon="check" onPress={() => console.log('Pressed')}>Example Chip</Chip>
              
             <TextInput
               label={t('businesses')}
@@ -118,8 +89,7 @@ export default function AddTransactionScreen({ route }: any) {
             <Button style={{marginTop: 16}} mode="contained" onPress={handleSave}>
               {formAction === "update" ? t('update') : t('save')}
             </Button>
-             <Button style={{marginTop: 16}} mode='outlined'>{t('cancel')}</Button>
-            
+            <Button style={{marginTop: 16}} mode='outlined'>{t('cancel')}</Button>
         </MaterialCard>
       </ScrollView>
 

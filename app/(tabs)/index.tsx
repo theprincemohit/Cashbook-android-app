@@ -3,8 +3,8 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { Card, Icon, Text, useTheme } from 'react-native-paper';
 
 import { MaterialCard } from '@/components/MaterialCard';
+import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
-import { useBusinessContext } from '@/hooks/useBusinessContext';
 import { useCustomerContext } from '@/hooks/useCustomerContext';
 import { usePassbookContext } from '@/hooks/usePassbookContext';
 

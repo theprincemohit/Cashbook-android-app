@@ -8,23 +8,22 @@ import {
 import {
   Button,
   Card,
-  Icon,
+  IconButton,
   Text,
-  useTheme,
+  useTheme
 } from 'react-native-paper';
 
 import { MaterialCard } from '@/components/MaterialCard';
+import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
-import { Business, useBusinessContext } from '@/hooks/useBusinessContext';
+import { Business } from '@/types/business';
 import { router } from 'expo-router';
 
 export default function BusinessScreen() {
   const theme = useTheme();
   const { t } = useLanguageContext();
-  const { businesses, addBusiness, updateBusiness, deleteBusiness } =
-    useBusinessContext();
-
-
+  const { businesses } = useBusinessContext();
+  
   const renderBusinessItem = ({ item }: { item: Business }) => (
     <Card  mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal:0, marginBottom: 0, borderRadius:0 }]}>
           <Card.Content>
@@ -45,26 +44,21 @@ export default function BusinessScreen() {
                   
                 </Text>
                  <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
-                  {item.createdAt.toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric"})}  |  
-                    {item.createdAt.toLocaleTimeString("en-Us",{ hour: "2-digit", minute: "2-digit" })}
-                  
-                </Text>
+                  {item.createdAt.toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric"})}  | {item.createdAt.toLocaleTimeString("en-Us",{ hour: "2-digit", minute: "2-digit" })}
+                 </Text>
               </View>
-               <View style={styles.customerInfo}>
+              <View style={styles.customerInfo}>
                 <Text variant="titleMedium" style={{ fontWeight: 'bold', textAlign: 'right' }}>
                   $10.00
-                  
-                </Text>
-                 <Text variant="titleMedium" style={{ fontWeight: 100, padding:0, backgroundColor: theme.colors.error, textAlign: 'center', fontSize: 8, color: "#fff" }}>
-                  Credit
-                  
                 </Text>
               </View>
               <View style={{}}>
-                <Icon
-                  source="dots-vertical"
+                <IconButton
+                  icon="dots-vertical"
                   size={20}
+                  onPress={() => {}}
                 />
+               
               </View>
             </View>
           </Card.Content>
@@ -76,7 +70,7 @@ export default function BusinessScreen() {
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
           <Text variant="headlineLarge" style={styles.title}>
-            {t('businessManagement')}
+            {t('businessManagement')}  {businesses.length}
           </Text>
            <Button icon="plus" mode="outlined" onPress={() =>  router.push({
                                     pathname: '/AddForm',

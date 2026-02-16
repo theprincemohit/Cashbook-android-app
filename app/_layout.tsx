@@ -4,6 +4,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
 import 'react-native-reanimated';
 
+import { BusinessProvider } from '@/context/BusinessContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { TeamProvider } from '@/context/TeamContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -42,6 +43,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <LanguageProvider>
+        <BusinessProvider>
         <TeamProvider>
           <PaperProvider theme={theme}>
             <Stack>
@@ -52,6 +54,7 @@ export default function RootLayout() {
             <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
           </PaperProvider>
         </TeamProvider>
+        </BusinessProvider>
       </LanguageProvider>
     </GestureHandlerRootView>
   );
