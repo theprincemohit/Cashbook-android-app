@@ -58,6 +58,7 @@ export default function AddFormScreen({ route }: any) {
 
       const result = await handleFunction(param);
       console.log("Result of handleFunction:", result);
+      router.back();
     };
    
  

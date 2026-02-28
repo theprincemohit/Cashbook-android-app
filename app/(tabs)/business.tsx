@@ -8,14 +8,16 @@ import {
 import {
   Button,
   Card,
+  Dialog,
   Divider,
   IconButton,
   Menu,
+  Portal,
   Text,
   useTheme
 } from 'react-native-paper';
 
-import { getBusinesses } from '@/api/businessApi';
+import { deleteBusinessById, getBusinesses } from '@/api/businessApi';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
@@ -23,12 +25,13 @@ import { Business } from '@/types/business';
 import { router } from 'expo-router';
 export default function BusinessScreen() {
    const [visible, setVisible] = useState('0');
-
+    const [showModal, setShowModal] = useState(false);
   const openMenu = (id:any) => setVisible(id);
   const closeMenu = (id:any) => setVisible(id);
   const theme = useTheme();
   const { t } = useLanguageContext();
-  const { businesses, setBusinesses } = useBusinessContext();
+  const { businesses, setBusinesses, deleteBusiness } = useBusinessContext();
+  const [selectedBusinessId, setSelectedBusinessId] = useState<string>('');
 
   const fetchBusinesses = async () => {
     try {
@@ -95,17 +98,21 @@ export default function BusinessScreen() {
         <Menu.Item onPress={() => {
           closeMenu('0')
           router.push({
-                                    pathname: '/AddForm',
-                                    params: { formId: item.id, 
-                                    formName: item.name,
-                                    formDescription: item.description,
-                                    formAction: "update",
-                                    formType: "Business"
-                                     },
-                                  })
-        } } title="Edit" />
+                        pathname: '/AddForm',
+                        params: { formId: item.id, 
+                        formName: item.name,
+                        formDescription: item.description,
+                        formAction: "update",
+                        formType: "Business"
+                          },
+                      })
+        }} title="Edit" />
         <Divider />
-        <Menu.Item onPress={() => { }} title="Delete" />
+        <Menu.Item onPress={() => {
+          setSelectedBusinessId(item.id);
+          setShowModal(true);
+           closeMenu('0');
+        }} title="Delete" />
         
       </Menu>
                 </View>
@@ -158,7 +165,22 @@ export default function BusinessScreen() {
             />
             
           </View>
-          
+          <Portal>
+          <Dialog visible={showModal} onDismiss={() => setShowModal(false)}>
+            {/* <Dialog.Title>Login Error</Dialog.Title> */}
+            <Dialog.Content>
+              <Text variant="bodyMedium">Are you sure you want to delete this business?</Text>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={() => {
+               // setShowError(false);
+                deleteBusinessById(selectedBusinessId);
+                setShowModal(false);
+                fetchBusinesses();
+              }}>OK</Button>
+            </Dialog.Actions>
+          </Dialog>
+      </Portal>
           </>
         )}
       </ScrollView>
