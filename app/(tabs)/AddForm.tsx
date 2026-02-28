@@ -1,10 +1,11 @@
+import { createBusiness, updateBusinessById } from '@/api/businessApi';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
 import { usePassbookContext } from '@/hooks/usePassbookContext';
 import { router, useLocalSearchParams } from "expo-router";
 
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Alert,
   StyleSheet,
@@ -21,11 +22,11 @@ import {
 export default function AddFormScreen({ route }: any) {
   const theme = useTheme();
   const { t } = useLanguageContext(); 
-  const { formId, formName, formAction, formType } = useLocalSearchParams();
+  const { formId, formName, formDescription, formAction, formType } = useLocalSearchParams();
 
   const { addEntry, deleteEntry, updateEntry, getBusinessEntries, getBusinessBalance } =
     usePassbookContext();
-  const { businesses, addBusiness } = useBusinessContext();
+  const { businesses, addBusiness, updateBusiness } = useBusinessContext();
  
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>(
     businesses[0]?.id || ''
@@ -33,17 +34,33 @@ export default function AddFormScreen({ route }: any) {
  
   const [formData, setFormData] = useState<{id?: number, name?: string, description?: string, formType?: string} | null>(null); 
 
-  const businessEntries = useMemo(
-    () => getBusinessEntries(selectedBusinessId),
-    [selectedBusinessId, getBusinessEntries]
-  );
+  const handleFunction = (param: any) => {
+      switch(formType) {
+        case "Business":
+          console.log("Business Form Action:", {formType}, {formAction}, "with data:", param);
+          return formAction === "update" ? updateBusinessById(formId, param) : createBusiness(param);
+        case "Passbook":
+          return formAction === "update" ? updateEntry : addEntry;
+        default:
+          return () => {};
+      }
+  };
+    const SubmitData = async() => {
+      const param = {
+        ...formData,
+        "user_id": 1,
+        "industry": "string",
+        "founded_year": 1800,
+        "revenue": 0,
+        "employees": 1,
+        "location": "string"
+      }
 
-  const selectedBusiness = useMemo(
-    () => businesses.find((b) => b.id === selectedBusinessId),
-    [selectedBusinessId, businesses]
-  );
-
-
+      const result = await handleFunction(param);
+      console.log("Result of handleFunction:", result);
+    };
+   
+ 
 
   const handleSave = () => {
     if (!formData?.name?.trim() || !formData?.description?.trim()) {
@@ -51,16 +68,17 @@ export default function AddFormScreen({ route }: any) {
       return;
     }
     console.log('Saving Business:', formData);
-    addBusiness(formData?.name, formData?.description);
+    SubmitData();
     setFormData(null);
-   router.push('/business');  };
+    
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
            {/* Add/Edit Business or Passbook Form */}
-        <Appbar.Content title= {` ${formAction} ${formType} ${businesses.length}`} /> 
+        <Appbar.Content title= {` ${formAction} ${formType} ${formId}`} /> 
         <Appbar.Action icon="dots-vertical" onPress={() => {}} />
     </Appbar.Header>
       <ScrollView style={styles.scrollView}>
@@ -68,7 +86,7 @@ export default function AddFormScreen({ route }: any) {
              
             <TextInput
               label={t('businesses')}
-              value={formData?.name || ''}
+              value={formData?.name || String(formName) ||  ''}
               onChangeText={(text) => setFormData({...formData, name: text})}
               mode="outlined"
               placeholder={t('enterBusinessName')}
@@ -78,7 +96,7 @@ export default function AddFormScreen({ route }: any) {
              
             <TextInput
               label={t('description')}
-              value={formData?.description || ''}
+              value={formData?.description || String(formDescription) ||  ''}
               onChangeText={(text) => setFormData({...formData, description: text})}
               mode="outlined"
               placeholder={t('enterTransactionDescription')}

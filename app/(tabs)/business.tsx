@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FlatList,
   ScrollView,
@@ -8,21 +8,40 @@ import {
 import {
   Button,
   Card,
+  Divider,
   IconButton,
+  Menu,
   Text,
   useTheme
 } from 'react-native-paper';
 
+import { getBusinesses } from '@/api/businessApi';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
 import { Business } from '@/types/business';
 import { router } from 'expo-router';
-
 export default function BusinessScreen() {
+   const [visible, setVisible] = useState('0');
+
+  const openMenu = (id:any) => setVisible(id);
+  const closeMenu = (id:any) => setVisible(id);
   const theme = useTheme();
   const { t } = useLanguageContext();
-  const { businesses } = useBusinessContext();
+  const { businesses, setBusinesses } = useBusinessContext();
+
+  const fetchBusinesses = async () => {
+    try {
+      const response = await getBusinesses();
+      setBusinesses(response.data);
+    } catch (error) {
+      console.error('Error fetching businesses:', error);
+    }
+  };
+  useEffect(() => {
+    fetchBusinesses();
+  }, []);
+
   
   const renderBusinessItem = ({ item }: { item: Business }) => (
     <Card  mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal:0, marginBottom: 0, borderRadius:0 }]}>
@@ -41,25 +60,56 @@ export default function BusinessScreen() {
                                      },
                                   })} variant="titleMedium" style={{ fontWeight: 'bold' }}>
                   {item.name}
-                  
                 </Text>
+                <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
+                  {item.description}
+                 </Text>
                  <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
-                  {item.createdAt.toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric"})}  | {item.createdAt.toLocaleTimeString("en-Us",{ hour: "2-digit", minute: "2-digit" })}
+                  {new Date(item.created_at).toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric"})}  | {new Date(item.created_at).toLocaleTimeString("en-Us",{ hour: "2-digit", minute: "2-digit" })}
                  </Text>
               </View>
-              <View style={styles.customerInfo}>
-                <Text variant="titleMedium" style={{ fontWeight: 'bold', textAlign: 'right' }}>
-                  $10.00
-                </Text>
-              </View>
-              <View style={{}}>
-                <IconButton
+                {/* <View style={styles.customerInfo}>
+                  <Text variant="titleMedium" style={{ fontWeight: 'bold', textAlign: 'right' }}>
+                    $10.00
+                  </Text>
+                </View> */}
+              
+                
+                <View style={{
+              paddingTop: 0,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              height: 10,
+              zIndex: 999,
+              backgroundColor: theme.colors.surface,
+            }}>
+      <Menu
+        visible={item.id === visible}
+        onDismiss={() => closeMenu('0')}
+        anchor={<IconButton
                   icon="dots-vertical"
                   size={20}
-                  onPress={() => {}}
-                />
-               
-              </View>
+                  onPress={() => openMenu(item.id)}
+                />}
+      >
+        <Menu.Item onPress={() => {
+          closeMenu('0')
+          router.push({
+                                    pathname: '/AddForm',
+                                    params: { formId: item.id, 
+                                    formName: item.name,
+                                    formDescription: item.description,
+                                    formAction: "update",
+                                    formType: "Business"
+                                     },
+                                  })
+        } } title="Edit" />
+        <Divider />
+        <Menu.Item onPress={() => { }} title="Delete" />
+        
+      </Menu>
+                </View>
+              
             </View>
           </Card.Content>
         </Card>
@@ -75,8 +125,9 @@ export default function BusinessScreen() {
            <Button icon="plus" mode="outlined" onPress={() =>  router.push({
                                     pathname: '/AddForm',
                                     params: { formId: 0, 
-                                    formName: 'Business',
-                                    formAction: "Add",
+                                    formName: '',
+                                    formDescription: '',
+                                    formAction: "new",
                                     formType: "Business"
                                      },
                                   })}>
@@ -86,12 +137,16 @@ export default function BusinessScreen() {
         </View>
 
         {businesses.length === 0 ? (
+          <>
           <MaterialCard title={t('noBusiness')} subtitle={t('getStartedBusiness')}>
             <Text variant="bodyMedium" style={{ textAlign: 'center', paddingVertical: 16 }}>
               {t('notCreatedBusiness')}
             </Text>
           </MaterialCard>
+        
+      </>
         ) : (
+          <>
           <View style={styles.listContainer}>
             <FlatList
               data={businesses}
@@ -101,7 +156,10 @@ export default function BusinessScreen() {
               ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
               contentContainerStyle={{ paddingHorizontal: 5 }}
             />
+            
           </View>
+          
+          </>
         )}
       </ScrollView>
     </View>

@@ -9,6 +9,7 @@ interface BusinessContextType {
   addBusiness: (name: string, description: string) => void;
   updateBusiness: (id: string, name: string, description: string) => void;
   deleteBusiness: (id: string) => void;
+  setBusinesses: React.Dispatch<React.SetStateAction<Business[]>>;
 }
 
 const BusinessContext = createContext<BusinessContextType | undefined>(undefined);
@@ -87,6 +88,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     addBusiness,
     updateBusiness,
     deleteBusiness,
+    setBusinesses,
       }}>
       {children}
     </BusinessContext.Provider>

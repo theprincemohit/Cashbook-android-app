@@ -3,24 +3,26 @@ import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Dialog, Portal, Text, useTheme } from 'react-native-paper';
 
+import { saveToken } from '@/api/keychain';
+import { login } from '@/api/userApi';
 import { MaterialButton } from '@/components/MaterialButton';
 import { MaterialCard } from '@/components/MaterialCard';
 import { MaterialInput } from '@/components/MaterialInput';
 
 // Dummy credentials for demo
-const DUMMY_EMAIL = 'admin@example.com';
-const DUMMY_PASSWORD = 'password123';
+const DUMMY_EMAIL = 'mohitkumar111';
+const DUMMY_PASSWORD = '123456';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('admin@example.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState(DUMMY_EMAIL);
+  const [password, setPassword] = useState(DUMMY_PASSWORD);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const theme = useTheme();
   const router = useRouter();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Validate inputs
     if (!email.trim() || !password.trim()) {
       setErrorMessage('Please enter both email and password');
@@ -29,21 +31,28 @@ export default function LoginScreen() {
     }
 
     // Simulate login process
-    setIsLoading(true);
-    setTimeout(() => {
-      // Check credentials
-      if (email === DUMMY_EMAIL && password === DUMMY_PASSWORD) {
+    //setIsLoading(true);
+    
+    try {
+      const response = await login({ username: email, password });
+      console.log('Login response:', response.data);
+      if (response.status === 200) {
         setIsLoading(false);
         setErrorMessage('');
         setShowError(false);
+        await saveToken('userToken', response.data.access_token);
+        
         // Navigate to home screen
-        router.replace('/(tabs)');
+       router.replace('/(tabs)');
       } else {
         setIsLoading(false);
         setErrorMessage('Invalid email or password. Try admin@example.com / password123');
         setShowError(true);
       }
-    }, 500);
+    } catch (error) {
+      //setMessage("Network error: " + error.message);
+      console.error('Login error:', error);
+    }
   };
 
   return (
@@ -83,7 +92,7 @@ export default function LoginScreen() {
           label={isLoading ? 'Signing In...' : 'Sign In'}
           onPress={handleLogin}
           mode="contained"
-          disabled={isLoading}
+          // disabled={isLoading}
         />
       </MaterialCard>
 
