@@ -1,8 +1,8 @@
 import { createBusiness, updateBusinessById } from '@/api/businessApi';
+import { createPassbook, updatePassbookById } from '@/api/passbookApi';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
-import { usePassbookContext } from '@/hooks/usePassbookContext';
 import { router, useLocalSearchParams } from "expo-router";
 
 import React, { useState } from 'react';
@@ -15,22 +15,13 @@ import { ScrollView } from 'react-native-gesture-handler';
 import {
   Appbar,
   Button,
-  TextInput,
-  useTheme
+  TextInput
 } from 'react-native-paper';
 
 export default function AddFormScreen({ route }: any) {
-  const theme = useTheme();
   const { t } = useLanguageContext(); 
   const { formId, formName, formDescription, formAction, formType } = useLocalSearchParams();
-
-  const { addEntry, deleteEntry, updateEntry, getBusinessEntries, getBusinessBalance } =
-    usePassbookContext();
-  const { businesses, addBusiness, updateBusiness } = useBusinessContext();
- 
-  const [selectedBusinessId, setSelectedBusinessId] = useState<string>(
-    businesses[0]?.id || ''
-  );
+  const { activeBusinessId } = useBusinessContext();
  
   const [formData, setFormData] = useState<{id?: number, name?: string, description?: string, formType?: string} | null>(null); 
 
@@ -40,25 +31,33 @@ export default function AddFormScreen({ route }: any) {
           console.log("Business Form Action:", {formType}, {formAction}, "with data:", param);
           return formAction === "update" ? updateBusinessById(formId, param) : createBusiness(param);
         case "Passbook":
-          return formAction === "update" ? updateEntry : addEntry;
+          return formAction === "update" ? updatePassbookById(activeBusinessId, formId, param) : createPassbook(param);
         default:
           return () => {};
       }
   };
     const SubmitData = async() => {
-      const param = {
+      let param;
+      if(formType === "Business") {
+       param = {
         ...formData,
-        "user_id": 1,
-        "industry": "string",
-        "founded_year": 1800,
-        "revenue": 0,
-        "employees": 1,
-        "location": "string"
+        "user_id": 1,  //Question: Should this be dynamic based on logged in user?
+        "industry": "string", // Optional: Could be added to form in future iterations
+        "founded_year": 1800, // Optional: Could be added to form in future iterations
+        "revenue": 0, // Optional: Could be added to form in future iterations
+        "employees": 1, // Optional: Could be added to form in future iterations
+        "location": "string" // Optional: Could be added to form in future iterations
       }
+    } else if(formType === "Passbook") {
+      param = {
+        ...formData,
+        "business_id": activeBusinessId,
+      }
+    }
 
       const result = await handleFunction(param);
       console.log("Result of handleFunction:", result);
-      router.back();
+      router.push(`/${formType === "Business" ? "business" : "passbook"}`);
     };
    
  

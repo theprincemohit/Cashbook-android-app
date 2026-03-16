@@ -81,6 +81,7 @@ export const englishTranslations = {
   // Passbook Screen
   passbookManagement: 'Passbook',
   transactionHistory: 'Transaction History',
+  noPassbook: 'No Passbook',
   noTransactions: 'No Transactions',
   getStartedTransaction: 'Get started by adding one',
   balance: 'Balance',

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getToken } from './keychain';
 
 const fetchy = axios.create({
-  baseURL: 'http://56.228.2.254:8000/'
+  baseURL: 'http://13.62.48.64:8000/'
 });
 
 

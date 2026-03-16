@@ -10,11 +10,14 @@ interface BusinessContextType {
   updateBusiness: (id: string, name: string, description: string) => void;
   deleteBusiness: (id: string) => void;
   setBusinesses: React.Dispatch<React.SetStateAction<Business[]>>;
+  activeBusinessId: Number | null;
+  setActiveBusinessId: React.Dispatch<React.SetStateAction<Number | null>>;
 }
 
 const BusinessContext = createContext<BusinessContextType | undefined>(undefined);
 
 export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [activeBusinessId, setActiveBusinessId] = useState<Number | null>(null);
     const [businesses, setBusinesses] = useState<Business[]>([
       {
         id: '1',
@@ -80,6 +83,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
    const deleteBusiness = useCallback((id: string) => {
      setBusinesses((prev) => prev.filter((business) => business.id !== id));
    }, []);
+   
 
   return (
     <BusinessContext.Provider
@@ -89,6 +93,8 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     updateBusiness,
     deleteBusiness,
     setBusinesses,
+    setActiveBusinessId,
+    activeBusinessId
       }}>
       {children}
     </BusinessContext.Provider>

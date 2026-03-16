@@ -14,44 +14,7 @@ export interface PassbookEntry {
 }
 
 export function usePassbookContext() {
-  const [entries, setEntries] = useState<PassbookEntry[]>([
-    {
-      id: '1',
-      businessId: '1',
-      name: 'Tech Solutions Inc.',
-      type: 'credit',
-      amount: 5000,
-      description: 'Initial deposit',
-      date: new Date('2026-01-15'),
-      balance: 5000,
-      createdAt: new Date('2026-01-15'),
-      createdBy: 'admin_001',
-    },
-    {
-      id: '2',
-      businessId: '1',
-      name: 'Tech Solutions Inc.',
-      type: 'debit',
-      amount: 1500,
-      description: 'Office supplies',
-      date: new Date('2026-01-16'),
-      balance: 3500,
-      createdAt: new Date('2026-01-16'),
-      createdBy: 'admin_001',
-    },
-    {
-      id: '3',
-      businessId: '2',
-      name: 'Creative Services LLC',
-      type: 'credit',
-      amount: 3000,
-      description: 'Project payment',
-      date: new Date('2026-01-10'),
-      balance: 3000,
-      createdAt: new Date('2026-01-10'),
-      createdBy: 'admin_001',
-    },
-  ]);
+  const [entries, setEntries] = useState<PassbookEntry[]>([]);
 
   const addEntry = useCallback(
     (
@@ -137,6 +100,7 @@ export function usePassbookContext() {
 
   return {
     entries,
+    setEntries,
     addEntry,
     deleteEntry,
     updateEntry,
