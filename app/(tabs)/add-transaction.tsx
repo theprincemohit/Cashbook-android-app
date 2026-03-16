@@ -1,95 +1,86 @@
+import { createTransaction, updateTransactionById } from '@/api/transactionApi';
 import { MaterialCard } from '@/components/MaterialCard';
-import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
-import { useTeamContext } from '@/context/TeamContext';
-import { useCustomerContext } from '@/hooks/useCustomerContext';
-import { usePassbookContext } from '@/hooks/usePassbookContext';
 import { router, useLocalSearchParams } from "expo-router";
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Alert,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
   View
 } from 'react-native';
 import {
   Appbar,
   Button,
   Chip,
-  Menu,
   SegmentedButtons,
   Text,
-  TextInput,
-  useTheme
+  TextInput
 } from 'react-native-paper';
 
 export default function AddTransactionScreen({ route }: any) {
-  const theme = useTheme();
   const { t } = useLanguageContext();
-  const { currentUser, canEdit } = useTeamContext();
-  const { postdata, businessId } = useLocalSearchParams();
+  const { formId, formAction, customerName, formDescription, formAmount, formType } = useLocalSearchParams();
+ 
 
-  const { addEntry, deleteEntry, updateEntry, getBusinessEntries, getBusinessBalance } =
-    usePassbookContext();
-  const { businesses } = useBusinessContext();
-  const { customers } = useCustomerContext();
-  console.log('businessId from route params:', businessId);
-  const [selectedBusinessId, setSelectedBusinessId] = useState<string>(
-    businesses[0]?.id || ''
-  );
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string>(
-    customers[0]?.id || ''
-  );
-  const [businessDropdownVisible, setBusinessDropdownVisible] = useState(false);
-  const [dialogVisible, setDialogVisible] = useState(false);
-  const [editDialogVisible, setEditDialogVisible] = useState(false);
-  const [customerDropdownVisible, setCustomerDropdownVisible] = useState(false);
+  // const [businessDropdownVisible, setBusinessDropdownVisible] = useState(false);
   const [transactionType, setTransactionType] = useState<'credit' | 'debit'>('credit');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
-  const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
-  const [partyName, setPartyName] = useState(postdata || ''); // Initialize with postdata from route params 
 
-  const businessEntries = useMemo(
-    () => getBusinessEntries(selectedBusinessId),
-    [selectedBusinessId, getBusinessEntries]
-  );
 
-  const currentBalance = useMemo(
-    () => getBusinessBalance(selectedBusinessId),
-    [selectedBusinessId, getBusinessBalance]
-  );
-
-  const selectedBusiness = useMemo(
-    () => businesses.find((b) => b.id === selectedBusinessId),
-    [selectedBusinessId, businesses]
-  );
-
-  const selectedCustomer = useMemo(
-    () => customers.find((c) => c.id === selectedCustomerId),
-    [selectedCustomerId, customers]
-  );
-
- 
-
-  useEffect(() => {
-    if (postdata) {
-      setPartyName(postdata);
+  const handleSubmit = async () => {
+    let params;
+    if(formAction === "update") {
+      params = {
+      passbook_id: 1, // Placeholder: Replace with actual passbook ID associated with selected business
+      txn_type: transactionType,
+      amount: parseFloat(amount),
+      txn_date: new Date().toISOString(),
+      description: `${customerName}@@@${description}`,
+      }
+      const result  = await updateTransactionById(formId,params);
+      console.log("Result of updateTransactionById API call:", result);
+      if(result.status === 200) {
+        handleAddEntry();
+        router.push({
+          pathname: '/transaction',
+          params: { },
+        });
+      }
     }
-  }, [postdata]);
+    else {
+      params = {
+      passbook_id: 1, // Placeholder: Replace with actual passbook ID associated with selected business
+      txn_type: transactionType,
+      amount: parseFloat(amount),
+      txn_date: new Date().toISOString(),
+      description: `${customerName}@@@${description}`,
+      }
+      const result  = await createTransaction(params);
+      console.log("Result of createTransaction API call:", result);
+      if(result.status === 200) {
+        handleAddEntry();
+        router.push({
+          pathname: '/transaction',
+          params: { },
+        });
+      }
+    }
+    
+      
+       
+  };
 
   const handleAddEntry = () => {
     setAmount('');
     setDescription('');
     setTransactionType('credit');
-    setSelectedCustomerId(customers[0]?.id || '');
-    setDialogVisible(true);
   };
 
   const handleSave = () => {
-    if (!amount.trim() || !description.trim() || !selectedCustomerId) {
+    if (!amount.trim() || !description.trim()) {
       Alert.alert(t('error'), t('pleaseEnterAllFields'));
       return;
     }
@@ -100,69 +91,58 @@ export default function AddTransactionScreen({ route }: any) {
       return;
     }
 
-    addEntry(
-      selectedBusinessId,
-      selectedBusiness?.name || 'Unknown Business',
-      transactionType,
-      numAmount,
-      description.trim(),
-      currentUser?.id || 'admin_001'
-    );
-
-    setDialogVisible(false);
-    setAmount('');
-    setDescription('');
+    handleSubmit();
   };
 
 
-  const menu = () => (
-     <Menu
-            visible={businessDropdownVisible}
-            onDismiss={() => setBusinessDropdownVisible(false)}
-            anchor={
-              <TouchableOpacity
-                style={[
-                  styles.dropdownButton,
-                  { backgroundColor: theme.colors.surface },
-                ]}
-                onPress={() => setBusinessDropdownVisible(true)}>
-                <Text
-                  variant="bodyMedium"
-                  style={{
-                    color: selectedBusinessId
-                      ? theme.colors.onSurface
-                      : theme.colors.onSurfaceVariant,
-                    flex: 1,
-                  }}>
-                  {selectedBusiness?.name}   ▼
-                </Text>
-                {/* <Text
-                  style={{
-                    color: theme.colors.onSurfaceVariant,
-                    fontSize: 18,
-                  }}>
-                  ▼
-                </Text> */}
-              </TouchableOpacity>
-            }>
-            {businesses.map((business) => (
-              <Menu.Item
-                key={business.id}
-                onPress={() => {
-                  setSelectedBusinessId(business.id);
-                  setBusinessDropdownVisible(false);
-                }}
-                title={business.name}
-                style={{
-                  backgroundColor:
-                    selectedBusinessId === business.id
-                      ? `${theme.colors.primary}20`
-                      : 'transparent',
-                }}
-              />
-            ))}
-          </Menu>
-  );
+  // const menu = () => (
+  //    <Menu
+  //           visible={businessDropdownVisible}
+  //           onDismiss={() => setBusinessDropdownVisible(false)}
+  //           anchor={
+  //             <TouchableOpacity
+  //               style={[
+  //                 styles.dropdownButton,
+  //                 { backgroundColor: theme.colors.surface },
+  //               ]}
+  //               onPress={() => setBusinessDropdownVisible(true)}>
+  //               <Text
+  //                 variant="bodyMedium"
+  //                 style={{
+  //                   color: selectedBusinessId
+  //                     ? theme.colors.onSurface
+  //                     : theme.colors.onSurfaceVariant,
+  //                   flex: 1,
+  //                 }}>
+  //                 {selectedBusiness?.name}   ▼
+  //               </Text>
+  //               {/* <Text
+  //                 style={{
+  //                   color: theme.colors.onSurfaceVariant,
+  //                   fontSize: 18,
+  //                 }}>
+  //                 ▼
+  //               </Text> */}
+  //             </TouchableOpacity>
+  //           }>
+  //           {businesses.map((business) => (
+  //             <Menu.Item
+  //               key={business.id}
+  //               onPress={() => {
+  //                 setSelectedBusinessId(business.id);
+  //                 setBusinessDropdownVisible(false);
+  //               }}
+  //               title={business.name}
+  //               style={{
+  //                 backgroundColor:
+  //                   selectedBusinessId === business.id
+  //                     ? `${theme.colors.primary}20`
+  //                     : 'transparent',
+  //               }}
+  //             />
+  //           ))}
+  //         </Menu>
+  // );
   
 
   return (
@@ -172,7 +152,7 @@ export default function AddTransactionScreen({ route }: any) {
                                           pathname: '/transaction',
                                           params: { },
                                         })} />
-      <Appbar.Content title={menu()} />
+      <Appbar.Content title="Add Transaction" />
       
       <Appbar.Action icon="dots-vertical" onPress={() => {}} />
     </Appbar.Header>
@@ -182,7 +162,11 @@ export default function AddTransactionScreen({ route }: any) {
           borderWidth: 2
         }}>
             <Chip  style={{marginBottom: 16, backgroundColor: '#dff0d8', borderColor: '#d6e9c6'}} icon="check" onPress={() => console.log('Pressed')}>Example Chip</Chip>
-             
+             <View style={styles.customerSelectRow}>
+                <Text>
+                  {`${customerName} ${String(formDescription)}`}
+                </Text>
+              </View>
              <View style={styles.transactionTypeRow}>
                 <SegmentedButtons
                 value={transactionType}
@@ -209,7 +193,7 @@ export default function AddTransactionScreen({ route }: any) {
             </View>
                 <TextInput
               label={t('entryAmount')}
-              value={amount}
+              value={amount || (formAmount ? String(formAmount) : '')}
               onChangeText={setAmount}
               mode="outlined"
               placeholder="0.00"
@@ -219,11 +203,13 @@ export default function AddTransactionScreen({ route }: any) {
 
              <TextInput
               label={t('selectCustomer')}
-              value=''
+              value={customerName ? String(customerName) : ''}
               onChangeText={() => {}}
               onFocus={() => router.push({
                         pathname: "/select-party",
-                        params: { businessId: selectedBusinessId },
+                        params: { formAction: formAction,
+                          formId: formId,
+                         },
                       })}
               mode="outlined"
               style={[styles.input]}
@@ -234,7 +220,7 @@ export default function AddTransactionScreen({ route }: any) {
 
             <TextInput
               label={t('description')}
-              value={description}
+              value={description || String(formDescription) || ''}
               onChangeText={setDescription}
               mode="outlined"
               placeholder={t('enterTransactionDescription')}
@@ -245,7 +231,7 @@ export default function AddTransactionScreen({ route }: any) {
             <Button style={{marginTop: 16}} mode="contained" onPress={handleSave}>
               {t('add')}
             </Button>
-             <Button style={{marginTop: 16}} mode='outlined' onPress={() => setDialogVisible(false)}>{t('cancel')}</Button>
+             <Button style={{marginTop: 16}} mode='outlined' onPress={() => {}}>{t('cancel')}</Button>
             
         </MaterialCard>
       </ScrollView>

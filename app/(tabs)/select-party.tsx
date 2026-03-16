@@ -1,10 +1,7 @@
-import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
-import { useTeamContext } from '@/context/TeamContext';
 import { useCustomerContext } from '@/hooks/useCustomerContext';
-import { usePassbookContext } from '@/hooks/usePassbookContext';
-import { router } from "expo-router";
-import React, { useMemo, useState } from 'react';
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useState } from 'react';
 import {
   Alert,
   PermissionsAndroid,
@@ -21,123 +18,91 @@ import {
   useTheme
 } from 'react-native-paper';
 
- 
+
 
 export default function SelectPartyScreen() {
-   const data = [{
-  "recordID": "6b2237ee0df85980",
-  "givenName": "John",
-  "familyName": "Doe",
-  "phoneNumbers": [
-    { "label": "mobile", "number": "(555) 555-5555" }
-  ],
-  "emailAddresses": [
-    { "label": "work", "email": "john.doe@company.com" }
+  const data = [{
+    "recordID": "6b2237ee0df85980",
+    "givenName": "John",
+    "familyName": "Doe",
+    "phoneNumbers": [
+      { "label": "mobile", "number": "(555) 555-5555" }
+    ],
+    "emailAddresses": [
+      { "label": "work", "email": "john.doe@company.com" }
+    ]
+  },
+  {
+    "recordID": "6b2237ee0df859801",
+    "givenName": "John",
+    "familyName": "Doe",
+    "phoneNumbers": [
+      { "label": "mobile", "number": "(555) 555-5555" }
+    ],
+    "emailAddresses": [
+      { "label": "work", "email": "john.doe@company.com" }
+    ]
+  }
   ]
-},
-{
-  "recordID": "6b2237ee0df859801",
-  "givenName": "John",
-  "familyName": "Doe",
-  "phoneNumbers": [
-    { "label": "mobile", "number": "(555) 555-5555" }
-  ],
-  "emailAddresses": [
-    { "label": "work", "email": "john.doe@company.com" }
-  ]
-}
-]
   const theme = useTheme();
-  const { t } = useLanguageContext();
-  const { currentUser, canEdit } = useTeamContext();
-  const { addEntry, deleteEntry, updateEntry, getBusinessEntries, getBusinessBalance } =
-    usePassbookContext();
-  const { businesses } = useBusinessContext();
-  const { customers } = useCustomerContext();
+  const { formId, formAction } = useLocalSearchParams();
 
-  const [selectedBusinessId, setSelectedBusinessId] = useState<string>(
-    businesses[0]?.id || ''
-  );
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string>(
-    customers[0]?.id || ''
-  );
-  const [businessDropdownVisible, setBusinessDropdownVisible] = useState(false);
-  const [dialogVisible, setDialogVisible] = useState(false);
-  const [editDialogVisible, setEditDialogVisible] = useState(false);
-  const [customerDropdownVisible, setCustomerDropdownVisible] = useState(false);
+  const { t } = useLanguageContext();
+  const { customers } = useCustomerContext();
   const [transactionType, setTransactionType] = useState<'credit' | 'debit'>('credit');
   const [amount, setAmount] = useState('');
   const [partyName, setPartyName] = useState('');
-  const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
   const [contactsList, setContactsList] = useState<any[]>(data);
 
-  const businessEntries = useMemo(
-    () => getBusinessEntries(selectedBusinessId),
-    [selectedBusinessId, getBusinessEntries]
-  );
 
-  const currentBalance = useMemo(
-    () => getBusinessBalance(selectedBusinessId),
-    [selectedBusinessId, getBusinessBalance]
-  );
 
-  const selectedBusiness = useMemo(
-    () => businesses.find((b) => b.id === selectedBusinessId),
-    [selectedBusinessId, businesses]
-  );
 
-  const selectedCustomer = useMemo(
-    () => customers.find((c) => c.id === selectedCustomerId),
-    [selectedCustomerId, customers]
-  );
 
   async function requestContactPermission() {
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-      {
-        title: 'Contacts Permission',
-        message: 'This app needs access to your contacts',
-        buttonPositive: 'OK',
-      }
-    );
-    return granted === PermissionsAndroid.RESULTS.GRANTED;
-  } catch (err) {
-    console.warn(err);
-    return false;
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+        {
+          title: 'Contacts Permission',
+          message: 'This app needs access to your contacts',
+          buttonPositive: 'OK',
+        }
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
   }
-}
 
   async function getContacts() {
-  const hasPermission = await requestContactPermission();
-  if (!hasPermission) {
-    console.log("Permission denied");
-    return;
-  }
+    const hasPermission = await requestContactPermission();
+    if (!hasPermission) {
+      console.log("Permission denied");
+      return;
+    }
 
-  Contacts.getAll()
-    .then(contacts => {
-    
-      console.log("Contacts:", contacts);
-      // setContactsList(contacts);
-      // Example: contacts[0].phoneNumbers[0].number
-    })
-    .catch(err => {
-      console.log("Error fetching contacts:", err);
-    });
-}
+    Contacts.getAll()
+      .then(contacts => {
+
+        console.log("Contacts:", contacts);
+        // setContactsList(contacts);
+        // Example: contacts[0].phoneNumbers[0].number
+      })
+      .catch(err => {
+        console.log("Error fetching contacts:", err);
+      });
+  }
 
 
 
   const handleAddEntry = () => {
     setAmount('');
     setTransactionType('credit');
-    setSelectedCustomerId(customers[0]?.id || '');
-    setDialogVisible(true);
   };
 
   const handleSave = () => {
-    if (!amount.trim() || !partyName.trim() || !selectedCustomerId) {
+    if (!amount.trim() || !partyName.trim()) {
       Alert.alert(t('error'), t('pleaseEnterAllFields'));
       return;
     }
@@ -147,86 +112,61 @@ export default function SelectPartyScreen() {
       Alert.alert(t('error'), 'Please enter a valid amount');
       return;
     }
-
-    addEntry(
-      selectedBusinessId,
-      selectedBusiness?.name || 'Unknown Business',
-      transactionType,
-      numAmount,
-      currentUser?.id || 'admin_001'
-    );
-
-    setDialogVisible(false);
     setAmount('');
   };
-
-  const handleDeleteEntry = (id: string, desc: string, createdBy: string) => {
-    if (!canEdit(createdBy)) {
-      Alert.alert(t('error'), 'You can only delete transactions you created');
-      return;
-    }
-    Alert.alert(
-      t('deleteTransaction'),
-      `${t('areYouSureDelete')} "${desc}"?`,
-      [
-        { text: t('cancel'), onPress: () => {}, style: 'cancel' },
-        {
-          text: t('delete'),
-          onPress: () => deleteEntry(id),
-          style: 'destructive',
-        },
-      ]
-    );
-  };
-
-   
-
-  
-
-  
- 
 
   return (
     <View style={[styles.container, { backgroundColor: '#eee' }]}>
       <Appbar.Header>
-      <Appbar.Content title={ <TextInput
-              label={t('description')}
-              value={partyName}
-              onChangeText={setPartyName}
-              mode="outlined"
-              placeholder={t('enterTransactionDescription')}
-              style={styles.input}
-              multiline
-              numberOfLines={3}
-              left={<TextInput.Icon onPress={() => router.back()}  icon="arrow-left" />}
-            />} />
-    </Appbar.Header>
+        <Appbar.Content title={<TextInput
+          label={t('description')}
+          value={partyName}
+          onChangeText={setPartyName}
+          mode="outlined"
+          placeholder={t('enterTransactionDescription')}
+          style={styles.input}
+          multiline
+          numberOfLines={3}
+          left={<TextInput.Icon onPress={() => router.back()} icon="arrow-left" />}
+        />} />
+      </Appbar.Header>
       <ScrollView style={styles.scrollView}>
+        <View>
           <View>
-            <View>
-                <Text 
-                  onPress={() =>  router.push({
-          pathname: "/add-transaction",
-          params: { 'postdata' : partyName },
-        })}
-                  
+            <Text
+              onPress={() => router.push({
+                pathname: "/add-transaction",
+                params: { 'customerName': partyName },
+              })}
 
-                  style={styles.contactName}>{partyName}</Text>
-            
+
+              style={styles.contactName}>{partyName}</Text>
+
             <Divider />
-            </View>
-            {contactsList.map((contact) => (
-              <View key={contact.recordID}>
-                <Text style={styles.contactName}>{contact.givenName} {contact.familyName}</Text>
-            
-            <Divider />
-            </View>
-            ))}
           </View>
-         
+          {contactsList.map((contact) => (
+            <View key={contact.recordID}>
+              <Text
+                style={styles.contactName}
+                onPress={() => router.push({
+                  pathname: "/add-transaction",
+                  params: {
+                    customerName: `${contact.givenName} ${contact.familyName}`,
+                    formId: formId, formAction: formAction
+                  },
+                })}
+              >
+                {contact.givenName} {contact.familyName}
+              </Text>
+
+              <Divider />
+            </View>
+          ))}
+        </View>
+
       </ScrollView>
 
-      
+
     </View>
   );
 }

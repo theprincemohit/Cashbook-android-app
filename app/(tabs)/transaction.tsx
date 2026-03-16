@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FlatList,
   ScrollView,
@@ -7,82 +7,155 @@ import {
 } from 'react-native';
 import {
   Appbar,
+  Button,
   Card,
+  Dialog,
+  Divider,
+  IconButton,
+  Menu,
+  Portal,
   Text,
   useTheme
 } from 'react-native-paper';
 
+import { deleteTransactionById, getTransactionByPassbookId } from '@/api/transactionApi';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useLanguageContext } from '@/context/LanguageContext';
-import { Customer, useCustomerContext } from '@/hooks/useCustomerContext';
-import { router } from 'expo-router';
+import { currencyFormat } from '@/utils';
+import { router, useLocalSearchParams } from 'expo-router';
 
 export default function TransactionScreen() {
   const theme = useTheme();
   const { t } = useLanguageContext();
-  const { customers } = useCustomerContext();
+  const params = useLocalSearchParams();
+  const [transactions, setTransactions] = React.useState<any[]>([]);
+
+  const [visible, setVisible] = useState('0');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedTransactionId, setSelectedTransactionId] = useState<string>('');
+
+  const openMenu = (id: any) => setVisible(id);
+  const closeMenu = (id: any) => setVisible(id);
+
+  const loadData = async () => {
+    try {
+      const { data, status } = await getTransactionByPassbookId(params.formId);
+      console.log("Fetched transaction Entries:", data);
+      if (status == 200) {
+        setTransactions(data);
+      }
+    } catch (error) {
+      console.error('Error loading businesses:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [params.formId]);
 
   const SummaryCard = () => (
-          <MaterialCard title={t('transactionHistory')} subtitle="Financial Summary">
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                  {t('totalCredit')}
-                </Text>
-                <Text variant="titleMedium" style={{ color: '#4CAF50', fontWeight: 'bold' }}>
-                  ₹ 10.00
-                </Text>
-              </View>
-              <View style={styles.divider} />
-              <View style={styles.statItem}>
-                <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                  {t('totalDebit')}
-                </Text>
-                <Text variant="titleMedium" style={{ color: '#FF6B6B', fontWeight: 'bold' }}>
-                  ₹ 10.00
-                </Text>
-              </View>
-              <View style={styles.divider} />
-              <View style={styles.statItem}>
-                <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                  {t('balance')}
-                </Text>
-                <Text
-                  variant="titleMedium"
-                  style={{
-                    color: 10 >= 0 ? '#4CAF50' : '#FF6B6B',
-                    fontWeight: 'bold',
-                  }}>
-                  ₹ 10.00
-                </Text>
-              </View>
-            </View>
-          </MaterialCard>
+    <MaterialCard title={t('transactionHistory')} subtitle="Financial Summary">
+      <View style={styles.statsRow}>
+        <View style={styles.statItem}>
+          <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+            {t('totalCredit')}
+          </Text>
+          <Text variant="titleMedium" style={{ color: '#4CAF50', fontWeight: 'bold' }}>
+            ₹ 10.00
+          </Text>
+        </View>
+        <View style={styles.divider} />
+        <View style={styles.statItem}>
+          <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+            {t('totalDebit')}
+          </Text>
+          <Text variant="titleMedium" style={{ color: '#FF6B6B', fontWeight: 'bold' }}>
+            ₹ 10.00
+          </Text>
+        </View>
+        <View style={styles.divider} />
+        <View style={styles.statItem}>
+          <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+            {t('balance')}
+          </Text>
+          <Text
+            variant="titleMedium"
+            style={{
+              color: 10 >= 0 ? '#4CAF50' : '#FF6B6B',
+              fontWeight: 'bold',
+            }}>
+            ₹ 10.00
+          </Text>
+        </View>
+      </View>
+    </MaterialCard>
   )
-  const renderCustomerItem = ({ item }: { item: Customer }) => (
-    <Card mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal:0, marginBottom: 0, borderRadius:0 }]}>
+  const renderCustomerItem = ({ item }: { item: any }) => (
+    <Card mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal: 0, marginBottom: 0, borderRadius: 0 }]}>
       <Card.Content>
-        <View style={[styles.customerHeader, { padding:0 }]}>
+        <View style={[styles.customerHeader, { padding: 0 }]}>
           <View style={styles.customerInfo}>
             <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
-              {item.name}
-              
+              {item.description?.split('@@@')[0]}
+
             </Text>
-             <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
-              {item.createdAt.toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric"})}  |  
+            <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
+              {/* {item.createdAt.toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric"})}  |  
                 {item.createdAt.toLocaleTimeString("en-Us",{ hour: "2-digit", minute: "2-digit" })}
-              
+               */}
+                {item.description?.split('@@@')[1]}
+             {/* <Text>{"Apr 15, 2026 | 10:30 AM"}</Text>  */}
             </Text>
           </View>
-           <View style={styles.customerInfo}>
+          <View style={styles.customerInfo}>
             <Text variant="titleMedium" style={{ fontWeight: 'bold', textAlign: 'right' }}>
-              $10.00
-              
+              {currencyFormat(item.amount)}
+
             </Text>
-             <Text variant="titleMedium" style={{ fontWeight: 100, padding:0, backgroundColor: theme.colors.error, textAlign: 'center', fontSize: 8, color: "#fff" }}>
-              Credit
-              
+            <Text variant="titleMedium" style={{ fontWeight: 100, padding: 0, backgroundColor: theme.colors.error, textAlign: 'center', fontSize: 8, color: "#fff" }}>
+              {item.txn_type}
+
             </Text>
+          </View>
+          <View style={{
+            paddingTop: 0,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            height: 10,
+            zIndex: 999,
+            backgroundColor: theme.colors.surface,
+          }}>
+            <Menu
+              visible={item.id === visible}
+              onDismiss={() => closeMenu('0')}
+              anchor={<IconButton
+                icon="dots-vertical"
+                size={20}
+                onPress={() => openMenu(item.id)}
+              />}
+            >
+              <Menu.Item onPress={() => {
+                closeMenu('0');
+                router.push({
+                  pathname: '/add-transaction',
+                  params: {
+                    formId: item.id,
+                    customerName: item.description?.split('@@@')[0],
+                    formDescription: item.description?.split('@@@')[1],
+                    formAmount: item.amount,
+                    formType: item.txn_type,
+                    formAction: "update",
+                  },
+                })
+              }} title="Edit" />
+              <Divider />
+              <Menu.Item onPress={() => {
+                setSelectedTransactionId(item.id);
+                setShowModal(true);
+                closeMenu('0');
+              }} title="Delete" />
+
+            </Menu>
           </View>
         </View>
       </Card.Content>
@@ -90,38 +163,39 @@ export default function TransactionScreen() {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor:  '#ecedee'  }]}>
+    <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.push({
-                                    pathname: '/passbook',
-                                    params: { },
-                                  })} />
+          pathname: '/passbook',
+          params: {},
+        })} />
         <Appbar.Content title="Transaction" />
         <Appbar.Action icon="plus" onPress={() => router.push({
-                                    pathname: '/add-transaction',
-                                    params: { formId: 0,
-                                    formName: 'Transaction',
-                                    formAction: "Add",
-                                    formType: "Transaction"
-                                     },
-                                  })} />
+          pathname: '/add-transaction',
+          params: {
+            formId: 0,
+            formName: 'Transaction',
+            formAction: "Add",
+            formType: "Transaction"
+          },
+        })} />
       </Appbar.Header>
-     
+
       <ScrollView style={styles.scrollView}>
         <SummaryCard />
-        {customers.length === 0 ? (
-          <MaterialCard title="No Customers" subtitle="Get started by adding one">
+        {transactions.length === 0 ? (
+          <MaterialCard title="No transactions" subtitle="Get started by adding one">
             <Text variant="bodyMedium" style={{ textAlign: 'center', paddingVertical: 16 }}>
-              You haven't added any customers yet. Tap the + button to add one.
+              You haven't added any transactions yet. Tap the + button to add one.
             </Text>
           </MaterialCard>
         ) : (
-          <View style={styles.listContainer}>
+          <><View style={styles.listContainer}>
             <Text variant="labelMedium" style={{ paddingHorizontal: 16, marginBottom: 8 }}>
-              Total {customers.length === 1 ? 'Customer' : 'Customers'}: {customers.length} 
+              Total {transactions.length === 1 ? 'Customer' : 'transactions'}: {transactions.length}
             </Text>
-             <FlatList
-              data={customers}
+            <FlatList
+              data={transactions}
               renderItem={renderCustomerItem}
               keyExtractor={(item) => item.id}
               scrollEnabled={false}
@@ -129,6 +203,25 @@ export default function TransactionScreen() {
               contentContainerStyle={{ paddingHorizontal: 5 }}
             />
           </View>
+           <Portal>
+              <Dialog visible={showModal} onDismiss={() => setShowModal(false)}>
+                {/* <Dialog.Title>Login Error</Dialog.Title> */}
+                <Dialog.Content>
+                  <Text variant="bodyMedium">Are you sure you want to delete this transaction id: {selectedTransactionId}?</Text>
+                </Dialog.Content>
+                <Dialog.Actions>
+                  <Button onPress={() => {
+                    deleteTransactionById(selectedTransactionId);
+                    setShowModal(false);
+                    loadData();
+                  }}>Yes</Button>
+                  <Button onPress={() => {
+                    setShowModal(false);
+                  }}>No</Button>
+                </Dialog.Actions>
+              </Dialog>
+            </Portal>
+          </>
         )}
       </ScrollView>
     </View>
@@ -155,9 +248,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   customerInfo: {
-    
+
   },
-   statsRow: {
+  statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
