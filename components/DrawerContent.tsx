@@ -21,7 +21,7 @@ export function DrawerContent(props: DrawerContentProps) {
     <DrawerContentScrollView {...props} style={{ backgroundColor: theme.colors.background }}>
       <View style={[styles.header, { borderBottomColor: theme.colors.outline }]}>
         <Text variant="headlineSmall" style={{ color: theme.colors.primary, fontWeight: 'bold' }}>
-          App Menu
+          Cashbook
         </Text>
         <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}>
           Welcome, User

@@ -45,7 +45,18 @@ export default function SelectPartyScreen() {
   }
   ]
   const theme = useTheme();
-  const { formId, formAction } = useLocalSearchParams();
+  const searchParams = useLocalSearchParams<{
+    formDescription?: string;
+    formAmount?: string;
+    formType?: string;
+    formId?: string;
+    formAction?: string;
+  }>();
+  
+  const getParamValue = (value: string | string[] | undefined): string => {
+    if (Array.isArray(value)) return value[0] ?? '';
+    return value ?? '';
+  };
 
   const { t } = useLanguageContext();
   const { customers } = useCustomerContext();
@@ -136,7 +147,14 @@ export default function SelectPartyScreen() {
             <Text
               onPress={() => router.push({
                 pathname: "/add-transaction",
-                params: { 'customerName': partyName },
+                params: {
+                    customerName: partyName,
+                    formDescription: getParamValue(searchParams.formDescription),
+                    formAmount: getParamValue(searchParams.formAmount),
+                    formType: getParamValue(searchParams.formType),
+                    formId: getParamValue(searchParams.formId),
+                    formAction: getParamValue(searchParams.formAction),  
+                  },
               })}
 
 
@@ -152,7 +170,11 @@ export default function SelectPartyScreen() {
                   pathname: "/add-transaction",
                   params: {
                     customerName: `${contact.givenName} ${contact.familyName}`,
-                    formId: formId, formAction: formAction
+                    formDescription: getParamValue(searchParams.formDescription),
+                    formAmount: getParamValue(searchParams.formAmount),
+                    formType: getParamValue(searchParams.formType),
+                    formId: getParamValue(searchParams.formId),
+                    formAction: getParamValue(searchParams.formAction),  
                   },
                 })}
               >

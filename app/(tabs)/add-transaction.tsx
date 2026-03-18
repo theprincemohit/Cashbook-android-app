@@ -25,14 +25,15 @@ export default function AddTransactionScreen({ route }: any) {
  
 
   // const [businessDropdownVisible, setBusinessDropdownVisible] = useState(false);
-  const [transactionType, setTransactionType] = useState<'credit' | 'debit'>('credit');
+  const [transactionType, setTransactionType] = useState<'credit' | 'debit'| ''>('');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
 
 
   const handleSubmit = async () => {
     let params;
-    if(formAction === "update") {
+    console.log("Form Action:", formAction);
+     if(formAction === "update") {
       params = {
       passbook_id: 1, // Placeholder: Replace with actual passbook ID associated with selected business
       txn_type: transactionType,
@@ -164,12 +165,12 @@ export default function AddTransactionScreen({ route }: any) {
             <Chip  style={{marginBottom: 16, backgroundColor: '#dff0d8', borderColor: '#d6e9c6'}} icon="check" onPress={() => console.log('Pressed')}>Example Chip</Chip>
              <View style={styles.customerSelectRow}>
                 <Text>
-                  {`${customerName} ${String(formDescription)}`}
+                  {`${customerName} ${String(formDescription)} ${String(formAmount)} ${String(formType)} ${String(formId)} ${String(formAction)}`}
                 </Text>
               </View>
              <View style={styles.transactionTypeRow}>
                 <SegmentedButtons
-                value={transactionType}
+                value={transactionType || String(formType)}
                 onValueChange={(value) => setTransactionType(value as 'credit' | 'debit')}
                 buttons={[
                   {
@@ -209,6 +210,10 @@ export default function AddTransactionScreen({ route }: any) {
                         pathname: "/select-party",
                         params: { formAction: formAction,
                           formId: formId,
+                          customerName: customerName,
+                          formAmount: amount || String(formAmount),
+                          formType:  transactionType || String(formType),
+                          formDescription: description || String(formDescription),
                          },
                       })}
               mode="outlined"

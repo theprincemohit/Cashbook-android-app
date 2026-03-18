@@ -23,15 +23,15 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         id: '1',
         name: 'Tech Solutions Inc.',
         description: 'A technology solutions provider for small businesses',
-        createdAt: new Date('2026-01-15'),
-        updatedAt: new Date('2026-01-15'),
+        created_at: new Date('2026-01-15'),
+        updated_at: new Date('2026-01-15'),
       },
       {
         id: '2',
         name: 'Creative Services LLC',
         description: 'Provides creative services for businesses',
-        createdAt: new Date('2026-01-10'),
-        updatedAt: new Date('2026-01-10'),
+        created_at: new Date('2026-01-10'),
+        updated_at: new Date('2026-01-10'),
       },
     ]);
 
@@ -63,8 +63,8 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
        id: Date.now().toString(),
        name,
        description,
-       createdAt: new Date(),
-       updatedAt: new Date(),
+       created_at: new Date(),
+       updated_at: new Date(),
      };
      setBusinesses((prev) => [newBusiness, ...prev]);
      return newBusiness;
@@ -74,7 +74,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
      setBusinesses((prev) =>
       prev.map((business) =>
         business.id === id
-          ? { ...business, name, description, updatedAt: new Date() }
+          ? { ...business, name, description, updated_at: new Date() }
           : business
       )
     );
