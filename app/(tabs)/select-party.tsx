@@ -1,9 +1,7 @@
 import { useLanguageContext } from '@/context/LanguageContext';
-import { useCustomerContext } from '@/hooks/useCustomerContext';
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from 'react';
 import {
-  Alert,
   PermissionsAndroid,
   ScrollView,
   StyleSheet,
@@ -59,9 +57,6 @@ export default function SelectPartyScreen() {
   };
 
   const { t } = useLanguageContext();
-  const { customers } = useCustomerContext();
-  const [transactionType, setTransactionType] = useState<'credit' | 'debit'>('credit');
-  const [amount, setAmount] = useState('');
   const [partyName, setPartyName] = useState('');
   const [contactsList, setContactsList] = useState<any[]>(data);
 
@@ -105,27 +100,6 @@ export default function SelectPartyScreen() {
       });
   }
 
-
-
-  const handleAddEntry = () => {
-    setAmount('');
-    setTransactionType('credit');
-  };
-
-  const handleSave = () => {
-    if (!amount.trim() || !partyName.trim()) {
-      Alert.alert(t('error'), t('pleaseEnterAllFields'));
-      return;
-    }
-
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount <= 0) {
-      Alert.alert(t('error'), 'Please enter a valid amount');
-      return;
-    }
-    setAmount('');
-  };
-
   return (
     <View style={[styles.container, { backgroundColor: '#eee' }]}>
       <Appbar.Header>
@@ -145,7 +119,9 @@ export default function SelectPartyScreen() {
         <View>
           <View>
             <Text
-              onPress={() => router.push({
+              onPress={() => {
+                setPartyName('');
+                router.push({
                 pathname: "/add-transaction",
                 params: {
                     customerName: partyName,
@@ -155,7 +131,8 @@ export default function SelectPartyScreen() {
                     formId: getParamValue(searchParams.formId),
                     formAction: getParamValue(searchParams.formAction),  
                   },
-              })}
+              })
+            }}
 
 
               style={styles.contactName}>{partyName}</Text>

@@ -18,7 +18,8 @@ import {
   useTheme
 } from 'react-native-paper';
 
-import { deletePassbookById, getPassbookById } from '@/api/passbookApi';
+import { createPassbook, deletePassbookById, getPassbookById, updatePassbookById } from '@/api/passbookApi';
+import FormDialog from '@/components/FormDialog';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
@@ -35,8 +36,52 @@ export default function PassbookScreen() {
   const [showModal, setShowModal] = useState(false);
   const [selectedPassbookId, setSelectedPassbookId] = useState<string>('');
 
+  const [formVisible, setFormVisible] = useState(false);
+  const [formInitialValue, setFormInitialValue] = useState('');
+  const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
+
   const openMenu = (id: any) => setVisible(id);
   const closeMenu = (id: any) => setVisible(id);
+
+
+  const handleSubmitUpdate = async (data: any) => {
+    const param = {
+      name: data.name,
+      "user_id": 1,  //Question: Should this be dynamic based on logged in user?
+    };
+    const result = await updatePassbookById(activeBusinessId, selectedPassbookId, param);
+    console.log("Result of updatePassbookById:", result.status);
+    if (result && result.status === 200) {
+      setFormVisible(false);
+      loadData();
+      console.log("Passbook updated successfully");
+    }
+    // Implementation for handling form submission
+  };
+
+  const handleSubmitAdd = async (data: any) => {
+    const param = {
+      name: data.name,
+      "business_id": activeBusinessId,
+    };
+    const result = await createPassbook(param);
+    console.log("Result of createPassbook:", result);
+    if (result && result.status === 201) {
+      setFormVisible(false);
+      loadData();
+      console.log("Passbook created successfully");
+    }
+    // Implementation for handling form submission
+  };
+
+  const deletePassbookByIdHandler = async () => {
+    const result = await deletePassbookById(activeBusinessId, selectedPassbookId);
+    console.log("Result of deletePassbookById:", result);
+    if (result && result.status === 204) {
+      loadData();
+      console.log("Passbook deleted successfully");
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -53,6 +98,10 @@ export default function PassbookScreen() {
   useEffect(() => {
     loadData();
   }, [activeBusinessId]);
+
+  useEffect(() => {
+    console.log("Form visibility or mode changed:", { formVisible, formMode, formInitialValue });
+  }, [formVisible, formMode, formInitialValue]);
 
   const renderBusinessItem = ({ item }: { item: any }) => (
     <Card mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal: 0, marginBottom: 0, borderRadius: 0 }]}>
@@ -110,17 +159,11 @@ export default function PassbookScreen() {
             >
               <Menu.Item onPress={() => {
                 closeMenu('0')
-                router.push({
-                  pathname: '/AddForm',
-                  params: {
-                    formId: item.id,
-                    formName: item.name,
-                    formDescription: item.description,
-                    formAction: "update",
-                    formType: "Passbook"
-                  },
-                })
-              }} title="Edit" />
+                setSelectedPassbookId(item.id);
+                setFormInitialValue(item.name);
+                setFormMode('edit');
+                setFormVisible(true);
+              }} title="Rename" />
               <Divider />
               <Menu.Item onPress={() => {
                 setSelectedPassbookId(item.id);
@@ -140,18 +183,27 @@ export default function PassbookScreen() {
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content title="Passbook" />
-        <Appbar.Action icon="plus" onPress={() => router.push({
-          pathname: '/AddForm',
-          params: {
-            formId: 0,
-            formName: '',
-            formDescription: '',
-            formAction: "new",
-            formType: "Passbook"
-          },
-        })} />
+        <Appbar.Action icon="plus" onPress={() => {
+          console.log("Add Passbook button pressed");
+          setFormVisible(true);
+          setFormMode('add');
+          setFormInitialValue('');
+        }
+        } />
       </Appbar.Header>
       <ScrollView style={styles.scrollView}>
+        <Button
+          icon="plus"
+          mode="outlined"
+          onPress={() => {
+            setFormVisible(true);
+            setFormMode('add');
+            setFormInitialValue('');
+          }
+          }
+        >
+          Add New Passbook
+        </Button>
         {entries.length === 0 ? (
           <MaterialCard title={t('noPassbook')} subtitle={t('getStartedBusiness')}>
             <Text variant="bodyMedium" style={{ textAlign: 'center', paddingVertical: 16 }}>
@@ -178,9 +230,9 @@ export default function PassbookScreen() {
                 <Dialog.Actions>
                   <Button onPress={() => {
                     // setShowError(false);
-                    deletePassbookById(activeBusinessId, selectedPassbookId);
+                    deletePassbookByIdHandler();
+
                     setShowModal(false);
-                    loadData();
                   }}>Yes</Button>
                   <Button onPress={() => {
                     setShowModal(false);
@@ -188,8 +240,28 @@ export default function PassbookScreen() {
                 </Dialog.Actions>
               </Dialog>
             </Portal>
+            
           </>
+          
         )}
+        <FormDialog
+              visible={formVisible}
+              onDismiss={() => {
+                setFormVisible(false);
+                setFormInitialValue('');
+              }}
+              title={`${formMode === 'add' ? 'Add' : 'Rename'} Passbook`}
+              label="Passbook Name"
+              initialValue={formInitialValue}
+              onSubmit={(data) => {
+                if (formMode === 'add') {
+                  handleSubmitAdd(data);
+                } else {
+                  handleSubmitUpdate(data);
+                }
+              }}
+              mode={formMode}
+            />
       </ScrollView>
     </View>
   );

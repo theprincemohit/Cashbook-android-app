@@ -18,22 +18,7 @@ const BusinessContext = createContext<BusinessContextType | undefined>(undefined
 
 export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [activeBusinessId, setActiveBusinessId] = useState<Number | null>(null);
-    const [businesses, setBusinesses] = useState<Business[]>([
-      {
-        id: '1',
-        name: 'Tech Solutions Inc.',
-        description: 'A technology solutions provider for small businesses',
-        created_at: new Date('2026-01-15'),
-        updated_at: new Date('2026-01-15'),
-      },
-      {
-        id: '2',
-        name: 'Creative Services LLC',
-        description: 'Provides creative services for businesses',
-        created_at: new Date('2026-01-10'),
-        updated_at: new Date('2026-01-10'),
-      },
-    ]);
+    const [businesses, setBusinesses] = useState<Business[]>([]);
 
   // Load team members and current user from storage
   // useEffect(() => {

@@ -17,7 +17,8 @@ import {
   useTheme
 } from 'react-native-paper';
 
-import { deleteBusinessById, getBusinesses } from '@/api/businessApi';
+import { createBusiness, deleteBusinessById, getBusinesses, updateBusinessById } from '@/api/businessApi';
+import FormDialog from '@/components/FormDialog';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
@@ -32,6 +33,55 @@ export default function BusinessScreen() {
   const { t } = useLanguageContext();
   const { businesses, setBusinesses, deleteBusiness, setActiveBusinessId } = useBusinessContext();
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('');
+
+  const [formVisible, setFormVisible] = useState(false);
+  const [formInitialValue, setFormInitialValue] = useState('');
+  const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
+
+  const handleSubmitUpdate = async (data: any) => {
+       const param = {
+        name: data.name,
+        "user_id": 1,  //Question: Should this be dynamic based on logged in user?
+       };
+       const result = await updateBusinessById(selectedBusinessId, param);
+        console.log("Result of updateBusinessById:", result.status);
+        if(result && result.status === 200) {
+          setFormVisible(false);
+          fetchBusinesses();
+          console.log("Business updated successfully");
+        }
+       // Implementation for handling form submission
+  };
+
+  const handleSubmitAdd = async (data: any) => {
+       const param = {
+        name: data.name,
+        description: data.name, // Using separate field for description
+        "user_id": 1,  //Question: Should this be dynamic based on logged in user?
+        "industry": "string", // Optional: Could be added to form in future iterations
+        "founded_year": 1800, // Optional: Could be added to form in future iterations
+        "revenue": 0, // Optional: Could be added to form in future iterations
+        "employees": 1, // Optional: Could be added to form in future iterations
+        "location": "string" // Optional: Could be added to form in future iterations
+       };
+       const result = await createBusiness(param);
+        console.log("Result of createBusiness:", result);
+        if(result && result.status === 201) {
+          setFormVisible(false);
+          fetchBusinesses();
+          console.log("Business created successfully");
+        }
+       // Implementation for handling form submission
+  };
+
+  const deleteBusinessByIdHandler = async () => {
+    const result = await deleteBusinessById(selectedBusinessId);
+    console.log("Result of deleteBusinessById:", result);
+    if(result && result.status === 204) {
+      fetchBusinesses();
+      console.log("Business deleted successfully");
+    }
+  };
 
   const fetchBusinesses = async () => {
     try {
@@ -84,18 +134,12 @@ export default function BusinessScreen() {
               />}
             >
               <Menu.Item onPress={() => {
+                setSelectedBusinessId(item.id);
                 closeMenu('0')
-                router.push({
-                  pathname: '/AddForm',
-                  params: {
-                    formId: item.id,
-                    formName: item.name,
-                    formDescription: item.description,
-                    formAction: "update",
-                    formType: "Business"
-                  },
-                })
-              }} title="Edit" />
+                setFormInitialValue(item.name);
+                setFormMode('edit');
+                setFormVisible(true);
+              }} title="Rename" />
               <Divider />
               <Menu.Item onPress={() => {
                 setSelectedBusinessId(item.id);
@@ -116,18 +160,18 @@ export default function BusinessScreen() {
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
           <Text variant="headlineLarge" style={styles.title}>
-            {t('businessManagement')}  {businesses.length}
+            {t('businessManagement')}
           </Text>
-          <Button icon="plus" mode="outlined" onPress={() => router.push({
-            pathname: '/AddForm',
-            params: {
-              formId: 0,
-              formName: '',
-              formDescription: '',
-              formAction: "new",
-              formType: "Business"
-            },
-          })}>
+          <Button 
+            icon="plus" 
+            mode="outlined" 
+            onPress={() => 
+              {
+                setFormVisible(true);
+                setFormInitialValue('');
+              }
+            }
+          >
             Add New Business
           </Button>
 
@@ -164,9 +208,9 @@ export default function BusinessScreen() {
                 <Dialog.Actions>
                   <Button onPress={() => {
                     // setShowError(false);
-                    deleteBusinessById(selectedBusinessId);
+                    deleteBusinessByIdHandler();
                     setShowModal(false);
-                    fetchBusinesses();
+                    // fetchBusinesses();
                   }}>Yes</Button>
                   <Button onPress={() => {
                     setShowModal(false);
@@ -174,8 +218,27 @@ export default function BusinessScreen() {
                 </Dialog.Actions>
               </Dialog>
             </Portal>
+            
           </>
         )}
+        <FormDialog 
+              visible={formVisible} 
+              onDismiss={() => {
+                setFormVisible(false);
+                setFormInitialValue('');
+              }}
+              title={`${formMode === 'add' ? 'Add' : 'Rename'} Business`}
+              label="Business Name"
+              initialValue={formInitialValue}
+              onSubmit={(data) => {
+                if (formMode === 'add') {
+                  handleSubmitAdd(data);
+                } else {
+                  handleSubmitUpdate(data);
+                }
+              }}
+              mode={formMode}
+            />
       </ScrollView>
     </View>
   );

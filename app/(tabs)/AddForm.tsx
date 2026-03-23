@@ -5,9 +5,10 @@ import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
 import { router, useLocalSearchParams } from "expo-router";
 
-import React, { useState } from 'react';
+import { yupResolver } from '@hookform/resolvers/yup';
+import React, { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
-  Alert,
   StyleSheet,
   View
 } from 'react-native';
@@ -15,15 +16,37 @@ import { ScrollView } from 'react-native-gesture-handler';
 import {
   Appbar,
   Button,
+  HelperText,
   TextInput
 } from 'react-native-paper';
+import * as yup from 'yup';
+
+const schema = yup.object({
+  name: yup.string().required('Name is required').min(2, 'Name must be at least 2 characters'),
+  description: yup.string().required('Description is required').min(5, 'Description must be at least 5 characters'),
+}).required();
 
 export default function AddFormScreen({ route }: any) {
   const { t } = useLanguageContext(); 
   const { formId, formName, formDescription, formAction, formType } = useLocalSearchParams();
   const { activeBusinessId } = useBusinessContext();
- 
-  const [formData, setFormData] = useState<{id?: number, name?: string, description?: string, formType?: string} | null>(null); 
+  console.log("Received params in AddFormScreen:", { formId, formName, formDescription, formAction, formType, activeBusinessId });
+  const { control, handleSubmit, formState: { errors }, reset } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      name: String(formName) || '',
+      description: String(formDescription) || '',
+    }
+  }); 
+
+  useEffect(() => {
+    if (formId) {
+      reset({
+      name: String(formName),
+      description: String(formDescription),
+    }); // Update form values when data arrives
+    }
+  }, [formId, reset]);
 
   const handleFunction = (param: any) => {
       switch(formType) {
@@ -36,11 +59,11 @@ export default function AddFormScreen({ route }: any) {
           return () => {};
       }
   };
-    const SubmitData = async() => {
+    const SubmitData = async(data: any) => {
       let param;
       if(formType === "Business") {
        param = {
-        ...formData,
+        ...data,
         "user_id": 1,  //Question: Should this be dynamic based on logged in user?
         "industry": "string", // Optional: Could be added to form in future iterations
         "founded_year": 1800, // Optional: Could be added to form in future iterations
@@ -50,27 +73,23 @@ export default function AddFormScreen({ route }: any) {
       }
     } else if(formType === "Passbook") {
       param = {
-        ...formData,
+        ...data,
         "business_id": activeBusinessId,
       }
     }
 
       const result = await handleFunction(param);
       console.log("Result of handleFunction:", result);
-      router.push(`/${formType === "Business" ? "business" : "passbook"}`);
+      const url = 'passbook/5';
+      //router.push(`/${formType === "Business" ? url : "add-transaction"}`);
     };
    
  
 
-  const handleSave = () => {
-    if (!formData?.name?.trim() || !formData?.description?.trim()) {
-      Alert.alert(t('pleaseEnterAllFields'));
-      return;
-    }
-    console.log('Saving Business:', formData);
-    SubmitData();
-    setFormData(null);
-    
+  const onSubmit = (data: any) => {
+    console.log('Saving Business:', data);
+    SubmitData(data);
+    reset();
   };
 
   return (
@@ -78,33 +97,61 @@ export default function AddFormScreen({ route }: any) {
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
            {/* Add/Edit Business or Passbook Form */}
-        <Appbar.Content title= {` ${formAction} ${formType} ${formId}`} /> 
+        <Appbar.Content title= {` ${String(formAction).toUpperCase()} ${String(formType).toUpperCase()}`} /> 
         <Appbar.Action icon="dots-vertical" onPress={() => {}} />
     </Appbar.Header>
       <ScrollView style={styles.scrollView}>
         <MaterialCard style={{paddingTop  : 25}}>
              
-            <TextInput
-              label={t('businesses')}
-              value={formData?.name || String(formName) ||  ''}
-              onChangeText={(text) => setFormData({...formData, name: text})}
-              mode="outlined"
-              placeholder={t('enterBusinessName')}
-              style={styles.input}
-              numberOfLines={1}
+            <Controller
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  label={t('businesses')}
+                  value={value}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  mode="outlined"
+                  placeholder={t('enterBusinessName')}
+                  style={styles.input}
+                  numberOfLines={1}
+                  error={!!errors.name}
+                />
+              )}
+              name="name"
             />
+            <HelperText type="error" visible={!!errors.name}>
+              {errors.name?.message}
+            </HelperText>
              
-            <TextInput
-              label={t('description')}
-              value={formData?.description || String(formDescription) ||  ''}
-              onChangeText={(text) => setFormData({...formData, description: text})}
-              mode="outlined"
-              placeholder={t('enterTransactionDescription')}
-              style={styles.input}
-              multiline
-              numberOfLines={5}
+            <Controller
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  label={t('description')}
+                  value={value}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  mode="outlined"
+                  placeholder={t('enterTransactionDescription')}
+                  style={styles.input}
+                  multiline
+                  numberOfLines={5}
+                  error={!!errors.description}
+                />
+              )}
+              name="description"
             />
-            <Button style={{marginTop: 16}} mode="contained" onPress={handleSave}>
+            <HelperText type="error" visible={!!errors.description}>
+              {errors.description?.message}
+            </HelperText>
+            <Button style={{marginTop: 16}} mode="contained" onPress={handleSubmit(onSubmit)}>
               {formAction === "update" ? t('update') : t('save')}
             </Button>
             <Button style={{marginTop: 16}} mode='outlined'>{t('cancel')}</Button>
