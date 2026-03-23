@@ -28,7 +28,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 
 export default function PassbookScreen() {
   const theme = useTheme();
-  const { activeBusinessId } = useBusinessContext();
+  const { activeBusinessId, setActivePassbookId } = useBusinessContext();
   const { t } = useLanguageContext();
   const { entries, setEntries } = usePassbookContext();
   const params = useLocalSearchParams();
@@ -108,7 +108,9 @@ export default function PassbookScreen() {
       <Card.Content>
         <View style={[styles.customerHeader, { padding: 0 }]} >
           <View style={styles.customerInfo}>
-            <Text onPress={() => router.push({
+            <Text onPress={() => {
+              setActivePassbookId(item.id);
+              router.push({
               pathname: "/transaction",
               params: {
                 formId: item.id,
@@ -116,7 +118,7 @@ export default function PassbookScreen() {
                 formAction: "update",
                 formType: "Passbook"
               },
-            })} variant="titleMedium" style={{ fontWeight: 'bold' }}>
+            })}} variant="titleMedium" style={{ fontWeight: 'bold' }}>
               {item.name}
 
 

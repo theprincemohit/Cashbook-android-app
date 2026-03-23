@@ -12,12 +12,15 @@ interface BusinessContextType {
   setBusinesses: React.Dispatch<React.SetStateAction<Business[]>>;
   activeBusinessId: Number | null;
   setActiveBusinessId: React.Dispatch<React.SetStateAction<Number | null>>;
+  activePassbookId: Number | null;
+  setActivePassbookId: React.Dispatch<React.SetStateAction<Number | null>>;
 }
 
 const BusinessContext = createContext<BusinessContextType | undefined>(undefined);
 
 export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [activeBusinessId, setActiveBusinessId] = useState<Number | null>(null);
+    const [activePassbookId, setActivePassbookId] = useState<Number | null>(null);
     const [businesses, setBusinesses] = useState<Business[]>([]);
 
   // Load team members and current user from storage
@@ -79,7 +82,9 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     deleteBusiness,
     setBusinesses,
     setActiveBusinessId,
-    activeBusinessId
+    activeBusinessId,
+    setActivePassbookId,
+    activePassbookId
       }}>
       {children}
     </BusinessContext.Provider>

@@ -1,5 +1,6 @@
 import { createTransaction, updateTransactionById } from '@/api/transactionApi';
 import { MaterialCard } from '@/components/MaterialCard';
+import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
 import { router, useLocalSearchParams } from "expo-router";
 
@@ -13,14 +14,13 @@ import {
 import {
   Appbar,
   Button,
-  Chip,
   SegmentedButtons,
-  Text,
   TextInput
 } from 'react-native-paper';
 
 export default function AddTransactionScreen({ route }: any) {
   const { t } = useLanguageContext();
+  const { setActivePassbookId, activePassbookId, setActiveBusinessId } = useBusinessContext();
   const { formId, formAction, customerName, formDescription, formAmount, formType } = useLocalSearchParams();
  
 
@@ -35,11 +35,11 @@ export default function AddTransactionScreen({ route }: any) {
     console.log("Form Action:", formAction);
      if(formAction === "update") {
       params = {
-      passbook_id: 1, // Placeholder: Replace with actual passbook ID associated with selected business
+      passbook_id: activePassbookId, // Placeholder: Replace with actual passbook ID associated with selected business
       txn_type: transactionType,
       amount: parseFloat(amount),
       txn_date: new Date().toISOString(),
-      description: `${customerName}@@@${description}`,
+      description: description,
       }
       const result  = await updateTransactionById(formId,params);
       console.log("Result of updateTransactionById API call:", result);
@@ -53,15 +53,15 @@ export default function AddTransactionScreen({ route }: any) {
     }
     else {
       params = {
-      passbook_id: 1, // Placeholder: Replace with actual passbook ID associated with selected business
+      passbook_id: activePassbookId, // Placeholder: Replace with actual passbook ID associated with selected business
       txn_type: transactionType,
       amount: parseFloat(amount),
       txn_date: new Date().toISOString(),
-      description: `${customerName}@@@${description}`,
+      description: description,
       }
       const result  = await createTransaction(params);
       console.log("Result of createTransaction API call:", result);
-      if(result.status === 200) {
+      if(result.status === 201) {
         handleAddEntry();
         router.push({
           pathname: '/transaction',
@@ -162,13 +162,7 @@ export default function AddTransactionScreen({ route }: any) {
           borderColor:transactionType === 'credit' ? '#01865f' : '#c93b3b', 
           borderWidth: 2
         }}>
-            <Chip  style={{marginBottom: 16, backgroundColor: '#dff0d8', borderColor: '#d6e9c6'}} icon="check" onPress={() => console.log('Pressed')}>Example Chip</Chip>
-             <View style={styles.customerSelectRow}>
-                <Text>
-                  {`${customerName} ${String(formDescription)} ${String(formAmount)} ${String(formType)} ${String(formId)} ${String(formAction)}`}
-                </Text>
-              </View>
-             <View style={styles.transactionTypeRow}>
+            <View style={styles.transactionTypeRow}>
                 <SegmentedButtons
                 value={transactionType || String(formType)}
                 onValueChange={(value) => setTransactionType(value as 'credit' | 'debit')}
@@ -202,7 +196,7 @@ export default function AddTransactionScreen({ route }: any) {
               style={styles.input}
             />
 
-             <TextInput
+             {/* <TextInput
               label={t('selectCustomer')}
               value={customerName ? String(customerName) : ''}
               onChangeText={() => {}}
@@ -218,7 +212,7 @@ export default function AddTransactionScreen({ route }: any) {
                       })}
               mode="outlined"
               style={[styles.input]}
-            />
+            /> */}
 
            
 

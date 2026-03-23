@@ -20,6 +20,7 @@ import {
 
 import { deleteTransactionById, getTransactionByPassbookId } from '@/api/transactionApi';
 import { MaterialCard } from '@/components/MaterialCard';
+import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
 import { currencyFormat } from '@/utils';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -28,6 +29,8 @@ export default function TransactionScreen() {
   const theme = useTheme();
   const { t } = useLanguageContext();
   const params = useLocalSearchParams();
+  
+    const { setActivePassbookId, activePassbookId, setActiveBusinessId } = useBusinessContext();
   const [transactions, setTransactions] = React.useState<any[]>([]);
 
   const [visible, setVisible] = useState('0');
@@ -37,9 +40,24 @@ export default function TransactionScreen() {
   const openMenu = (id: any) => setVisible(id);
   const closeMenu = (id: any) => setVisible(id);
 
+  const deleteTransaction = async (id: string) => {
+    try {
+      const result = await deleteTransactionById(id);
+      console.log("Result of deleteTransactionById API call:", result);
+      if (result.status === 204) {
+        setTransactions((prev) => prev.filter((txn) => txn.id !== id)); 
+        console.log(`Transaction with id ${id} deleted successfully`);
+      } else {
+        console.error(`Failed to delete transaction with id ${id}. Status code: ${result.status}`);
+      }
+    } catch (error) {
+      console.error(`Error deleting transaction with id ${id}:`, error);
+    }
+  };
+
   const loadData = async () => {
     try {
-      const { data, status } = await getTransactionByPassbookId(params.formId);
+      const { data, status } = await getTransactionByPassbookId(activePassbookId);
       console.log("Fetched transaction Entries:", data);
       if (status == 200) {
         setTransactions(data);
@@ -96,14 +114,14 @@ export default function TransactionScreen() {
         <View style={[styles.customerHeader, { padding: 0 }]}>
           <View style={styles.customerInfo}>
             <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
-              {item.description?.split('@@@')[0]}
+              {item.description}
 
             </Text>
             <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
               {/* {item.createdAt.toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric"})}  |  
                 {item.createdAt.toLocaleTimeString("en-Us",{ hour: "2-digit", minute: "2-digit" })}
                */}
-                {item.description?.split('@@@')[1]}
+                {item.description}
              {/* <Text>{"Apr 15, 2026 | 10:30 AM"}</Text>  */}
             </Text>
           </View>
@@ -140,8 +158,8 @@ export default function TransactionScreen() {
                   pathname: '/add-transaction',
                   params: {
                     formId: item.id,
-                    customerName: item.description?.split('@@@')[0],
-                    formDescription: item.description?.split('@@@')[1],
+                    customerName: item.description,
+                    formDescription: item.description,
                     formAmount: item.amount,
                     formType: item.txn_type,
                     formAction: "update",
