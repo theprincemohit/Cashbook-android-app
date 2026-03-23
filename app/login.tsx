@@ -43,7 +43,7 @@ export default function LoginScreen() {
         await saveToken('userToken', response.data.access_token);
         
         // Navigate to home screen
-       router.replace('/(tabs)');
+       router.replace('/business');
       } else {
         setIsLoading(false);
         setErrorMessage('Invalid email or password. Try admin@example.com / password123');

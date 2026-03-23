@@ -6,6 +6,7 @@ import {
   View
 } from 'react-native';
 import {
+  Appbar,
   Button,
   Card,
   Dialog,
@@ -22,9 +23,9 @@ import FormDialog from '@/components/FormDialog';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
+import { useRouteContext } from '@/context/RouteContext';
 import { Business } from '@/types/business';
 import { formatDateTime } from '@/utils';
-import { router } from 'expo-router';
 export default function BusinessScreen() {
   const [visible, setVisible] = useState('0');
   const [showModal, setShowModal] = useState(false);
@@ -33,6 +34,7 @@ export default function BusinessScreen() {
   const theme = useTheme();
   const { t } = useLanguageContext();
   const { businesses, setBusinesses, deleteBusiness, setActiveBusinessId } = useBusinessContext();
+  const {routeIndex, setRouteIndex} = useRouteContext();
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('');
 
   const [formVisible, setFormVisible] = useState(false);
@@ -107,7 +109,7 @@ export default function BusinessScreen() {
           <View style={styles.customerInfo}>
             <Text onPress={() => {
               setActiveBusinessId(Number(item.id));
-              router.push({ pathname: '/passbook' })
+              setRouteIndex(2);
             }}
               variant="titleMedium" style={{ fontWeight: 'bold' }}>
               {item.name}
@@ -158,11 +160,17 @@ export default function BusinessScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
+       <Appbar.Header>
+        {/* Appbar.Header typically handles status bar padding automatically if you use Expo or react-navigation */}
+        <Appbar.Content 
+          title={t('businessManagement')} 
+          titleStyle={{ fontWeight: 'bold' }}
+          style={{ }}
+          />
+      </Appbar.Header>
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
-          <Text variant="headlineLarge" style={styles.title}>
-            {t('businessManagement')}
-          </Text>
+         
           <Button 
             icon="plus" 
             mode="outlined" 
