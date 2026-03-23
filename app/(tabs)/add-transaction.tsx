@@ -4,9 +4,10 @@ import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
 import { router, useLocalSearchParams } from "expo-router";
 
-import React, { useState } from 'react';
+import { yupResolver } from '@hookform/resolvers/yup';
+import React, { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   View
@@ -14,32 +15,43 @@ import {
 import {
   Appbar,
   Button,
+  HelperText,
   SegmentedButtons,
   TextInput
 } from 'react-native-paper';
+import * as yup from 'yup';
+
+const schema = yup.object({
+  transactionType: yup.mixed<'credit' | 'debit'>().oneOf(['credit', 'debit'], 'Please select transaction type').required('Transaction type is required'),
+  amount: yup.number().positive('Amount must be positive').required('Amount is required').typeError('Amount must be a valid number'),
+  description: yup.string().required('Description is required').min(3, 'Description must be at least 3 characters'),
+}).required();
 
 export default function AddTransactionScreen({ route }: any) {
   const { t } = useLanguageContext();
   const { setActivePassbookId, activePassbookId, setActiveBusinessId } = useBusinessContext();
-  const { formId, formAction, customerName, formDescription, formAmount, formType } = useLocalSearchParams();
- 
+  const parseQueryParams  = useLocalSearchParams();
+  const { formId, formAction, customerName, formDescription, formAmount, formType } = parseQueryParams;
+  const { control, handleSubmit, formState: { errors }, reset } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      transactionType: (String(formType) || 'credit') as 'credit' | 'debit',
+      amount: Number(formAmount) || 0,
+      description: String(formDescription) || '',
+    }
+  });
+  console.log("Received params in AddTransactionScreen:", { formId, formAction, customerName, formDescription, formAmount, formType });
 
-  // const [businessDropdownVisible, setBusinessDropdownVisible] = useState(false);
-  const [transactionType, setTransactionType] = useState<'credit' | 'debit'| ''>('');
-  const [amount, setAmount] = useState('');
-  const [description, setDescription] = useState('');
-
-
-  const handleSubmit = async () => {
+  const onFormSubmit = async (data: any) => {
     let params;
     console.log("Form Action:", formAction);
      if(formAction === "update") {
       params = {
       passbook_id: activePassbookId, // Placeholder: Replace with actual passbook ID associated with selected business
-      txn_type: transactionType,
-      amount: parseFloat(amount),
+      txn_type: data.transactionType,
+      amount: parseFloat(data.amount),
       txn_date: new Date().toISOString(),
-      description: description,
+      description: data.description,
       }
       const result  = await updateTransactionById(formId,params);
       console.log("Result of updateTransactionById API call:", result);
@@ -47,17 +59,17 @@ export default function AddTransactionScreen({ route }: any) {
         handleAddEntry();
         router.push({
           pathname: '/transaction',
-          params: { },
+          params: { refresh: String(new Date().getTime()) }, // Pass a timestamp
         });
       }
     }
     else {
       params = {
       passbook_id: activePassbookId, // Placeholder: Replace with actual passbook ID associated with selected business
-      txn_type: transactionType,
-      amount: parseFloat(amount),
+      txn_type: data.transactionType,
+      amount: parseFloat(data.amount),
       txn_date: new Date().toISOString(),
-      description: description,
+      description: data.description,
       }
       const result  = await createTransaction(params);
       console.log("Result of createTransaction API call:", result);
@@ -65,7 +77,7 @@ export default function AddTransactionScreen({ route }: any) {
         handleAddEntry();
         router.push({
           pathname: '/transaction',
-          params: { },
+          params: { refresh: String(new Date().getTime()) },
         });
       }
     }
@@ -75,27 +87,26 @@ export default function AddTransactionScreen({ route }: any) {
   };
 
   const handleAddEntry = () => {
-    setAmount('');
-    setDescription('');
-    setTransactionType('credit');
+    reset();
   };
 
-  const handleSave = () => {
-    if (!amount.trim() || !description.trim()) {
-      Alert.alert(t('error'), t('pleaseEnterAllFields'));
-      return;
+ useEffect(() => {
+    const fetchUserData = async () => {
+      // Simulate an API call
+      //const result = //await new Promise(resolve => setTimeout(() => resolve(
+      const result =   {
+      transactionType: (String(formType) || 'credit') as 'credit' | 'debit',
+      amount: formAmount ? Number(formAmount) : 0,
+      description: String(formDescription) || '',
     }
+    //   ), 200));
+      
+      
+      reset(result); // Resets the form with fetched values
+    };
 
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount <= 0) {
-      Alert.alert(t('error'), 'Please enter a valid amount');
-      return;
-    }
-
-    handleSubmit();
-  };
-
-
+    fetchUserData();
+  }, [parseQueryParams.formId, reset]);
   // const menu = () => (
   //    <Menu
   //           visible={businessDropdownVisible}
@@ -159,42 +170,67 @@ export default function AddTransactionScreen({ route }: any) {
     </Appbar.Header>
       <ScrollView style={styles.scrollView}>
         <MaterialCard style={{paddingTop  : 25, 
-          borderColor:transactionType === 'credit' ? '#01865f' : '#c93b3b', 
+          borderColor:formType === 'credit' ? '#01865f' : '#c93b3b', 
           borderWidth: 2
         }}>
+           
             <View style={styles.transactionTypeRow}>
-                <SegmentedButtons
-                value={transactionType || String(formType)}
-                onValueChange={(value) => setTransactionType(value as 'credit' | 'debit')}
-                buttons={[
-                  {
-                    value: 'credit',
-                    checkedColor: transactionType === 'credit' ? '#fff' : '#000',
-                    label: t('credit'),
-                    style: { flex: 1, borderRadius: 5,
-                      backgroundColor: transactionType === 'credit' ? '#01865f' : 'transparent',
-                     },
-                  },
-                  {
-                    value: 'debit',
-                    checkedColor: transactionType === 'debit' ? '#fff' : '#000',
-                    label: t('debit'),
-                    style: { flex: 1, borderRadius: 5, 
-                      backgroundColor: transactionType === 'debit' ? '#c93b3b' : 'transparent',
-                     },
-                  },
-                ]}
-              />
+                <Controller
+                  control={control}
+                  name="transactionType"
+                  render={({ field: { onChange, value } }) => (
+                    <>
+                      <SegmentedButtons
+                        value={value || String(formType)}
+                        onValueChange={onChange}
+                        buttons={[
+                          {
+                            value: 'credit',
+                            checkedColor: value === 'credit' ? '#fff' : '#000',
+                            label: t('credit'),
+                            style: { flex: 1, borderRadius: 5,
+                              backgroundColor: value === 'credit' ? '#01865f' : 'transparent',
+                             },
+                          },
+                          {
+                            value: 'debit',
+                            checkedColor: value === 'debit' ? '#fff' : '#000',
+                            label: t('debit'),
+                            style: { flex: 1, borderRadius: 5, 
+                              backgroundColor: value === 'debit' ? '#c93b3b' : 'transparent',
+                             },
+                          },
+                        ]}
+                      />
+                      <HelperText type="error" visible={!!errors.transactionType}>
+                        {errors.transactionType?.message}
+                      </HelperText>
+                    </>
+                  )}
+                />
             </View>
-                <TextInput
-              label={t('entryAmount')}
-              value={amount || (formAmount ? String(formAmount) : '')}
-              onChangeText={setAmount}
-              mode="outlined"
-              placeholder="0.00"
-              keyboardType="decimal-pad"
-              style={styles.input}
-            />
+                <Controller
+                  control={control}
+                  name="amount"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <>
+                      <TextInput
+                        label={t('entryAmount')}
+                        value={value !== 0 ? String(value) : ''}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        mode="outlined"
+                        placeholder="0.00"
+                        keyboardType="decimal-pad"
+                        style={styles.input}
+                        error={!!errors.amount}
+                      />
+                      <HelperText type="error" visible={!!errors.amount}>
+                        {errors.amount?.message}
+                      </HelperText>
+                    </>
+                  )}
+                />
 
              {/* <TextInput
               label={t('selectCustomer')}
@@ -217,20 +253,36 @@ export default function AddTransactionScreen({ route }: any) {
            
 
 
-            <TextInput
-              label={t('description')}
-              value={description || String(formDescription) || ''}
-              onChangeText={setDescription}
-              mode="outlined"
-              placeholder={t('enterTransactionDescription')}
-              style={styles.input}
-              multiline
-              numberOfLines={3}
+            <Controller
+              control={control}
+              name="description"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <>
+                  <TextInput
+                    label={t('description')}
+                    value={value !== undefined && value !== null ? String(value) : ''}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    mode="outlined"
+                    placeholder={t('enterTransactionDescription')}
+                    style={styles.input}
+                    multiline
+                    numberOfLines={3}
+                    error={!!errors.description}
+                  />
+                  <HelperText type="error" visible={!!errors.description}>
+                    {errors.description?.message}
+                  </HelperText>
+                </>
+              )}
             />
-            <Button style={{marginTop: 16}} mode="contained" onPress={handleSave}>
+            <Button style={{marginTop: 16}} mode="contained" onPress={handleSubmit(onFormSubmit)}>
               {t('add')}
             </Button>
-             <Button style={{marginTop: 16}} mode='outlined' onPress={() => {}}>{t('cancel')}</Button>
+             <Button style={{marginTop: 16}} mode='outlined' 
+                onPress={() => router.push({pathname: '/transaction'})}>
+                  {t('cancel')}
+             </Button>
             
         </MaterialCard>
       </ScrollView>

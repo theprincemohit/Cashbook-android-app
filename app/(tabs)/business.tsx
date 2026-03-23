@@ -23,6 +23,7 @@ import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
 import { Business } from '@/types/business';
+import { formatDateTime } from '@/utils';
 import { router } from 'expo-router';
 export default function BusinessScreen() {
   const [visible, setVisible] = useState('0');
@@ -112,7 +113,7 @@ export default function BusinessScreen() {
               {item.name}
             </Text>
             <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
-              {new Date(item.created_at).toLocaleDateString("en-Us", { year: "numeric", month: "short", day: "numeric" })}  | {new Date(item.created_at).toLocaleTimeString("en-Us", { hour: "2-digit", minute: "2-digit" })}
+               {formatDateTime(item.created_at)}
             </Text>
           </View>
 

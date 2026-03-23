@@ -8,6 +8,10 @@ export const formatDate = (dateString) => {
 };
 
 export const formatDateTime = (dateString) => {
-  const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-  return new Date(dateString).toLocaleDateString(undefined, options);
+  return new Intl.DateTimeFormat('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    dateStyle: 'medium', // 'medium' provides a format like Mar 25, 2026
+    timeStyle: 'medium', // 'medium' provides a format like 2:34:56 AM
+    hour12: true
+}).format(new Date(dateString));
 };

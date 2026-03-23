@@ -24,6 +24,7 @@ import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
 import { usePassbookContext } from '@/hooks/usePassbookContext';
+import { formatDateTime } from '@/utils';
 import { router, useLocalSearchParams } from 'expo-router';
 
 export default function PassbookScreen() {
@@ -128,7 +129,7 @@ export default function PassbookScreen() {
                   {item.created_at?.toLocaleTimeString("en-Us",{ hour: "2-digit", minute: "2-digit" })}
                    */}
               {/* {"Apr 15, 2026 | 10:30 AM"} */}
-              {item.description}
+              {formatDateTime(item.created_at)}
             </Text>
           </View>
           <View style={styles.customerInfo}>

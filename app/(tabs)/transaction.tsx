@@ -22,7 +22,7 @@ import { deleteTransactionById, getTransactionByPassbookId } from '@/api/transac
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
-import { currencyFormat } from '@/utils';
+import { currencyFormat, formatDateTime } from '@/utils';
 import { router, useLocalSearchParams } from 'expo-router';
 
 export default function TransactionScreen() {
@@ -30,7 +30,7 @@ export default function TransactionScreen() {
   const { t } = useLanguageContext();
   const params = useLocalSearchParams();
   
-    const { setActivePassbookId, activePassbookId, setActiveBusinessId } = useBusinessContext();
+  const { activePassbookId } = useBusinessContext();
   const [transactions, setTransactions] = React.useState<any[]>([]);
 
   const [visible, setVisible] = useState('0');
@@ -69,17 +69,28 @@ export default function TransactionScreen() {
 
   useEffect(() => {
     loadData();
-  }, [params.formId]);
+  }, [params.formId, params.refresh]); // Re-fetch data when formId or refresh param changes
 
+  const summary = transactions.reduce((accumulator, currentValue) => {
+    if(currentValue.txn_type === 'credit') {
+      accumulator.credit += currentValue.amount;
+    } else {     
+       accumulator.debit += currentValue.amount;
+    }
+     return accumulator;
+   
+  }, {total: 0, credit: 0, debit: 0}); 
+  summary.total = summary.credit - summary.debit;
+  console.log("Transaction summary calculated:", summary);
   const SummaryCard = () => (
-    <MaterialCard title={t('transactionHistory')} subtitle="Financial Summary">
+    <MaterialCard title={t('transactionHistory')}>
       <View style={styles.statsRow}>
         <View style={styles.statItem}>
           <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
             {t('totalCredit')}
           </Text>
           <Text variant="titleMedium" style={{ color: '#4CAF50', fontWeight: 'bold' }}>
-            ₹ 10.00
+            ₹ {summary.credit}
           </Text>
         </View>
         <View style={styles.divider} />
@@ -88,7 +99,7 @@ export default function TransactionScreen() {
             {t('totalDebit')}
           </Text>
           <Text variant="titleMedium" style={{ color: '#FF6B6B', fontWeight: 'bold' }}>
-            ₹ 10.00
+            ₹ {summary.debit}
           </Text>
         </View>
         <View style={styles.divider} />
@@ -99,10 +110,9 @@ export default function TransactionScreen() {
           <Text
             variant="titleMedium"
             style={{
-              color: 10 >= 0 ? '#4CAF50' : '#FF6B6B',
               fontWeight: 'bold',
             }}>
-            ₹ 10.00
+            ₹ {summary.total}
           </Text>
         </View>
       </View>
@@ -112,7 +122,7 @@ export default function TransactionScreen() {
     <Card mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal: 0, marginBottom: 0, borderRadius: 0 }]}>
       <Card.Content>
         <View style={[styles.customerHeader, { padding: 0 }]}>
-          <View style={styles.customerInfo}>
+          <View style={[styles.customerInfo, { width: '60%' }]}>
             <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
               {item.description}
 
@@ -121,19 +131,16 @@ export default function TransactionScreen() {
               {/* {item.createdAt.toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric"})}  |  
                 {item.createdAt.toLocaleTimeString("en-Us",{ hour: "2-digit", minute: "2-digit" })}
                */}
-                {item.description}
+                {formatDateTime(item.created_at)}
              {/* <Text>{"Apr 15, 2026 | 10:30 AM"}</Text>  */}
             </Text>
           </View>
           <View style={styles.customerInfo}>
-            <Text variant="titleMedium" style={{ fontWeight: 'bold', textAlign: 'right' }}>
+            <Text variant="titleMedium" style={{ fontWeight: 'bold', textAlign: 'right', color: item.txn_type === 'credit' ? '#4CAF50' : '#FF6B6B' }}>
               {currencyFormat(item.amount)}
 
             </Text>
-            <Text variant="titleMedium" style={{ fontWeight: 100, padding: 0, backgroundColor: theme.colors.error, textAlign: 'center', fontSize: 8, color: "#fff" }}>
-              {item.txn_type}
-
-            </Text>
+             
           </View>
           <View style={{
             paddingTop: 0,
@@ -193,8 +200,10 @@ export default function TransactionScreen() {
           params: {
             formId: 0,
             formName: 'Transaction',
+            formDescription: '',
+            formAmount: 0,
+            formType: 'credit',
             formAction: "Add",
-            formType: "Transaction"
           },
         })} />
       </Appbar.Header>
@@ -225,7 +234,7 @@ export default function TransactionScreen() {
               <Dialog visible={showModal} onDismiss={() => setShowModal(false)}>
                 {/* <Dialog.Title>Login Error</Dialog.Title> */}
                 <Dialog.Content>
-                  <Text variant="bodyMedium">Are you sure you want to delete this transaction id: {selectedTransactionId}?</Text>
+                  <Text variant="bodyMedium">Are you sure you want to delete this transaction id: ?</Text>
                 </Dialog.Content>
                 <Dialog.Actions>
                   <Button onPress={() => {
