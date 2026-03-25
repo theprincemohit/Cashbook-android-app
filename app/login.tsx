@@ -31,13 +31,13 @@ export default function LoginScreen() {
     }
 
     // Simulate login process
-    //setIsLoading(true);
+    setIsLoading(true);
     
     try {
       const response = await login({ username: email, password });
       console.log('Login response:', response.data);
       if (response.status === 200) {
-        setIsLoading(false);
+        // setIsLoading(false);
         setErrorMessage('');
         setShowError(false);
         await saveToken('userToken', response.data.access_token);
@@ -52,7 +52,9 @@ export default function LoginScreen() {
     } catch (error) {
       //setMessage("Network error: " + error.message);
       console.error('Login error:', error);
+      setIsLoading(false);
     }
+   
   };
 
   return (
@@ -92,7 +94,8 @@ export default function LoginScreen() {
           label={isLoading ? 'Signing In...' : 'Sign In'}
           onPress={handleLogin}
           mode="contained"
-          // disabled={isLoading}
+          disabled={isLoading}
+          loading={isLoading}
         />
       </MaterialCard>
 

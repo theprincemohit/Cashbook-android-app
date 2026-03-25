@@ -113,6 +113,7 @@ export const englishTranslations = {
   date: 'Date',
   amount: 'Amount',
   action: 'Action',
+  enterTransactionRemarks: 'Enter remarks',
 
   // Settings
   settingsManagement: 'Settings',

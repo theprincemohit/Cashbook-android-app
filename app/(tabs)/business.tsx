@@ -19,6 +19,7 @@ import {
 
 import { createBusiness, deleteBusinessById, getBusinesses, updateBusinessById } from '@/api/businessApi';
 import FormDialog from '@/components/FormDialog';
+import Loader from '@/components/Loader';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
@@ -38,6 +39,7 @@ export default function BusinessScreen() {
   const [formVisible, setFormVisible] = useState(false);
   const [formInitialValue, setFormInitialValue] = useState('');
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmitUpdate = async (data: any) => {
        const param = {
@@ -51,6 +53,7 @@ export default function BusinessScreen() {
           fetchBusinesses();
           console.log("Business updated successfully");
         }
+        setIsLoading(false);
        // Implementation for handling form submission
   };
 
@@ -66,12 +69,11 @@ export default function BusinessScreen() {
         "location": "string" // Optional: Could be added to form in future iterations
        };
        const result = await createBusiness(param);
-        console.log("Result of createBusiness:", result);
         if(result && result.status === 201) {
           setFormVisible(false);
           fetchBusinesses();
-          console.log("Business created successfully");
         }
+        setIsLoading(false);
        // Implementation for handling form submission
   };
 
@@ -82,15 +84,20 @@ export default function BusinessScreen() {
       fetchBusinesses();
       console.log("Business deleted successfully");
     }
+    setIsLoading(false);
   };
 
   const fetchBusinesses = async () => {
+    setIsLoading(true);
     try {
       const response = await getBusinesses();
       setBusinesses(response.data);
+      setIsLoading(false);
     } catch (error) {
       console.error('Error fetching businesses:', error);
+      setIsLoading(false);
     }
+    
   };
   useEffect(() => {
     fetchBusinesses();
@@ -190,15 +197,18 @@ export default function BusinessScreen() {
         ) : (
           <>
             <View style={styles.listContainer}>
-              <FlatList
-                data={businesses}
-                renderItem={renderBusinessItem}
-                keyExtractor={(item) => item.id}
-                scrollEnabled={false}
-                ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
+              {isLoading ? (
+                <Loader />
+              ) : (
+                <FlatList
+                  data={businesses}
+                  renderItem={renderBusinessItem}
+                  keyExtractor={(item) => item.id}
+                  scrollEnabled={false}
+                  ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
                 contentContainerStyle={{ paddingHorizontal: 5 }}
               />
-
+              )}
             </View>
             <Portal>
               <Dialog visible={showModal} onDismiss={() => setShowModal(false)}>
@@ -208,7 +218,7 @@ export default function BusinessScreen() {
                 </Dialog.Content>
                 <Dialog.Actions>
                   <Button onPress={() => {
-                    // setShowError(false);
+                    setIsLoading(true);
                     deleteBusinessByIdHandler();
                     setShowModal(false);
                     // fetchBusinesses();
@@ -232,6 +242,7 @@ export default function BusinessScreen() {
               label="Business Name"
               initialValue={formInitialValue}
               onSubmit={(data) => {
+                setIsLoading(true);
                 if (formMode === 'add') {
                   handleSubmitAdd(data);
                 } else {

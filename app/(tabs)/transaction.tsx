@@ -36,26 +36,30 @@ export default function TransactionScreen() {
   const [visible, setVisible] = useState('0');
   const [showModal, setShowModal] = useState(false);
   const [selectedTransactionId, setSelectedTransactionId] = useState<string>('');
-
+  const [isLoading, setIsLoading] = useState(false);
   const openMenu = (id: any) => setVisible(id);
   const closeMenu = (id: any) => setVisible(id);
 
   const deleteTransaction = async (id: string) => {
+    setIsLoading(true);
     try {
       const result = await deleteTransactionById(id);
       console.log("Result of deleteTransactionById API call:", result);
       if (result.status === 204) {
         setTransactions((prev) => prev.filter((txn) => txn.id !== id)); 
-        console.log(`Transaction with id ${id} deleted successfully`);
+        setIsLoading(false);
       } else {
+        setIsLoading(false);
         console.error(`Failed to delete transaction with id ${id}. Status code: ${result.status}`);
       }
     } catch (error) {
       console.error(`Error deleting transaction with id ${id}:`, error);
+      setIsLoading(false);
     }
   };
 
   const loadData = async () => {
+    setIsLoading(true);
     try {
       const { data, status } = await getTransactionByPassbookId(activePassbookId);
       console.log("Fetched transaction Entries:", data);
@@ -64,6 +68,8 @@ export default function TransactionScreen() {
       }
     } catch (error) {
       console.error('Error loading businesses:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -219,9 +225,7 @@ export default function TransactionScreen() {
           </MaterialCard>
         ) : (
           <><View style={styles.listContainer}>
-            <Text variant="labelMedium" style={{ paddingHorizontal: 16, marginBottom: 8 }}>
-              Total {transactions.length === 1 ? 'Customer' : 'transactions'}: {transactions.length}
-            </Text>
+           
             <FlatList
               data={transactions}
               renderItem={renderCustomerItem}

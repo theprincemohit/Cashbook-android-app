@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getToken } from './keychain';
 
 const fetchy = axios.create({
-  baseURL: 'http://13.49.72.158:8000/'
+  baseURL: 'https://casbook-api.onrender.com/'
 });
 
 

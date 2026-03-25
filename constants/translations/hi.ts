@@ -76,6 +76,7 @@ export const hindiTranslations = {
   editCustomer: 'ग्राहक संपादित करें',
   deleteCustomer: 'ग्राहक हटाएं',
   confirmDeleteCustomer: 'क्या आप इस ग्राहक को हटाना चाहते हैं?',
+  enterTransactionRemarks: 'टिप्पणियां दर्ज करें',
 
   // Passbook Screen
   passbookManagement: 'पासबुक',

@@ -20,6 +20,7 @@ import {
 
 import { createPassbook, deletePassbookById, getPassbookById, updatePassbookById } from '@/api/passbookApi';
 import FormDialog from '@/components/FormDialog';
+import Loader from '@/components/Loader';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
@@ -40,6 +41,7 @@ export default function PassbookScreen() {
   const [formVisible, setFormVisible] = useState(false);
   const [formInitialValue, setFormInitialValue] = useState('');
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
+  const [isLoading, setIsLoading] = useState(false);
 
   const openMenu = (id: any) => setVisible(id);
   const closeMenu = (id: any) => setVisible(id);
@@ -57,6 +59,7 @@ export default function PassbookScreen() {
       loadData();
       console.log("Passbook updated successfully");
     }
+    setIsLoading(false);
     // Implementation for handling form submission
   };
 
@@ -72,6 +75,7 @@ export default function PassbookScreen() {
       loadData();
       console.log("Passbook created successfully");
     }
+    setIsLoading(false);
     // Implementation for handling form submission
   };
 
@@ -82,18 +86,23 @@ export default function PassbookScreen() {
       loadData();
       console.log("Passbook deleted successfully");
     }
+    setIsLoading(false);
   };
 
   const loadData = async () => {
+    setIsLoading(true);
     try {
       const { data, status } = await getPassbookById(activeBusinessId);
       console.log("Fetched Passbook Entries for Business ID:", { activeBusinessId }, { status }, data);
       if (status == 200) {
         setEntries(data);
+        setIsLoading(false);
       }
     } catch (error) {
       console.error('Error loading businesses:', error);
+      setIsLoading(false);
     }
+    
   };
 
   useEffect(() => {
@@ -181,6 +190,10 @@ export default function PassbookScreen() {
     </Card>
   );
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
       <Appbar.Header>
@@ -215,6 +228,8 @@ export default function PassbookScreen() {
           </MaterialCard>
         ) : (
           <><View style={styles.listContainer}>
+           {isLoading ? <Loader /> 
+           : (
             <FlatList
               data={entries}
               renderItem={renderBusinessItem}
@@ -223,6 +238,8 @@ export default function PassbookScreen() {
               ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
               contentContainerStyle={{ paddingHorizontal: 5 }}
             />
+           )
+           } 
           </View>
             <Portal>
               <Dialog visible={showModal} onDismiss={() => setShowModal(false)}>
@@ -232,7 +249,7 @@ export default function PassbookScreen() {
                 </Dialog.Content>
                 <Dialog.Actions>
                   <Button onPress={() => {
-                    // setShowError(false);
+                    setIsLoading(true);
                     deletePassbookByIdHandler();
 
                     setShowModal(false);
@@ -257,6 +274,7 @@ export default function PassbookScreen() {
               label="Passbook Name"
               initialValue={formInitialValue}
               onSubmit={(data) => {
+                setIsLoading(true);
                 if (formMode === 'add') {
                   handleSubmitAdd(data);
                 } else {
@@ -264,6 +282,7 @@ export default function PassbookScreen() {
                 }
               }}
               mode={formMode}
+              isLoading={isLoading}
             />
       </ScrollView>
     </View>

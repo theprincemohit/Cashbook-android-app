@@ -5,7 +5,7 @@ import { useLanguageContext } from '@/context/LanguageContext';
 import { router, useLocalSearchParams } from "expo-router";
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   ScrollView,
@@ -21,7 +21,10 @@ import {
 } from 'react-native-paper';
 import * as yup from 'yup';
 
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 const schema = yup.object({
+  startDate: yup.date().required('Date is required'),
   transactionType: yup.mixed<'credit' | 'debit'>().oneOf(['credit', 'debit'], 'Please select transaction type').required('Transaction type is required'),
   amount: yup.number().positive('Amount must be positive').required('Amount is required').typeError('Amount must be a valid number'),
   description: yup.string().required('Description is required').min(3, 'Description must be at least 3 characters'),
@@ -35,13 +38,18 @@ export default function AddTransactionScreen({ route }: any) {
   const { control, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
+      startDate: new Date(),
       transactionType: (String(formType) || 'credit') as 'credit' | 'debit',
       amount: Number(formAmount) || 0,
       description: String(formDescription) || '',
     }
   });
-  console.log("Received params in AddTransactionScreen:", { formId, formAction, customerName, formDescription, formAmount, formType });
+  const [startDate, setStartDate] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)); // 30 days ago
+  const [showStartDateDialog, setShowStartDateDialog] = useState(false);
 
+  const handleDateChange = (date: string) => {
+    setStartDate(new Date(date));
+  };
   const onFormSubmit = async (data: any) => {
     let params;
     console.log("Form Action:", formAction);
@@ -54,7 +62,6 @@ export default function AddTransactionScreen({ route }: any) {
       description: data.description,
       }
       const result  = await updateTransactionById(formId,params);
-      console.log("Result of updateTransactionById API call:", result);
       if(result.status === 200) {
         handleAddEntry();
         router.push({
@@ -173,13 +180,125 @@ export default function AddTransactionScreen({ route }: any) {
           borderColor:formType === 'credit' ? '#01865f' : '#c93b3b', 
           borderWidth: 2
         }}>
+          
+           <Controller
+                  control={control}
+                  name="startDate"
+                  render={({ field: { onChange, value } }) => (
+                    <>
+                    <Button 
+                   icon="calendar" 
+                    mode="outlined"
+                     onPress={() => {
+                      console.log("Current startDate value:", value);
+                      setShowStartDateDialog(true)
+                    }} 
+                     style={{marginBottom: 8}}>
+    {startDate ? new Date(value).toLocaleDateString() : 'Select Date'}
+  </Button>
+                     {showStartDateDialog && <DateTimePicker
+          testID="dateTimePicker"
+          value={startDate}
+          mode={'date'}
+          is24Hour={true}
+          onValueChange={(event, selectedDate) => {
+            console.log("Selected date:", selectedDate);
+           // handleDateChange('start', selectedDate.toISOString().split('T')[0])
+            //handleDateChange('start', selectedDate.toISOString().split('T')[0])}
+                 setShowStartDateDialog(false);
+        }
+            
+          }
+          onDismiss={() => setShowStartDateDialog(false)}
+        />
+                  }
+                      <HelperText type="error" visible={!!errors.transactionType}>
+                        {errors.transactionType?.message}
+                      </HelperText>
+                    </>
+                  )}
+                />
+
+                 <Controller
+                  control={control}
+                  name="amount"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <>
+                      <TextInput
+                        label={t('entryAmount')}
+                        value={value !== 0 ? String(value) : ''}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        mode="outlined"
+                        placeholder="0.00"
+                        keyboardType="decimal-pad"
+                        style={styles.input}
+                        error={!!errors.amount}
+                      />
+                      <HelperText type="error" visible={!!errors.amount}>
+                        {errors.amount?.message}
+                      </HelperText>
+                    </>
+                  )}
+                />
+
+            
+               
+
+             {/* <TextInput
+              label={t('selectCustomer')}
+              value={customerName ? String(customerName) : ''}
+              onChangeText={() => {}}
+              onFocus={() => router.push({
+                        pathname: "/select-party",
+                        params: { formAction: formAction,
+                          formId: formId,
+                          customerName: customerName,
+                          formAmount: amount || String(formAmount),
+                          formType:  transactionType || String(formType),
+                          formDescription: description || String(formDescription),
+                         },
+                      })}
+              mode="outlined"
+              style={[styles.input]}
+            /> */}
+
            
+
+
+            <Controller
+              control={control}
+              name="description"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <>
+                  <TextInput
+                    label={t('remarks')}
+                    value={value !== undefined && value !== null ? String(value) : ''}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    mode="outlined"
+                    placeholder={t('enterTransactionRemarks')}
+                    style={styles.input}
+                    multiline
+                    numberOfLines={3}
+                    error={!!errors.description}
+                  />
+                  <HelperText type="error" visible={!!errors.description}>
+                    {errors.description?.message}
+                  </HelperText>
+                </>
+
+
+              )}
+            />
+
             <View style={styles.transactionTypeRow}>
                 <Controller
                   control={control}
                   name="transactionType"
                   render={({ field: { onChange, value } }) => (
                     <>
+                    
                       <SegmentedButtons
                         value={value || String(formType)}
                         onValueChange={onChange}
@@ -209,74 +328,7 @@ export default function AddTransactionScreen({ route }: any) {
                   )}
                 />
             </View>
-                <Controller
-                  control={control}
-                  name="amount"
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <>
-                      <TextInput
-                        label={t('entryAmount')}
-                        value={value !== 0 ? String(value) : ''}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        mode="outlined"
-                        placeholder="0.00"
-                        keyboardType="decimal-pad"
-                        style={styles.input}
-                        error={!!errors.amount}
-                      />
-                      <HelperText type="error" visible={!!errors.amount}>
-                        {errors.amount?.message}
-                      </HelperText>
-                    </>
-                  )}
-                />
-
-             {/* <TextInput
-              label={t('selectCustomer')}
-              value={customerName ? String(customerName) : ''}
-              onChangeText={() => {}}
-              onFocus={() => router.push({
-                        pathname: "/select-party",
-                        params: { formAction: formAction,
-                          formId: formId,
-                          customerName: customerName,
-                          formAmount: amount || String(formAmount),
-                          formType:  transactionType || String(formType),
-                          formDescription: description || String(formDescription),
-                         },
-                      })}
-              mode="outlined"
-              style={[styles.input]}
-            /> */}
-
-           
-
-
-            <Controller
-              control={control}
-              name="description"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <>
-                  <TextInput
-                    label={t('description')}
-                    value={value !== undefined && value !== null ? String(value) : ''}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    mode="outlined"
-                    placeholder={t('enterTransactionDescription')}
-                    style={styles.input}
-                    multiline
-                    numberOfLines={3}
-                    error={!!errors.description}
-                  />
-                  <HelperText type="error" visible={!!errors.description}>
-                    {errors.description?.message}
-                  </HelperText>
-                </>
-              )}
-            />
-            <Button style={{marginTop: 16}} mode="contained" onPress={handleSubmit(onFormSubmit)}>
+            <Button style={{marginTop: 2}} mode="contained" onPress={handleSubmit(onFormSubmit)}>
               {t('add')}
             </Button>
              <Button style={{marginTop: 16}} mode='outlined' 
@@ -363,10 +415,10 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   input: {
-    marginTop: 8,
+    marginTop: 2,
   },
   transactionTypeRow: {
-    marginBottom: 16,
+    marginBottom: 5,
   },
   customerSelectRow: {
     marginBottom: 16,

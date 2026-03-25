@@ -16,6 +16,7 @@ interface FormDialogProps {
   initialValue?: string;
   onSubmit: (data: { name: string }) => void;
   mode: 'add' | 'edit';
+  isLoading?: boolean;
 }
 
 const FormDialog: React.FC<FormDialogProps> = ({
@@ -26,6 +27,7 @@ const FormDialog: React.FC<FormDialogProps> = ({
   initialValue = '',
   onSubmit,
   mode,
+  isLoading = false,
 }) => {
   const { control, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema),
@@ -66,8 +68,13 @@ const FormDialog: React.FC<FormDialogProps> = ({
           )}
         />
         {errors.name && <Text style={{ color: 'red', marginBottom: 16 }}>{errors.name.message}</Text>}
-        <Button mode="contained" onPress={handleSubmit(handleFormSubmit)} style={{ marginTop: 16 }}>
-          {mode === 'add' ? 'Add' : 'Update'}
+        <Button mode="contained" 
+          onPress={handleSubmit(handleFormSubmit)} 
+          style={{ marginTop: 16 }}
+          loading={isLoading}
+          disabled={isLoading}
+        >
+            {mode === 'add' ? 'Add' : 'Update'}
         </Button>
         <Button mode="outlined" onPress={onDismiss} style={{ marginTop: 8 }}>
           Cancel
