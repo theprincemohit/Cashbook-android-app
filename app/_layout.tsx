@@ -4,10 +4,12 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
 import 'react-native-reanimated';
 
+import { getToken } from '@/api/keychain';
 import { BusinessProvider } from '@/context/BusinessContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { TeamProvider } from '@/context/TeamContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useEffect, useState } from 'react';
 
 export const unstable_settings = {
   initialRouteName: 'login',
@@ -39,7 +41,15 @@ const darkTheme = {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? darkTheme : lightTheme;
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = await getToken();
+      console.log('Token on app load:', token);
+      setIsLoggedIn(!!token);
+    };
+    checkToken();
+  }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <LanguageProvider>
@@ -47,6 +57,14 @@ export default function RootLayout() {
         <TeamProvider>
           <PaperProvider theme={theme}>
             <Stack>
+              {/* {isLoggedIn ? (
+                <>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+                </>
+              ) : (
+                <Stack.Screen name="login" options={{ headerShown: false }} />
+              )} */}
               <Stack.Screen name="login" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />

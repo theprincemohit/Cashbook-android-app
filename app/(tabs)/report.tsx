@@ -336,22 +336,6 @@ export default function ReportScreen() {
       </View>
 
       {showStartDateDialog && (
-        // <Portal>
-        //   <Dialog visible={showStartDateDialog} onDismiss={() => setShowStartDateDialog(false)}>
-        //     <Dialog.Title>Select Start Date</Dialog.Title>
-        //     <Dialog.Content>
-        //       <Text>Enter date in YYYY-MM-DD format:</Text>
-        //       <Text>{startDate.toISOString().split('T')[0]}</Text>
-        //       <Button onPress={() => handleDateChange('start', startDate.toISOString().split('T')[0])}>
-        //         Use Current Date
-        //       </Button>
-        //     </Dialog.Content>
-        //     <Dialog.Actions>
-        //       <Button onPress={() => setShowStartDateDialog(false)}>Cancel</Button>
-        //       <Button onPress={() => handleDateChange('start', startDate.toISOString().split('T')[0])}>OK</Button>
-        //     </Dialog.Actions>
-        //   </Dialog>
-        // </Portal>
         <DateTimePicker
           testID="dateTimePicker"
           value={startDate}
@@ -359,7 +343,6 @@ export default function ReportScreen() {
           is24Hour={true}
           onValueChange={(event, selectedDate) => {
             handleDateChange('start', selectedDate.toISOString().split('T')[0])
-            //handleDateChange('start', selectedDate.toISOString().split('T')[0])}
                  setShowStartDateDialog(false);
         }
             
@@ -369,30 +352,13 @@ export default function ReportScreen() {
       )}
 
       {showEndDateDialog && (
-        // <Portal>
-        //   <Dialog visible={showEndDateDialog} onDismiss={() => setShowEndDateDialog(false)}>
-        //     <Dialog.Title>Select End Date</Dialog.Title>
-        //     <Dialog.Content>
-        //       <Text>Enter date in YYYY-MM-DD format:</Text>
-        //       <Text>{endDate.toISOString().split('T')[0]}</Text>
-        //       <Button onPress={() => handleDateChange('end', endDate.toISOString().split('T')[0])}>
-        //         Use Current Date
-        //       </Button>
-        //     </Dialog.Content>
-        //     <Dialog.Actions>
-        //       <Button onPress={() => setShowEndDateDialog(false)}>Cancel</Button>
-        //       <Button onPress={() => handleDateChange('end', endDate.toISOString().split('T')[0])}>OK</Button>
-        //     </Dialog.Actions>
-        //   </Dialog>
-        // </Portal>
-        <DateTimePicker
+       <DateTimePicker
           testID="dateTimePicker"
           value={endDate}
           mode={'date'}
           is24Hour={true}
           onValueChange={(event, selectedDate) => {
             handleDateChange('end', selectedDate.toISOString().split('T')[0])
-            //handleDateChange('start', selectedDate.toISOString().split('T')[0])}
                  setShowEndDateDialog(false);
         }
             

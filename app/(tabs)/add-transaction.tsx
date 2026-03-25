@@ -21,6 +21,7 @@ import {
 } from 'react-native-paper';
 import * as yup from 'yup';
 
+import { formatDate } from '@/utils';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const schema = yup.object({
@@ -34,11 +35,11 @@ export default function AddTransactionScreen({ route }: any) {
   const { t } = useLanguageContext();
   const { setActivePassbookId, activePassbookId, setActiveBusinessId } = useBusinessContext();
   const parseQueryParams  = useLocalSearchParams();
-  const { formId, formAction, customerName, formDescription, formAmount, formType } = parseQueryParams;
+  const { formId, formAction, formDate, formDescription, formAmount, formType } = parseQueryParams;
   const { control, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      startDate: new Date(),
+      startDate:  new Date(),
       transactionType: (String(formType) || 'credit') as 'credit' | 'debit',
       amount: Number(formAmount) || 0,
       description: String(formDescription) || '',
@@ -46,19 +47,20 @@ export default function AddTransactionScreen({ route }: any) {
   });
   const [startDate, setStartDate] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)); // 30 days ago
   const [showStartDateDialog, setShowStartDateDialog] = useState(false);
+  const [isloading, setIsLoading] = useState(false);
 
   const handleDateChange = (date: string) => {
     setStartDate(new Date(date));
   };
   const onFormSubmit = async (data: any) => {
     let params;
-    console.log("Form Action:", formAction);
+    setIsLoading(true);
      if(formAction === "update") {
       params = {
       passbook_id: activePassbookId, // Placeholder: Replace with actual passbook ID associated with selected business
       txn_type: data.transactionType,
       amount: parseFloat(data.amount),
-      txn_date: new Date().toISOString(),
+      txn_date: startDate.toISOString(),
       description: data.description,
       }
       const result  = await updateTransactionById(formId,params);
@@ -75,7 +77,7 @@ export default function AddTransactionScreen({ route }: any) {
       passbook_id: activePassbookId, // Placeholder: Replace with actual passbook ID associated with selected business
       txn_type: data.transactionType,
       amount: parseFloat(data.amount),
-      txn_date: new Date().toISOString(),
+      txn_date: startDate.toISOString(),
       description: data.description,
       }
       const result  = await createTransaction(params);
@@ -88,7 +90,7 @@ export default function AddTransactionScreen({ route }: any) {
         });
       }
     }
-    
+    console.log("Form submitted with data:", params);
       
        
   };
@@ -102,13 +104,14 @@ export default function AddTransactionScreen({ route }: any) {
       // Simulate an API call
       //const result = //await new Promise(resolve => setTimeout(() => resolve(
       const result =   {
+      startDate:  new Date(),
       transactionType: (String(formType) || 'credit') as 'credit' | 'debit',
       amount: formAmount ? Number(formAmount) : 0,
       description: String(formDescription) || '',
     }
     //   ), 200));
       
-      
+      setIsLoading(false);
       reset(result); // Resets the form with fetched values
     };
 
@@ -194,7 +197,8 @@ export default function AddTransactionScreen({ route }: any) {
                       setShowStartDateDialog(true)
                     }} 
                      style={{marginBottom: 8}}>
-    {startDate ? new Date(value).toLocaleDateString() : 'Select Date'}
+                    
+    {startDate ? formatDate(startDate) : 'Select Date'}
   </Button>
                      {showStartDateDialog && <DateTimePicker
           testID="dateTimePicker"
@@ -203,7 +207,7 @@ export default function AddTransactionScreen({ route }: any) {
           is24Hour={true}
           onValueChange={(event, selectedDate) => {
             console.log("Selected date:", selectedDate);
-           // handleDateChange('start', selectedDate.toISOString().split('T')[0])
+           handleDateChange(selectedDate.toISOString().split('T')[0])
             //handleDateChange('start', selectedDate.toISOString().split('T')[0])}
                  setShowStartDateDialog(false);
         }
@@ -328,8 +332,12 @@ export default function AddTransactionScreen({ route }: any) {
                   )}
                 />
             </View>
-            <Button style={{marginTop: 2}} mode="contained" onPress={handleSubmit(onFormSubmit)}>
-              {t('add')}
+            <Button style={{marginTop: 2}} 
+              mode="contained"
+              loading={isloading}
+              disabled={isloading}
+              onPress={handleSubmit(onFormSubmit)}>
+                {t('add')}
             </Button>
              <Button style={{marginTop: 16}} mode='outlined' 
                 onPress={() => router.push({pathname: '/transaction'})}>

@@ -22,7 +22,7 @@ import { deleteTransactionById, getTransactionByPassbookId } from '@/api/transac
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
-import { currencyFormat, formatDateTime } from '@/utils';
+import { currencyFormat, formatDate } from '@/utils';
 import { router, useLocalSearchParams } from 'expo-router';
 
 export default function TransactionScreen() {
@@ -134,11 +134,7 @@ export default function TransactionScreen() {
 
             </Text>
             <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
-              {/* {item.createdAt.toLocaleDateString("en-Us",{ year: "numeric", month: "short", day: "numeric"})}  |  
-                {item.createdAt.toLocaleTimeString("en-Us",{ hour: "2-digit", minute: "2-digit" })}
-               */}
-                {formatDateTime(item.created_at)}
-             {/* <Text>{"Apr 15, 2026 | 10:30 AM"}</Text>  */}
+                {formatDate(item.txn_date)}
             </Text>
           </View>
           <View style={styles.customerInfo}>
@@ -176,6 +172,7 @@ export default function TransactionScreen() {
                     formAmount: item.amount,
                     formType: item.txn_type,
                     formAction: "update",
+                    formDate: item.txn_date,
                   },
                 })
               }} title="Edit" />
