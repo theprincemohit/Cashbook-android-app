@@ -106,6 +106,14 @@ export default function TabLayout() {
             title: 'Settings',
           }}
         />
+        <Drawer.Screen
+          name="report"
+          options={{
+            drawerLabel: 'Report',
+            title: 'Report',
+            headerShown: false,
+          }}
+        />
       </Drawer>
     </GestureHandlerRootView>
   );
