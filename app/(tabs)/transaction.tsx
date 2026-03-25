@@ -195,6 +195,7 @@ export default function TransactionScreen() {
           params: {},
         })} />
         <Appbar.Content title="Transaction" />
+        <Appbar.Action icon="file" onPress={() => router.push('/report')} />
         <Appbar.Action icon="plus" onPress={() => router.push({
           pathname: '/add-transaction',
           params: {
