@@ -172,7 +172,7 @@ export default function TransactionScreen() {
                     formAmount: item.amount,
                     formType: item.txn_type,
                     formAction: "update",
-                    formDate: item.txn_date,
+                    formDate: item.txn_date.split('T')[0],
                   },
                 })
               }} title="Edit" />

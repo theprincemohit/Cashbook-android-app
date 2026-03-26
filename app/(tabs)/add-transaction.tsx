@@ -25,7 +25,7 @@ import { formatDate } from '@/utils';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const schema = yup.object({
-  startDate: yup.date().required('Date is required'),
+  txnDate: yup.date().required('Date is required'),
   transactionType: yup.mixed<'credit' | 'debit'>().oneOf(['credit', 'debit'], 'Please select transaction type').required('Transaction type is required'),
   amount: yup.number().positive('Amount must be positive').required('Amount is required').typeError('Amount must be a valid number'),
   description: yup.string().required('Description is required').min(3, 'Description must be at least 3 characters'),
@@ -39,7 +39,7 @@ export default function AddTransactionScreen({ route }: any) {
   const { control, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      startDate:  new Date(),
+      txnDate:  new Date(),
       transactionType: (String(formType) || 'credit') as 'credit' | 'debit',
       amount: Number(formAmount) || 0,
       description: String(formDescription) || '',
@@ -104,7 +104,7 @@ export default function AddTransactionScreen({ route }: any) {
       // Simulate an API call
       //const result = //await new Promise(resolve => setTimeout(() => resolve(
       const result =   {
-      startDate:  new Date(),
+      txnDate:  formDate ,
       transactionType: (String(formType) || 'credit') as 'credit' | 'debit',
       amount: formAmount ? Number(formAmount) : 0,
       description: String(formDescription) || '',
@@ -186,7 +186,7 @@ export default function AddTransactionScreen({ route }: any) {
           
            <Controller
                   control={control}
-                  name="startDate"
+                  name="txnDate"
                   render={({ field: { onChange, value } }) => (
                     <>
                     <Button 
@@ -198,11 +198,11 @@ export default function AddTransactionScreen({ route }: any) {
                     }} 
                      style={{marginBottom: 8}}>
                     
-    {startDate ? formatDate(startDate) : 'Select Date'}
+    {value ? formatDate(new Date(value)) : 'Select Date'}
   </Button>
                      {showStartDateDialog && <DateTimePicker
           testID="dateTimePicker"
-          value={startDate}
+          value={value}
           mode={'date'}
           is24Hour={true}
           onValueChange={(event, selectedDate) => {
