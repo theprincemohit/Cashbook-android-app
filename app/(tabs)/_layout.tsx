@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Drawer } from 'expo-router/drawer';
 import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Appbar, useTheme } from 'react-native-paper';
+import { Appbar, Avatar, useTheme } from 'react-native-paper';
 
 import { DrawerContent } from '@/components/DrawerContent';
 
@@ -12,9 +12,9 @@ function HamburgerHeader() {
   const theme = useTheme();
 
   return (
-    <Appbar.Header style={{ backgroundColor: theme.colors.primary }}>
+    <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
       <Appbar.Action
-        icon="menu"
+        icon={ () => <Avatar.Text size={24} label="MK" />}
         onPress={() => navigation.toggleDrawer()}
         iconColor={theme.colors.onPrimary}
       />

@@ -185,7 +185,7 @@ export default function BusinessScreen() {
 
         </View>
 
-        {businesses.length === 0 ? (
+        {isLoading ? <Loader /> : businesses.length === 0 ? (
           <>
             <MaterialCard title={t('noBusiness')} subtitle={t('getStartedBusiness')}>
               <Text variant="bodyMedium" style={{ textAlign: 'center', paddingVertical: 16 }}>

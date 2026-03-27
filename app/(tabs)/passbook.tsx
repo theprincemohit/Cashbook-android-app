@@ -190,10 +190,6 @@ export default function PassbookScreen() {
     </Card>
   );
 
-  if (isLoading) {
-    return <Loader />;
-  }
-
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
       <Appbar.Header>
@@ -220,7 +216,7 @@ export default function PassbookScreen() {
         >
           Add New Passbook
         </Button>
-        {entries.length === 0 ? (
+        {isLoading ? <Loader /> : entries.length === 0 ? (
           <MaterialCard title={t('noPassbook')} subtitle={t('getStartedBusiness')}>
             <Text variant="bodyMedium" style={{ textAlign: 'center', paddingVertical: 16 }}>
               {t('notCreatedBusiness')}

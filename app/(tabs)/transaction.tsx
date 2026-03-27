@@ -19,6 +19,7 @@ import {
 } from 'react-native-paper';
 
 import { deleteTransactionById, getTransactionByPassbookId } from '@/api/transactionApi';
+import Loader from '@/components/Loader';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
@@ -214,7 +215,7 @@ export default function TransactionScreen() {
 
       <ScrollView style={styles.scrollView}>
         <SummaryCard />
-        {transactions.length === 0 ? (
+        {isLoading ? <Loader /> : transactions.length === 0 ? (
           <MaterialCard title="No transactions" subtitle="Get started by adding one">
             <Text variant="bodyMedium" style={{ textAlign: 'center', paddingVertical: 16 }}>
               You haven't added any transactions yet. Tap the + button to add one.
@@ -222,7 +223,9 @@ export default function TransactionScreen() {
           </MaterialCard>
         ) : (
           <><View style={styles.listContainer}>
-           
+           {isLoading ? (
+                <Loader />
+              ) : (
             <FlatList
               data={transactions}
               renderItem={renderCustomerItem}
@@ -231,6 +234,7 @@ export default function TransactionScreen() {
               ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
               contentContainerStyle={{ paddingHorizontal: 5 }}
             />
+            )}
           </View>
            <Portal>
               <Dialog visible={showModal} onDismiss={() => setShowModal(false)}>
