@@ -115,14 +115,7 @@ export function BottomTabLayout() {
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="compass" color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="login"
-        options={{
-          headerShown: false,
-          title: 'Login',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="sign-in" color={color} />,
-        }}
-      />
+      
     </Tabs>
   );
 }
