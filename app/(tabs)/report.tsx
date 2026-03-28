@@ -252,7 +252,14 @@ export default function ReportScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
-      <Appbar.Header>
+      <Appbar.Header dark={true} style={{ 
+        backgroundColor: theme.colors.primary, 
+        height: 30,
+        marginTop: 2,
+        paddingTop: 0,
+        marginBottom: 8,
+
+         }}>
         <Appbar.BackAction onPress={() => router.push('/transaction')} />
         <Appbar.Content title="Report" />
         
