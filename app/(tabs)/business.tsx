@@ -24,10 +24,12 @@ import Loader from '@/components/Loader';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
+import { useProtectedRoute } from '@/hooks/useAuthRoute';
 import { Business } from '@/types/business';
 import { formatDateTime } from '@/utils';
 import { router } from 'expo-router';
 export default function BusinessScreen() {
+  useProtectedRoute();
   const [visible, setVisible] = useState('0');
   const [showModal, setShowModal] = useState(false);
   const openMenu = (id: any) => setVisible(id);

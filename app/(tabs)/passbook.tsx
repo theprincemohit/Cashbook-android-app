@@ -24,11 +24,13 @@ import Loader from '@/components/Loader';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
+import { useProtectedRoute } from '@/hooks/useAuthRoute';
 import { usePassbookContext } from '@/hooks/usePassbookContext';
 import { formatDateTime } from '@/utils';
 import { router, useLocalSearchParams } from 'expo-router';
 
 export default function PassbookScreen() {
+  useProtectedRoute();
   const theme = useTheme();
   const { activeBusinessId, setActivePassbookId } = useBusinessContext();
   const { t } = useLanguageContext();

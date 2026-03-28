@@ -8,12 +8,14 @@ import { login } from '@/api/userApi';
 import { MaterialButton } from '@/components/MaterialButton';
 import { MaterialCard } from '@/components/MaterialCard';
 import { MaterialInput } from '@/components/MaterialInput';
+import { usePublicRoute } from '@/hooks/useAuthRoute';
 
 // Dummy credentials for demo
 const DUMMY_EMAIL = 'mohitkumar111';
 const DUMMY_PASSWORD = '123456';
 
 export default function LoginScreen() {
+  usePublicRoute();
   const [email, setEmail] = useState(DUMMY_EMAIL);
   const [password, setPassword] = useState(DUMMY_PASSWORD);
   const [showError, setShowError] = useState(false);

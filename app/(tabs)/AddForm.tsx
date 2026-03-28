@@ -5,6 +5,7 @@ import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
 import { router, useLocalSearchParams } from "expo-router";
 
+import { useProtectedRoute } from '@/hooks/useAuthRoute';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -27,6 +28,7 @@ const schema = yup.object({
 }).required();
 
 export default function AddFormScreen({ route }: any) {
+  useProtectedRoute();
   const { t } = useLanguageContext(); 
   const { formId, formName, formDescription, formAction, formType } = useLocalSearchParams();
   const { activeBusinessId } = useBusinessContext();

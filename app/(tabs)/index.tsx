@@ -5,10 +5,12 @@ import { Card, Icon, Text, useTheme } from 'react-native-paper';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
+import { useProtectedRoute } from '@/hooks/useAuthRoute';
 import { useCustomerContext } from '@/hooks/useCustomerContext';
 import { usePassbookContext } from '@/hooks/usePassbookContext';
 
 export default function HomeScreen() {
+  useProtectedRoute();
   const theme = useTheme();
   const { t } = useLanguageContext();
   const { businesses } = useBusinessContext();

@@ -8,11 +8,13 @@ import { getTransactionByPassbookId } from '@/api/transactionApi';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
+import { useProtectedRoute } from '@/hooks/useAuthRoute';
 import { formatDateTime } from '@/utils';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 
 export default function ReportScreen() {
+  useProtectedRoute();
   const theme = useTheme();
   const { t } = useLanguageContext();
   const { activePassbookId, businesses, activeBusinessId } = useBusinessContext();

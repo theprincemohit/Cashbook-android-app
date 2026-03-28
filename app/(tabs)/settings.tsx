@@ -5,10 +5,12 @@ import { Button, Menu, Text, TouchableRipple, useTheme } from 'react-native-pape
 import { deleteToken } from '@/api/keychain';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useTeamContext } from '@/context/TeamContext';
+import { useProtectedRoute } from '@/hooks/useAuthRoute';
 import { useLanguage } from '@/hooks/useLanguage';
 import { router } from 'expo-router';
 
 export default function SettingsScreen() {
+  useProtectedRoute();
   const theme = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const { currentUser } = useTeamContext();

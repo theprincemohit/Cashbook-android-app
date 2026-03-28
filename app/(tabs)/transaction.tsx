@@ -23,10 +23,12 @@ import Loader from '@/components/Loader';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
+import { useProtectedRoute } from '@/hooks/useAuthRoute';
 import { currencyFormat, formatDate } from '@/utils';
 import { router, useLocalSearchParams } from 'expo-router';
 
 export default function TransactionScreen() {
+  useProtectedRoute();
   const theme = useTheme();
   const { t } = useLanguageContext();
   const params = useLocalSearchParams();

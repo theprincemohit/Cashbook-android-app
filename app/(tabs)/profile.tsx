@@ -4,8 +4,10 @@ import { Avatar, Divider, Text, useTheme } from 'react-native-paper';
 
 import { MaterialCard } from '@/components/MaterialCard';
 import { useLanguageContext } from '@/context/LanguageContext';
+import { useProtectedRoute } from '@/hooks/useAuthRoute';
 
 export default function ProfileScreen() {
+  useProtectedRoute();
   const theme = useTheme();
   const { t } = useLanguageContext();
 

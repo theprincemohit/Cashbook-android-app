@@ -1,4 +1,5 @@
 import { useLanguageContext } from '@/context/LanguageContext';
+import { useProtectedRoute } from '@/hooks/useAuthRoute';
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from 'react';
 import {
@@ -19,6 +20,7 @@ import {
 
 
 export default function SelectPartyScreen() {
+  useProtectedRoute();
   const data = [{
     "recordID": "6b2237ee0df85980",
     "givenName": "John",
