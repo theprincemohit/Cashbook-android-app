@@ -7,9 +7,10 @@ import { Appbar, Avatar, useTheme } from 'react-native-paper';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 export function BottomTabLayout() {
+  const theme = useTheme();
   return (
     <Tabs screenOptions={{ 
-      tabBarActiveTintColor: 'blue',  
+      tabBarActiveTintColor: theme.colors.primary,  
       headerShown: false ,
        tabBarStyle: {
       height: 50,

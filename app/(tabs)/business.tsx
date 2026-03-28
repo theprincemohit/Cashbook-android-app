@@ -34,7 +34,7 @@ export default function BusinessScreen() {
   const closeMenu = (id: any) => setVisible(id);
   const theme = useTheme();
   const { t } = useLanguageContext();
-  const { businesses, setBusinesses, deleteBusiness, setActiveBusinessId } = useBusinessContext();
+  const { businesses, setBusinesses, deleteBusiness, setActiveBusinessId, activeBusinessId } = useBusinessContext();
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('');
 
   const [formVisible, setFormVisible] = useState(false);
@@ -43,45 +43,45 @@ export default function BusinessScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmitUpdate = async (data: any) => {
-       const param = {
-        name: data.name,
-        "user_id": 1,  //Question: Should this be dynamic based on logged in user?
-       };
-       const result = await updateBusinessById(selectedBusinessId, param);
-        console.log("Result of updateBusinessById:", result.status);
-        if(result && result.status === 200) {
-          setFormVisible(false);
-          fetchBusinesses();
-          console.log("Business updated successfully");
-        }
-        setIsLoading(false);
-       // Implementation for handling form submission
+    const param = {
+      name: data.name,
+      "user_id": 1,  //Question: Should this be dynamic based on logged in user?
+    };
+    const result = await updateBusinessById(selectedBusinessId, param);
+    console.log("Result of updateBusinessById:", result.status);
+    if (result && result.status === 200) {
+      setFormVisible(false);
+      fetchBusinesses();
+      console.log("Business updated successfully");
+    }
+    setIsLoading(false);
+    // Implementation for handling form submission
   };
 
   const handleSubmitAdd = async (data: any) => {
-       const param = {
-        name: data.name,
-        description: data.name, // Using separate field for description
-        "user_id": 1,  //Question: Should this be dynamic based on logged in user?
-        "industry": "string", // Optional: Could be added to form in future iterations
-        "founded_year": 1800, // Optional: Could be added to form in future iterations
-        "revenue": 0, // Optional: Could be added to form in future iterations
-        "employees": 1, // Optional: Could be added to form in future iterations
-        "location": "string" // Optional: Could be added to form in future iterations
-       };
-       const result = await createBusiness(param);
-        if(result && result.status === 201) {
-          setFormVisible(false);
-          fetchBusinesses();
-        }
-        setIsLoading(false);
-       // Implementation for handling form submission
+    const param = {
+      name: data.name,
+      description: data.name, // Using separate field for description
+      "user_id": 1,  //Question: Should this be dynamic based on logged in user?
+      "industry": "string", // Optional: Could be added to form in future iterations
+      "founded_year": 1800, // Optional: Could be added to form in future iterations
+      "revenue": 0, // Optional: Could be added to form in future iterations
+      "employees": 1, // Optional: Could be added to form in future iterations
+      "location": "string" // Optional: Could be added to form in future iterations
+    };
+    const result = await createBusiness(param);
+    if (result && result.status === 201) {
+      setFormVisible(false);
+      fetchBusinesses();
+    }
+    setIsLoading(false);
+    // Implementation for handling form submission
   };
 
   const deleteBusinessByIdHandler = async () => {
     const result = await deleteBusinessById(selectedBusinessId);
     console.log("Result of deleteBusinessById:", result);
-    if(result && result.status === 204) {
+    if (result && result.status === 204) {
       fetchBusinesses();
       console.log("Business deleted successfully");
     }
@@ -98,7 +98,7 @@ export default function BusinessScreen() {
       console.error('Error fetching businesses:', error);
       setIsLoading(false);
     }
-    
+
   };
   useEffect(() => {
     fetchBusinesses();
@@ -121,7 +121,7 @@ export default function BusinessScreen() {
               {item.name}
             </Text>
             <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
-               {formatDateTime(item.created_at)}
+              {formatDateTime(item.created_at)}
             </Text>
           </View>
 
@@ -166,29 +166,28 @@ export default function BusinessScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
-       <Appbar.Header dark={true} style={{ 
-        backgroundColor: theme.colors.primary, 
+      <Appbar.Header dark={true} style={{
+        backgroundColor: theme.colors.primary,
         height: 30,
         marginTop: 2,
         paddingTop: 0,
         marginBottom: 8,
 
-         }}>
-       
+      }}>
+
         <Appbar.Content title={t('businessManagement')} />
-        
+
       </Appbar.Header>
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
-         
-          <Button 
-            icon="plus" 
-            mode="outlined" 
-            onPress={() => 
-              {
-                setFormVisible(true);
-                setFormInitialValue('');
-              }
+
+          <Button
+            icon="plus"
+            mode="outlined"
+            onPress={() => {
+              setFormVisible(true);
+              setFormInitialValue('');
+            }
             }
           >
             Add New Business
@@ -217,8 +216,8 @@ export default function BusinessScreen() {
                   keyExtractor={(item) => item.id}
                   scrollEnabled={false}
                   ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
-                contentContainerStyle={{ paddingHorizontal: 5 }}
-              />
+                  contentContainerStyle={{ paddingHorizontal: 5 }}
+                />
               )}
             </View>
             <Portal>
@@ -240,28 +239,36 @@ export default function BusinessScreen() {
                 </Dialog.Actions>
               </Dialog>
             </Portal>
-            
+
           </>
         )}
-        <FormDialog 
-              visible={formVisible} 
-              onDismiss={() => {
-                setFormVisible(false);
-                setFormInitialValue('');
-              }}
-              title={`${formMode === 'add' ? 'Add' : 'Rename'} Business`}
-              label="Business Name"
-              initialValue={formInitialValue}
-              onSubmit={(data) => {
-                setIsLoading(true);
-                if (formMode === 'add') {
-                  handleSubmitAdd(data);
-                } else {
-                  handleSubmitUpdate(data);
-                }
-              }}
-              mode={formMode}
-            />
+        <FormDialog
+          visible={formVisible}
+          onDismiss={() => {
+            setFormVisible(false);
+            setFormInitialValue('');
+          }}
+          title={`${formMode === 'add' ? 'Add' : 'Rename'} Business`}
+          label="Business Name"
+          initialValue={formInitialValue}
+          onSubmit={(data) => {
+            setIsLoading(true);
+            if (formMode === 'add') {
+              handleSubmitAdd(data);
+            } else {
+              handleSubmitUpdate(data);
+            }
+          }}
+          mode={formMode}
+        />
+        {/* {businesses.length > 0 &&
+          <BottomDrawer
+            business={businesses}
+            setActiveBusinessId={setActiveBusinessId}
+            activeBusinessId={String(activeBusinessId)}
+            handleChange={() => {}}
+          />
+        } */}
       </ScrollView>
     </View>
   );
