@@ -66,6 +66,7 @@ export default function AddTransactionScreen({ route }: any) {
       const result  = await updateTransactionById(formId,params);
       if(result.status === 200) {
         handleAddEntry();
+        setIsLoading(false);
         router.push({
           pathname: '/transaction',
           params: { refresh: String(new Date().getTime()) }, // Pass a timestamp
@@ -83,6 +84,7 @@ export default function AddTransactionScreen({ route }: any) {
       const result  = await createTransaction(params);
       if(result.status === 201) {
         handleAddEntry();
+        setIsLoading(false);
         router.push({
           pathname: '/transaction',
           params: { refresh: String(new Date().getTime()) },
@@ -203,6 +205,7 @@ export default function AddTransactionScreen({ route }: any) {
           mode={'date'}
           is24Hour={true}
           onValueChange={(event, selectedDate) => {
+            console.log('Date', selectedDate)
            handleDateChange(selectedDate.toISOString().split('T')[0])
             //handleDateChange('start', selectedDate.toISOString().split('T')[0])}
                  setShowStartDateDialog(false);
