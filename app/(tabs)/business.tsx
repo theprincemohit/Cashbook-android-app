@@ -50,11 +50,9 @@ export default function BusinessScreen() {
       "user_id": 1,  //Question: Should this be dynamic based on logged in user?
     };
     const result = await updateBusinessById(selectedBusinessId, param);
-    console.log("Result of updateBusinessById:", result.status);
     if (result && result.status === 200) {
       setFormVisible(false);
       fetchBusinesses();
-      console.log("Business updated successfully");
     }
     setIsLoading(false);
     // Implementation for handling form submission
@@ -82,10 +80,8 @@ export default function BusinessScreen() {
 
   const deleteBusinessByIdHandler = async () => {
     const result = await deleteBusinessById(selectedBusinessId);
-    console.log("Result of deleteBusinessById:", result);
     if (result && result.status === 204) {
       fetchBusinesses();
-      console.log("Business deleted successfully");
     }
     setIsLoading(false);
   };
@@ -189,6 +185,7 @@ export default function BusinessScreen() {
             onPress={() => {
               setFormVisible(true);
               setFormInitialValue('');
+              setFormMode('add');
             }
             }
           >

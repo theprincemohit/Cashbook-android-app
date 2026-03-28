@@ -20,6 +20,5 @@ export const createTransaction = (data) => {
 
 // Delete a transaction
 export const deleteTransactionById = (transactionId) => {
-  console.log("Deleting transaction with ID:", transactionId);
   return fetchy.delete(`/transaction/${transactionId}`);
 };

@@ -47,7 +47,6 @@ export default function TransactionScreen() {
     setIsLoading(true);
     try {
       const result = await deleteTransactionById(id);
-      console.log("Result of deleteTransactionById API call:", result);
       if (result.status === 204) {
         setTransactions((prev) => prev.filter((txn) => txn.id !== id)); 
         setIsLoading(false);
@@ -65,7 +64,6 @@ export default function TransactionScreen() {
     setIsLoading(true);
     try {
       const { data, status } = await getTransactionByPassbookId(activePassbookId);
-      console.log("Fetched transaction Entries:", data);
       if (status == 200) {
         setTransactions(data);
       }
@@ -90,7 +88,6 @@ export default function TransactionScreen() {
    
   }, {total: 0, credit: 0, debit: 0}); 
   summary.total = summary.credit - summary.debit;
-  console.log("Transaction summary calculated:", summary);
   const SummaryCard = () => (
     <MaterialCard title={t('transactionHistory')}>
       <View style={styles.statsRow}>

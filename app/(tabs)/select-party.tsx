@@ -93,9 +93,7 @@ export default function SelectPartyScreen() {
     Contacts.getAll()
       .then(contacts => {
 
-        console.log("Contacts:", contacts);
-        // setContactsList(contacts);
-        // Example: contacts[0].phoneNumbers[0].number
+      
       })
       .catch(err => {
         console.log("Error fetching contacts:", err);

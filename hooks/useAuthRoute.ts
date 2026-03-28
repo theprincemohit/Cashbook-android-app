@@ -10,7 +10,6 @@ export function useProtectedRoute() {
     let isMounted = true;
     const checkAuth = async () => {
       const token = await getToken('userToken');
-      console.log('Token in useProtectedRoute:', token);
       if (!token && isMounted) {
         router.replace('/login');
       }

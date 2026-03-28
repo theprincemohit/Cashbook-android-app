@@ -81,7 +81,6 @@ export default function AddTransactionScreen({ route }: any) {
       description: data.description,
       }
       const result  = await createTransaction(params);
-      console.log("Result of createTransaction API call:", result);
       if(result.status === 201) {
         handleAddEntry();
         router.push({
@@ -90,7 +89,6 @@ export default function AddTransactionScreen({ route }: any) {
         });
       }
     }
-    console.log("Form submitted with data:", params);
       
        
   };
@@ -193,7 +191,6 @@ export default function AddTransactionScreen({ route }: any) {
                    icon="calendar" 
                     mode="outlined"
                      onPress={() => {
-                      console.log("Current startDate value:", value);
                       setShowStartDateDialog(true)
                     }} 
                      style={{marginBottom: 8}}>
@@ -206,7 +203,6 @@ export default function AddTransactionScreen({ route }: any) {
           mode={'date'}
           is24Hour={true}
           onValueChange={(event, selectedDate) => {
-            console.log("Selected date:", selectedDate);
            handleDateChange(selectedDate.toISOString().split('T')[0])
             //handleDateChange('start', selectedDate.toISOString().split('T')[0])}
                  setShowStartDateDialog(false);

@@ -14,7 +14,6 @@ fetchy.interceptors.request.use(
       config.headers['Authorization'] = `Bearer ${token}`;
     }
     config.headers['Content-Type'] = "application/json";
-    console.log('Starting Request', JSON.stringify(config, null, 2))
     return config;
   },
   (error) => {

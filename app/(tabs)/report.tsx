@@ -242,7 +242,6 @@ export default function ReportScreen() {
 
   const handleDateChange = (mode: 'start' | 'end', dateString: string) => {
     const selectedDate = new Date(dateString);
-    console.log('Selected date:', selectedDate, dateString);
     if (mode === 'start') {
       setStartDate(selectedDate);
       setShowStartDateDialog(false);

@@ -18,6 +18,5 @@ export const createPassbook = (data) => {
 
 // Delete a passbook
 export const deletePassbookById = (businessId,passbookId) => {
-  console.log("Deleting passbook with ID:", passbookId, "for business ID:", businessId);
   return fetchy.delete(`/passbook/${businessId}/${passbookId}`);
 };

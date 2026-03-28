@@ -32,7 +32,6 @@ export default function AddFormScreen({ route }: any) {
   const { t } = useLanguageContext(); 
   const { formId, formName, formDescription, formAction, formType } = useLocalSearchParams();
   const { activeBusinessId } = useBusinessContext();
-  console.log("Received params in AddFormScreen:", { formId, formName, formDescription, formAction, formType, activeBusinessId });
   const { control, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -53,7 +52,6 @@ export default function AddFormScreen({ route }: any) {
   const handleFunction = (param: any) => {
       switch(formType) {
         case "Business":
-          console.log("Business Form Action:", {formType}, {formAction}, "with data:", param);
           return formAction === "update" ? updateBusinessById(formId, param) : createBusiness(param);
         case "Passbook":
           return formAction === "update" ? updatePassbookById(activeBusinessId, formId, param) : createPassbook(param);
@@ -81,7 +79,6 @@ export default function AddFormScreen({ route }: any) {
     }
 
       const result = await handleFunction(param);
-      console.log("Result of handleFunction:", result);
       const url = 'passbook/5';
       //router.push(`/${formType === "Business" ? url : "add-transaction"}`);
     };
@@ -89,7 +86,6 @@ export default function AddFormScreen({ route }: any) {
  
 
   const onSubmit = (data: any) => {
-    console.log('Saving Business:', data);
     SubmitData(data);
     reset();
   };

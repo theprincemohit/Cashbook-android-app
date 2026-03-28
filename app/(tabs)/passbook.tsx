@@ -55,11 +55,9 @@ export default function PassbookScreen() {
       "user_id": 1,  //Question: Should this be dynamic based on logged in user?
     };
     const result = await updatePassbookById(activeBusinessId, selectedPassbookId, param);
-    console.log("Result of updatePassbookById:", result.status);
     if (result && result.status === 200) {
       setFormVisible(false);
       loadData();
-      console.log("Passbook updated successfully");
     }
     setIsLoading(false);
     // Implementation for handling form submission
@@ -71,11 +69,9 @@ export default function PassbookScreen() {
       "business_id": activeBusinessId,
     };
     const result = await createPassbook(param);
-    console.log("Result of createPassbook:", result);
     if (result && result.status === 201) {
       setFormVisible(false);
       loadData();
-      console.log("Passbook created successfully");
     }
     setIsLoading(false);
     // Implementation for handling form submission
@@ -83,10 +79,8 @@ export default function PassbookScreen() {
 
   const deletePassbookByIdHandler = async () => {
     const result = await deletePassbookById(activeBusinessId, selectedPassbookId);
-    console.log("Result of deletePassbookById:", result);
     if (result && result.status === 204) {
       loadData();
-      console.log("Passbook deleted successfully");
     }
     setIsLoading(false);
   };
@@ -95,7 +89,6 @@ export default function PassbookScreen() {
     setIsLoading(true);
     try {
       const { data, status } = await getPassbookById(activeBusinessId);
-      console.log("Fetched Passbook Entries for Business ID:", { activeBusinessId }, { status }, data);
       if (status == 200) {
         setEntries(data);
         setIsLoading(false);
@@ -110,10 +103,6 @@ export default function PassbookScreen() {
   useEffect(() => {
     loadData();
   }, [activeBusinessId]);
-
-  useEffect(() => {
-    console.log("Form visibility or mode changed:", { formVisible, formMode, formInitialValue });
-  }, [formVisible, formMode, formInitialValue]);
 
   const renderBusinessItem = ({ item }: { item: any }) => (
     <Card mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal: 0, marginBottom: 0, borderRadius: 0 }]}>
@@ -209,7 +198,6 @@ export default function PassbookScreen() {
                 })} />
         <Appbar.Content title="Passbook" />
         <Appbar.Action icon="plus" onPress={() => {
-          console.log("Add Passbook button pressed");
           setFormVisible(true);
           setFormMode('add');
           setFormInitialValue('');

@@ -47,7 +47,6 @@ export default function RootLayout() {
   useEffect(() => {
     const checkToken = async () => {
       const token = await getToken();
-      console.log('Token on app load:', token);
       setIsLoggedIn(!!token);
     };
     checkToken();

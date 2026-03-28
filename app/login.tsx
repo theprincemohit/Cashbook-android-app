@@ -37,7 +37,6 @@ export default function LoginScreen() {
     
     try {
       const response = await login({ username: email, password });
-      console.log('Login response:', response.data);
       if (response.status === 200) {
         // setIsLoading(false);
         setErrorMessage('');
