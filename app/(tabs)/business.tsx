@@ -6,6 +6,7 @@ import {
   View
 } from 'react-native';
 import {
+  Appbar,
   Button,
   Card,
   Dialog,
@@ -165,11 +166,21 @@ export default function BusinessScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
+       <Appbar.Header dark={true} style={{ 
+        backgroundColor: theme.colors.primary, 
+        height: 30,
+        marginTop: 2,
+        paddingTop: 0,
+        marginBottom: 8,
+
+         }}>
+       
+        <Appbar.Content title={t('businessManagement')} />
+        
+      </Appbar.Header>
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
-          <Text variant="headlineLarge" style={styles.title}>
-            {t('businessManagement')}
-          </Text>
+         
           <Button 
             icon="plus" 
             mode="outlined" 

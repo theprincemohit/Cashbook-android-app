@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { List, Menu, Switch, Text, TouchableRipple, useTheme } from 'react-native-paper';
+import { Button, Menu, Text, TouchableRipple, useTheme } from 'react-native-paper';
 
+import { deleteToken } from '@/api/keychain';
 import { MaterialCard } from '@/components/MaterialCard';
-import { TeamMemberManager } from '@/components/TeamMemberManager';
 import { useTeamContext } from '@/context/TeamContext';
 import { useLanguage } from '@/hooks/useLanguage';
-import { Link } from 'expo-router';
+import { router } from 'expo-router';
 
 export default function SettingsScreen() {
   const theme = useTheme();
@@ -28,7 +28,7 @@ export default function SettingsScreen() {
         </Text>
       </View>
 
-      <MaterialCard title="Notifications" subtitle="Control notification preferences">
+      {/* <MaterialCard title="Notifications" subtitle="Control notification preferences">
         <List.Item
           title="Push Notifications"
           description="Receive push notifications"
@@ -41,9 +41,9 @@ export default function SettingsScreen() {
           left={(props) => <List.Icon {...props} icon="email" />}
           right={() => <Switch value={true} onValueChange={() => {}} />}
         />
-      </MaterialCard>
+      </MaterialCard> */}
 
-      <MaterialCard title="Display" subtitle="Customize app appearance">
+      {/* <MaterialCard title="Display" subtitle="Customize app appearance">
         <List.Item
           title="Dark Mode"
           description="Enable dark theme"
@@ -56,9 +56,9 @@ export default function SettingsScreen() {
           left={(props) => <List.Icon {...props} icon="format-size" />}
           right={(props) => <Text {...props}>Normal</Text>}
         />
-      </MaterialCard>
+      </MaterialCard> */}
 
-      <MaterialCard title="Security" subtitle="Privacy and security options">
+      {/* <MaterialCard title="Security" subtitle="Privacy and security options">
         <List.Item
           title="Biometric Login"
           description="Use fingerprint to login"
@@ -71,13 +71,13 @@ export default function SettingsScreen() {
           left={(props) => <List.Icon {...props} icon="shield-check" />}
           right={(props) => <Text {...props}>Disabled</Text>}
         />
-      </MaterialCard>
+      </MaterialCard> */}
 
-      {currentUser?.role === 'admin' && (
+      {/* {currentUser?.role === 'admin' && (
         <TeamMemberManager />
-      )}
+      )} */}
 
-      <MaterialCard title="About" subtitle="App information">
+      {/* <MaterialCard title="About" subtitle="App information">
         <List.Item
           title="Version"
           description="1.0.0"
@@ -88,12 +88,26 @@ export default function SettingsScreen() {
           description="2026.01"
           left={(props) => <List.Icon {...props} icon="package" />}
         />
+      </MaterialCard> */}
+
+      <MaterialCard title="Logout" subtitle="">
+       <Button
+          icon="plus"
+          mode="outlined"
+          onPress={() => {
+            deleteToken('userToken');
+            router.push({
+                              pathname: '/login',
+                              params: {},
+                            })
+          }
+          }
+        >
+          Logout
+        </Button>
       </MaterialCard>
 
-      <MaterialCard title="About" subtitle="App information">
-        
-        <Link href="/login">Logout</Link>
-      </MaterialCard>
+      
 
       <MaterialCard title={t('language')} subtitle={t('selectLanguage')}>
         <Menu

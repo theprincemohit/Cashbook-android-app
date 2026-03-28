@@ -192,8 +192,19 @@ export default function PassbookScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
-      <Appbar.Header>
-        <Appbar.BackAction onPress={() => router.back()} />
+      <Appbar.Header dark={true} style={{ 
+        backgroundColor: theme.colors.primary, 
+        height: 30,
+        marginTop: 2,
+        paddingTop: 0,
+        marginBottom: 8,
+
+         }}
+      >
+        <Appbar.BackAction onPress={() => router.push({
+                  pathname: '/business',
+                  params: {},
+                })} />
         <Appbar.Content title="Passbook" />
         <Appbar.Action icon="plus" onPress={() => {
           console.log("Add Passbook button pressed");
@@ -204,6 +215,7 @@ export default function PassbookScreen() {
         } />
       </Appbar.Header>
       <ScrollView style={styles.scrollView}>
+        <View style={styles.header}>
         <Button
           icon="plus"
           mode="outlined"
@@ -216,6 +228,7 @@ export default function PassbookScreen() {
         >
           Add New Passbook
         </Button>
+        </View>
         {isLoading ? <Loader /> : entries.length === 0 ? (
           <MaterialCard title={t('noPassbook')} subtitle={t('getStartedBusiness')}>
             <Text variant="bodyMedium" style={{ textAlign: 'center', paddingVertical: 16 }}>
@@ -291,6 +304,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+    marginTop: 8,
   },
   header: {
     paddingHorizontal: 16,
