@@ -1,11 +1,130 @@
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
-import { Drawer } from 'expo-router/drawer';
 import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Appbar, Avatar, useTheme } from 'react-native-paper';
 
-import { DrawerContent } from '@/components/DrawerContent';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Tabs } from 'expo-router';
+export function BottomTabLayout() {
+  return (
+    <Tabs screenOptions={{ 
+      tabBarActiveTintColor: 'blue',  
+      headerShown: false ,
+       tabBarStyle: {
+      height: 50,
+    },
+     
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          href: null,
+          title: 'Home',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+          headerShown: false,
+        }}
+      />
+      
+      <Tabs.Screen
+        name="business"
+        options={{
+          headerShown: false,
+          title: 'Businesses',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="briefcase" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          headerShown: false,
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          headerShown: false,
+          title: 'Profile',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="passbook"
+        options={{
+           href: null,
+           headerShown: false,
+          title: 'Passbook',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="book" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="transaction"
+        options={{
+           href: null,
+           headerShown: false,
+          title: 'Transactions',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="list" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="add-transaction"
+        options={{
+           href: null,
+           headerShown: false,
+          title: 'Add Transaction',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="plus" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="report"
+        options={{
+           href: null,
+           headerShown: false,
+          title: 'Report',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="bar-chart" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="select-party"
+        options={{
+           href: null,
+           headerShown: false,
+          title: 'Select Party',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="AddForm"
+        options={{
+           href: null,
+           headerShown: false,
+          title: 'Add Form',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="plus" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="explore"
+        options={{
+           href: null,
+           headerShown: false,
+          title: 'Explore',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="compass" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="login"
+        options={{
+          headerShown: false,
+          title: 'Login',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="sign-in" color={color} />,
+        }}
+      />
+    </Tabs>
+  );
+}
 
 function HamburgerHeader() {
   const navigation = useNavigation<DrawerNavigationProp<any>>();
@@ -31,7 +150,7 @@ export default function TabLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Drawer
+      {/* <Drawer
         screenOptions={{
           header: () => <HamburgerHeader />,
           headerShown: true,
@@ -114,7 +233,8 @@ export default function TabLayout() {
             headerShown: false,
           }}
         />
-      </Drawer>
+      </Drawer> */}
+      <BottomTabLayout />
     </GestureHandlerRootView>
   );
 }

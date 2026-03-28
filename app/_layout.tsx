@@ -10,6 +10,8 @@ import { LanguageProvider } from '@/context/LanguageContext';
 import { TeamProvider } from '@/context/TeamContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export const unstable_settings = {
   initialRouteName: 'login',
@@ -51,6 +53,7 @@ export default function RootLayout() {
     checkToken();
   }, []);
   return (
+    <SafeAreaView style={styles.container}>
     <GestureHandlerRootView style={{ flex: 1 }}>
       <LanguageProvider>
         <BusinessProvider>
@@ -75,5 +78,12 @@ export default function RootLayout() {
         </BusinessProvider>
       </LanguageProvider>
     </GestureHandlerRootView>
+    </SafeAreaView>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff', // Add a background color if needed
+  },
+});

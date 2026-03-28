@@ -6,6 +6,7 @@ import { MaterialCard } from '@/components/MaterialCard';
 import { TeamMemberManager } from '@/components/TeamMemberManager';
 import { useTeamContext } from '@/context/TeamContext';
 import { useLanguage } from '@/hooks/useLanguage';
+import { Link } from 'expo-router';
 
 export default function SettingsScreen() {
   const theme = useTheme();
@@ -87,6 +88,11 @@ export default function SettingsScreen() {
           description="2026.01"
           left={(props) => <List.Icon {...props} icon="package" />}
         />
+      </MaterialCard>
+
+      <MaterialCard title="About" subtitle="App information">
+        
+        <Link href="/login">Logout</Link>
       </MaterialCard>
 
       <MaterialCard title={t('language')} subtitle={t('selectLanguage')}>
