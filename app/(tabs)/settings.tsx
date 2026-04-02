@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Menu, Text, TouchableRipple, useTheme } from 'react-native-paper';
+import { ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Button, List, Menu, Text, TouchableRipple, useTheme } from 'react-native-paper';
 
-import { deleteToken } from '@/api/keychain';
+import { deleteToken, saveToken } from '@/api/keychain';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useTeamContext } from '@/context/TeamContext';
 import { useProtectedRoute } from '@/hooks/useAuthRoute';
@@ -45,20 +45,23 @@ export default function SettingsScreen() {
         />
       </MaterialCard> */}
 
-      {/* <MaterialCard title="Display" subtitle="Customize app appearance">
+      <MaterialCard title="Display (Not Working)" subtitle="Customize app appearance">
         <List.Item
           title="Dark Mode"
           description="Enable dark theme"
-          left={(props) => <List.Icon {...props} icon="moon-new" />}
-          right={() => <Switch value={darkMode} onValueChange={setDarkMode} />}
+          // left={(props) => <List.Icon {...props} icon="moon-new" />}
+          right={() => <Switch value={darkMode} onValueChange={() => {
+              setDarkMode(!darkMode);
+              saveToken('darkMode', (!darkMode).toString());
+          }} />}
         />
-        <List.Item
+        {/* <List.Item
           title="Font Size"
           description="Adjust text size"
           left={(props) => <List.Icon {...props} icon="format-size" />}
           right={(props) => <Text {...props}>Normal</Text>}
-        />
-      </MaterialCard> */}
+        /> */}
+      </MaterialCard>
 
       {/* <MaterialCard title="Security" subtitle="Privacy and security options">
         <List.Item
