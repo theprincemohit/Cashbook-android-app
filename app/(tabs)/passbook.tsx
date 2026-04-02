@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
   FlatList,
+  Pressable,
   ScrollView,
   StyleSheet,
   View
 } from 'react-native';
 import {
   Appbar,
+  Avatar,
   Button,
   Card,
   Dialog,
@@ -19,6 +21,7 @@ import {
 } from 'react-native-paper';
 
 import { createPassbook, deletePassbookById, getPassbookById, updatePassbookById } from '@/api/passbookApi';
+import BottomDrawer from '@/components/BottomDrawer';
 import FormDialog from '@/components/FormDialog';
 import Loader from '@/components/Loader';
 import { MaterialCard } from '@/components/MaterialCard';
@@ -32,7 +35,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 export default function PassbookScreen() {
   useProtectedRoute();
   const theme = useTheme();
-  const { activeBusinessId, setActivePassbookId } = useBusinessContext();
+  const { activeBusinessId, setActivePassbookId, businesses, setActiveBusinessId } = useBusinessContext();
   const { t } = useLanguageContext();
   const { entries, setEntries } = usePassbookContext();
   const params = useLocalSearchParams();
@@ -44,6 +47,7 @@ export default function PassbookScreen() {
   const [formInitialValue, setFormInitialValue] = useState('');
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
   const [isLoading, setIsLoading] = useState(false);
+  const [showBottomSheet, setShowBottomSheet] = useState(false);
 
   const openMenu = (id: any) => setVisible(id);
   const closeMenu = (id: any) => setVisible(id);
@@ -97,7 +101,7 @@ export default function PassbookScreen() {
       console.error('Error loading businesses:', error);
       setIsLoading(false);
     }
-    
+
   };
 
   useEffect(() => {
@@ -105,19 +109,20 @@ export default function PassbookScreen() {
   }, [activeBusinessId]);
 
   const renderBusinessItem = ({ item }: { item: any }) => (
-    <Card 
-     onPress={() => {
-              setActivePassbookId(item.id);
-              router.push({
-              pathname: "/transaction",
-              params: {
-                formId: item.id,
-                formName: item.name,
-                formAction: "update",
-                formType: "Passbook"
-              },
-            })}}
-    mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal: 0, marginBottom: 0, borderRadius: 0 }]}>
+    <Card
+      onPress={() => {
+        setActivePassbookId(item.id);
+        router.push({
+          pathname: "/transaction",
+          params: {
+            formId: item.id,
+            formName: item.name,
+            formAction: "update",
+            formType: "Passbook"
+          },
+        })
+      }}
+      mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal: 0, marginBottom: 0, borderRadius: 0 }]}>
       <Card.Content>
         <View style={[styles.customerHeader, { padding: 0 }]} >
           <View style={styles.customerInfo}>
@@ -185,20 +190,38 @@ export default function PassbookScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
-      <Appbar.Header dark={true} style={{ 
-        backgroundColor: theme.colors.primary, 
+      <Appbar.Header dark={true} style={{
+        backgroundColor: theme.colors.primary,
         height: 30,
         marginTop: 2,
         paddingTop: 0,
         marginBottom: 8,
 
-         }}
+      }}
       >
-        <Appbar.BackAction onPress={() => router.push({
+        {/* <Appbar.BackAction onPress={() => router.push({
                   pathname: '/business',
                   params: {},
-                })} />
-        <Appbar.Content title="Passbook" />
+                })} /> */}
+        <Appbar.Content
+          
+          title={
+            <Pressable onPress={() => setShowBottomSheet(true)}>
+            <View
+            
+             style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Avatar.Icon size={34} icon="bank" />
+              <Text style={{ marginLeft: 8, color: '#ffffff'  }}>{Number(activeBusinessId)}</Text>
+              <Avatar.Icon size={14} icon="triangle-down" />
+            </View>
+            </Pressable>
+          }
+        />
+        {/* <Appbar.Content title={ <><Icon
+    source="bank"
+    color='#ffffff'
+    size={20}
+  /> <Text>Passbook</Text></>} /> */}
         <Appbar.Action icon="plus" onPress={() => {
           setFormVisible(true);
           setFormMode('add');
@@ -208,18 +231,18 @@ export default function PassbookScreen() {
       </Appbar.Header>
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
-        <Button
-          icon="plus"
-          mode="outlined"
-          onPress={() => {
-            setFormVisible(true);
-            setFormMode('add');
-            setFormInitialValue('');
-          }
-          }
-        >
-          Add New Passbook
-        </Button>
+          <Button
+            icon="plus"
+            mode="outlined"
+            onPress={() => {
+              setFormVisible(true);
+              setFormMode('add');
+              setFormInitialValue('');
+            }
+            }
+          >
+            Add New Passbook
+          </Button>
         </View>
         {isLoading ? <Loader /> : entries.length === 0 ? (
           <MaterialCard title={t('noPassbook')} subtitle={t('getStartedBusiness')}>
@@ -229,18 +252,18 @@ export default function PassbookScreen() {
           </MaterialCard>
         ) : (
           <><View style={styles.listContainer}>
-           {isLoading ? <Loader /> 
-           : (
-            <FlatList
-              data={entries}
-              renderItem={renderBusinessItem}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-              ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
-              contentContainerStyle={{ paddingHorizontal: 5 }}
-            />
-           )
-           } 
+            {isLoading ? <Loader />
+              : (
+                <FlatList
+                  data={entries}
+                  renderItem={renderBusinessItem}
+                  keyExtractor={(item) => item.id}
+                  scrollEnabled={false}
+                  ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
+                  contentContainerStyle={{ paddingHorizontal: 5 }}
+                />
+              )
+            }
           </View>
             <Portal>
               <Dialog visible={showModal} onDismiss={() => setShowModal(false)}>
@@ -261,30 +284,41 @@ export default function PassbookScreen() {
                 </Dialog.Actions>
               </Dialog>
             </Portal>
-            
+
           </>
-          
+
         )}
         <FormDialog
-              visible={formVisible}
-              onDismiss={() => {
-                setFormVisible(false);
-                setFormInitialValue('');
-              }}
-              title={`${formMode === 'add' ? 'Add' : 'Rename'} Passbook`}
-              label="Passbook Name"
-              initialValue={formInitialValue}
-              onSubmit={(data) => {
-                setIsLoading(true);
-                if (formMode === 'add') {
-                  handleSubmitAdd(data);
-                } else {
-                  handleSubmitUpdate(data);
-                }
-              }}
-              mode={formMode}
-              isLoading={isLoading}
-            />
+          visible={formVisible}
+          onDismiss={() => {
+            setFormVisible(false);
+            setFormInitialValue('');
+          }}
+          title={`${formMode === 'add' ? 'Add' : 'Rename'} Passbook`}
+          label="Passbook Name"
+          initialValue={formInitialValue}
+          onSubmit={(data) => {
+            setIsLoading(true);
+            if (formMode === 'add') {
+              handleSubmitAdd(data);
+            } else {
+              handleSubmitUpdate(data);
+            }
+          }}
+          mode={formMode}
+          isLoading={isLoading}
+        />
+
+         
+          <BottomDrawer
+            business={businesses}
+            setActiveBusinessId={setActiveBusinessId}
+            activeBusinessId={String(activeBusinessId)}
+            handleChange={() => { }}
+            showBottomSheet={showBottomSheet}
+            setShowBottomSheet={() => setShowBottomSheet(false)}
+          />
+         
       </ScrollView>
     </View>
   );

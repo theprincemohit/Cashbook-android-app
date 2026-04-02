@@ -8,13 +8,17 @@ interface BottomDrawerProps {
     setActiveBusinessId: (id: number) => void;
     activeBusinessId: string;
     handleChange: (id: number) => void;
+    showBottomSheet: boolean;
+    setShowBottomSheet: (show: boolean) => void;
 }
 
 const BottomDrawer = ({ 
     business, 
     setActiveBusinessId, 
     activeBusinessId,
-    handleChange 
+    handleChange,
+    showBottomSheet,
+    setShowBottomSheet
     }: BottomDrawerProps) => {
     const [visible, setVisible] = React.useState(true);
 
@@ -38,9 +42,9 @@ const BottomDrawer = ({
         <Portal>
             <PaperProvider>
                 <Portal>
-                    <Modal style={modalStyle} visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
+                    <Modal style={modalStyle} visible={showBottomSheet} onDismiss={() => setShowBottomSheet(false)} contentContainerStyle={containerStyle}>
                         <Text style={{padding: 20}}>
-                            Choose Business     
+                            Choose Business {activeBusinessId}
                         </Text>
                         <Divider />
                         <ScrollView>
@@ -49,6 +53,8 @@ const BottomDrawer = ({
                                 onValueChange={value => {
                                     handleChange(Number(value))
                                     setActiveBusinessId(Number(value))
+                                    hideModal()
+                                    setShowBottomSheet(false)
 
                                 }}
                                 value={activeBusinessId}
@@ -57,10 +63,14 @@ const BottomDrawer = ({
                                 {business.map((item) => (
                                     <React.Fragment key={item.id}>
                                         <RadioButton.Item
-                                            label={item.name}
-                                            // onPress={() => setActiveBusinessId(Number(item.id))}
+                                            label={`${item.name} - ${item.id}`}
+                                            onPress={() => {
+                                                if (activeBusinessId != item.id) {
+                                                setActiveBusinessId(Number(item.id))
+                                                }
+                                            }}
                                             value={item.id}
-                                            status={activeBusinessId == item.id ? 'checked': 'unchecked'}
+                                            uncheckedColor='rgb(71, 85, 182)'
                                         />
                                         <Divider />
                                     </React.Fragment>
