@@ -26,6 +26,7 @@ const lightTheme = {
     "onPrimary": "rgb(255, 255, 255)",
     "primaryContainer": "rgb(223, 224, 255)",
     "onPrimaryContainer": "rgb(0, 13, 95)",
+    "background": "rgb(236, 237, 238)",
   },
 };
 
@@ -33,10 +34,12 @@ const darkTheme = {
   ...MD3DarkTheme,
   colors: {
     ...MD3DarkTheme.colors,
-     "primary": "rgb(187, 195, 255)",
-    "onPrimary": "rgb(17, 34, 134)",
+     "primary": "rgb(23, 24, 25)",
+    "onPrimary": "rgb(223, 224, 255)",
     "primaryContainer": "rgb(45, 60, 156)",
     "onPrimaryContainer": "rgb(223, 224, 255)",
+    "background": "rgb(23, 24, 25)",
+    "surface": "rgb(28, 28, 28)",
   },
 };
 
@@ -46,7 +49,7 @@ export default function RootLayout() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   useEffect(() => {
     const checkToken = async () => {
-      const token = await getToken();
+      const token = await getToken('userToken');
       setIsLoggedIn(!!token);
     };
     checkToken();

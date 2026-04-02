@@ -71,7 +71,7 @@ export default function LoginScreen() {
         </Text>
       </View>
 
-      <MaterialCard title="Login" subtitle="Enter your credentials">
+      <MaterialCard style={{ backgroundColor: theme.colors.surface}} title="Login" subtitle="Enter your credentials">
         <MaterialInput
           label="Email"
           value={email}

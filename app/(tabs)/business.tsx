@@ -163,7 +163,7 @@ export default function BusinessScreen() {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Appbar.Header dark={true} style={{
         backgroundColor: theme.colors.primary,
         height: 30,
@@ -189,7 +189,7 @@ export default function BusinessScreen() {
             }
             }
           >
-            Add New Business
+            Add New Business 
           </Button>
 
         </View>
