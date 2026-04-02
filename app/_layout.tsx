@@ -22,7 +22,7 @@ const lightTheme = {
   ...MD3LightTheme,
   colors: {
     ...MD3LightTheme.colors,
-    "primary": "rgb(71, 85, 182)",
+    "primary": "rgb(1, 30, 105)",
     "onPrimary": "rgb(255, 255, 255)",
     "primaryContainer": "rgb(223, 224, 255)",
     "onPrimaryContainer": "rgb(0, 13, 95)",
