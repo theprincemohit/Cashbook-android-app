@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ScrollView, Text } from 'react-native';
-import { Divider, Modal, PaperProvider, Portal, RadioButton } from 'react-native-paper';
+import { Divider, Modal, PaperProvider, Portal, RadioButton, useTheme } from 'react-native-paper';
 import { MaterialButton } from './MaterialButton';
 
 interface BottomDrawerProps {
@@ -20,6 +20,7 @@ const BottomDrawer = ({
     showBottomSheet,
     setShowBottomSheet
     }: BottomDrawerProps) => {
+        const theme = useTheme();
     const [visible, setVisible] = React.useState(true);
 
     const showModal = () => setVisible(true);
@@ -51,6 +52,7 @@ const BottomDrawer = ({
 
                             <RadioButton.Group
                                 onValueChange={value => {
+                                    
                                     handleChange(Number(value))
                                     setActiveBusinessId(Number(value))
                                     hideModal()
@@ -81,7 +83,7 @@ const BottomDrawer = ({
                                 <MaterialButton
                                     label="Create New Business"
                                     onPress={() => {}}
-                                    style={{backgroundColor: "rgb(71, 85, 182)"}}
+                                    style={{backgroundColor: theme.colors.primary}}
                                  />
                     </Modal>
                 </Portal>
