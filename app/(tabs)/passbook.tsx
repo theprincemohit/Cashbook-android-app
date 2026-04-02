@@ -105,11 +105,8 @@ export default function PassbookScreen() {
   }, [activeBusinessId]);
 
   const renderBusinessItem = ({ item }: { item: any }) => (
-    <Card mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal: 0, marginBottom: 0, borderRadius: 0 }]}>
-      <Card.Content>
-        <View style={[styles.customerHeader, { padding: 0 }]} >
-          <View style={styles.customerInfo}>
-            <Text onPress={() => {
+    <Card 
+     onPress={() => {
               setActivePassbookId(item.id);
               router.push({
               pathname: "/transaction",
@@ -119,7 +116,12 @@ export default function PassbookScreen() {
                 formAction: "update",
                 formType: "Passbook"
               },
-            })}} variant="titleMedium" style={{ fontWeight: 'bold' }}>
+            })}}
+    mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal: 0, marginBottom: 0, borderRadius: 0 }]}>
+      <Card.Content>
+        <View style={[styles.customerHeader, { padding: 0 }]} >
+          <View style={styles.customerInfo}>
+            <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
               {item.name}
 
 

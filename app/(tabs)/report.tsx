@@ -270,13 +270,17 @@ export default function ReportScreen() {
 
       <MaterialCard title="Date Range" subtitle="Select the period for your report">
         <View style={styles.dateRow}>
+          <Text>
           <Button
             mode="outlined"
-            onPress={() => showDatePickerModal('start')}
+            onPress={() => {
+              showDatePickerModal('start')
+            }}
             style={styles.dateButton}
           >
             From: {startDate.toLocaleDateString()}
           </Button>
+          </Text>
           <Button
             mode="outlined"
             onPress={() => showDatePickerModal('end')}
@@ -349,13 +353,13 @@ export default function ReportScreen() {
           value={startDate}
           mode={'date'}
           is24Hour={true}
-          onValueChange={(event, selectedDate) => {
+          onChange={(event, selectedDate) => {
             handleDateChange('start', selectedDate.toISOString().split('T')[0])
                  setShowStartDateDialog(false);
         }
             
           }
-          onDismiss={() => setShowStartDateDialog(false)}
+          // onDismiss={() => setShowStartDateDialog(false)}
         />
       )}
 
@@ -365,13 +369,13 @@ export default function ReportScreen() {
           value={endDate}
           mode={'date'}
           is24Hour={true}
-          onValueChange={(event, selectedDate) => {
+          onChange={(event, selectedDate) => {
             handleDateChange('end', selectedDate.toISOString().split('T')[0])
                  setShowEndDateDialog(false);
         }
             
           }
-          onDismiss={() => setShowEndDateDialog(false)}
+          // onDismiss={() => setShowEndDateDialog(false)}
         />
       )}
     </ScrollView>

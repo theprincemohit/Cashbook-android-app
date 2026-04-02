@@ -17,10 +17,12 @@ import {
   Button,
   HelperText,
   SegmentedButtons,
-  TextInput
+  TextInput,
+  useTheme
 } from 'react-native-paper';
 import * as yup from 'yup';
 
+import { useProtectedRoute } from '@/hooks/useAuthRoute';
 import { formatDate } from '@/utils';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -32,6 +34,8 @@ const schema = yup.object({
 }).required();
 
 export default function AddTransactionScreen({ route }: any) {
+  useProtectedRoute();
+   const theme = useTheme();
   const { t } = useLanguageContext();
   const { setActivePassbookId, activePassbookId, setActiveBusinessId } = useBusinessContext();
   const parseQueryParams  = useLocalSearchParams();
@@ -91,7 +95,7 @@ export default function AddTransactionScreen({ route }: any) {
         });
       }
     }
-      
+    setIsLoading(false);  
        
   };
 
@@ -169,7 +173,14 @@ export default function AddTransactionScreen({ route }: any) {
 
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
-      <Appbar.Header>
+      <Appbar.Header dark={true} style={{ 
+        backgroundColor: theme.colors.primary, 
+        height: 30,
+        marginTop: 2,
+        paddingTop: 0,
+        marginBottom: 8,
+
+         }}>
       <Appbar.BackAction  onPress={() => router.push({
                                           pathname: '/transaction',
                                           params: { },
@@ -179,9 +190,7 @@ export default function AddTransactionScreen({ route }: any) {
       <Appbar.Action icon="dots-vertical" onPress={() => {}} />
     </Appbar.Header>
       <ScrollView style={styles.scrollView}>
-        <MaterialCard style={{paddingTop  : 25, 
-          borderColor:formType === 'credit' ? '#01865f' : '#c93b3b', 
-          borderWidth: 2
+        <MaterialCard style={{paddingTop  : 25
         }}>
           
            <Controller
@@ -204,8 +213,9 @@ export default function AddTransactionScreen({ route }: any) {
           value={value}
           mode={'date'}
           is24Hour={true}
-          onValueChange={(event, selectedDate) => {
+          onChange={(event, selectedDate) => {
             console.log('Date', selectedDate)
+            onChange(selectedDate);
            handleDateChange(selectedDate.toISOString().split('T')[0])
             //handleDateChange('start', selectedDate.toISOString().split('T')[0])}
                  setShowStartDateDialog(false);

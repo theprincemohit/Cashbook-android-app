@@ -104,17 +104,20 @@ export default function BusinessScreen() {
 
 
   const renderBusinessItem = ({ item }: { item: Business }) => (
-    <Card mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal: 0, marginBottom: 0, borderRadius: 0 }]}>
+    <Card 
+    
+    onPress={() => {
+              setActiveBusinessId(Number(item.id));
+              router.push({ pathname: '/passbook' })
+            }}
+     mode='contained' style={[styles.customerCard, { backgroundColor: theme.colors.surface, marginHorizontal: 0, marginBottom: 0, borderRadius: 0 }]}>
       <Card.Content>
 
         <View
           style={[styles.customerHeader, { padding: 0 }]}
         >
           <View style={styles.customerInfo}>
-            <Text onPress={() => {
-              setActiveBusinessId(Number(item.id));
-              router.push({ pathname: '/passbook' })
-            }}
+            <Text 
               variant="titleMedium" style={{ fontWeight: 'bold' }}>
               {item.name}
             </Text>
