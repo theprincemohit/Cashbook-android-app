@@ -27,7 +27,7 @@ import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
 import { useProtectedRoute } from '@/hooks/useAuthRoute';
-import { currencyFormat, formatDate } from '@/utils';
+import { currencyFormat, filterDate, formatDate } from '@/utils';
 import { router, useLocalSearchParams } from 'expo-router';
 
 export default function TransactionScreen() {
@@ -35,7 +35,7 @@ export default function TransactionScreen() {
   const theme = useTheme();
   const { t } = useLanguageContext();
   const params = useLocalSearchParams();
-  
+
   const { activePassbookId } = useBusinessContext();
   const [transactions, setTransactions] = React.useState<any[]>([]);
 
@@ -47,14 +47,14 @@ export default function TransactionScreen() {
   const closeMenu = (id: any) => setVisible(id);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilterDialog, setShowFilterDialog] = useState(false);
-  const [filterParams, setFilterParams] = useState('');
+  const [filterParams, setFilterParams] = useState({ date_from: 'All Time', type: 'All', search: '', date_to: '' });
 
   const deleteTransaction = async (id: string) => {
     setIsLoading(true);
     try {
       const result = await deleteTransactionById(id);
       if (result.status === 204) {
-        setTransactions((prev) => prev.filter((txn) => txn.id !== id)); 
+        setTransactions((prev) => prev.filter((txn) => txn.id !== id));
         setIsLoading(false);
       } else {
         setIsLoading(false);
@@ -85,36 +85,59 @@ export default function TransactionScreen() {
   }, [params.formId, params.refresh]); // Re-fetch data when formId or refresh param changes
 
   const summary = transactions.reduce((accumulator, currentValue) => {
-    if(currentValue.txn_type === 'credit') {
+    if (currentValue.txn_type === 'credit') {
       accumulator.credit += currentValue.amount;
-    } else {     
-       accumulator.debit += currentValue.amount;
+    } else {
+      accumulator.debit += currentValue.amount;
     }
-     return accumulator;
-   
-  }, {total: 0, credit: 0, debit: 0}); 
+    return accumulator;
+
+  }, { total: 0, credit: 0, debit: 0 });
   summary.total = summary.credit - summary.debit;
 
-  const searchFilteredTransactions = (query: any) => {
-
-    if (Object.keys(query).length === 0) {
-      return transactions;
+  const createParam = () => {
+    let params: any = {};
+    if (filterParams.date_from && filterParams.date_from != 'All Time') {
+      params.date_from = filterDate(filterParams.date_from);
     }
+    if (filterParams.type != 'All') {
+      params.type = filterParams.type;
+    }
+    if (searchQuery) {
+      params.search = searchQuery;
+    }
+    if (filterParams.date_to) {
+      params.date_to = filterParams.date_to;
+    }
+    return params;
+  }
 
-    query.inputText = searchQuery.toLowerCase();
+  useEffect(() => {
+    const fetchFilteredData = async () => {
+      setIsLoading(true);
+      try {
+        let params = createParam();
+        const filteredTransactions = await getTransactionByPassbookId(activePassbookId, params);
+        console.log('Filtered transactions:', filteredTransactions.data, params, filterParams);
+        setTransactions(filteredTransactions.data);
+      } catch (error) {
+        console.error('Error fetching filtered transactions:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    const params = new URLSearchParams(query as any);
-    setFilterParams(params.toString());
-  };
+    fetchFilteredData();
+  }, [searchQuery, filterParams]);
 
   const SearchField = () => (
     <View style={{ padding: 8 }}>
-      <TextInput  
+      <TextInput
         label='Search'
         value={searchQuery}
         onChangeText={setSearchQuery}
         mode="outlined"
-        left={<TextInput.Icon icon="magnify" onPress={() => {}} />}
+        left={<TextInput.Icon icon="magnify" onPress={() => { }} />}
         right={searchQuery ? <TextInput.Icon icon="close" onPress={() => setSearchQuery('')} /> : null}
       />
     </View>
@@ -122,10 +145,10 @@ export default function TransactionScreen() {
 
   const FilterRow = () => (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 8 }}>
-       <Chip mode='outlined' onPress={() => setShowFilterDialog(true)}>Date</Chip>
-       {/* <Chip mode='outlined' onPress={() => console.log('Pressed')}>Payment Mode</Chip> */}
-       <Chip mode='outlined' onPress={() => setShowFilterDialog(true)}>Entry Type</Chip>
-       
+      <Chip mode='outlined' onPress={() => setShowFilterDialog(true)}>Date</Chip>
+      {/* <Chip mode='outlined' onPress={() => console.log('Pressed')}>Payment Mode</Chip> */}
+      <Chip mode='outlined' onPress={() => setShowFilterDialog(true)}>Entry Type</Chip>
+
     </View>
   );
 
@@ -175,7 +198,7 @@ export default function TransactionScreen() {
 
             </Text>
             <Text variant="titleMedium" style={{ fontWeight: 100, fontSize: 10, color: theme.colors.onSurfaceVariant }}>
-                {formatDate(item.txn_date)}
+              {formatDate(item.txn_date)}
             </Text>
           </View>
           <View style={styles.customerInfo}>
@@ -183,7 +206,7 @@ export default function TransactionScreen() {
               {currencyFormat(item.amount)}
 
             </Text>
-             
+
           </View>
           <View style={{
             paddingTop: 0,
@@ -233,25 +256,25 @@ export default function TransactionScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: '#ecedee' }]}>
-      <Appbar.Header dark={true} style={{ 
-        backgroundColor: theme.colors.primary, 
+      <Appbar.Header dark={true} style={{
+        backgroundColor: theme.colors.primary,
         height: 30,
         marginTop: 2,
         paddingTop: 0,
         marginBottom: 8,
 
-         }}>
+      }}>
         <Appbar.BackAction onPress={() => router.push({
           pathname: '/passbook',
           params: {},
         })} />
         <Appbar.Content title="Transaction" />
-         <Appbar.Action icon="file" onPress={() => router.push({
+        <Appbar.Action icon="file" onPress={() => router.push({
           pathname: '/report',
           params: {
             filterData: filterParams,
           },
-         })} />
+        })} />
         <Appbar.Action icon="plus" onPress={() => router.push({
           pathname: '/add-transaction',
           params: {
@@ -277,20 +300,20 @@ export default function TransactionScreen() {
           </MaterialCard>
         ) : (
           <><View style={styles.listContainer}>
-           {isLoading ? (
-                <Loader />
-              ) : (
-            <FlatList
-              data={transactions}
-              renderItem={renderCustomerItem}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-              ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
-              contentContainerStyle={{ paddingHorizontal: 5 }}
-            />
+            {isLoading ? (
+              <Loader />
+            ) : (
+              <FlatList
+                data={transactions}
+                renderItem={renderCustomerItem}
+                keyExtractor={(item) => item.id}
+                scrollEnabled={false}
+                ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
+                contentContainerStyle={{ paddingHorizontal: 5 }}
+              />
             )}
           </View>
-           <Portal>
+            <Portal>
               <Dialog visible={showModal} onDismiss={() => setShowModal(false)}>
                 {/* <Dialog.Title>Login Error</Dialog.Title> */}
                 <Dialog.Content>
@@ -311,10 +334,10 @@ export default function TransactionScreen() {
           </>
         )}
         <FilterDialog
-          handleSave={(data) => searchFilteredTransactions(data)}
+          handleSave={(data) => setFilterParams(data)}
           show={showFilterDialog}
           setShow={setShowFilterDialog}
-         />
+        />
       </ScrollView>
     </View>
   );

@@ -2,9 +2,10 @@ import fetchy from './axios';
 
 
 // Fetch transaction profile
-export const getTransactionByPassbookId = (passbookId) => {
+export const getTransactionByPassbookId = (passbookId, filterParams) => {
   return fetchy.get('/transaction/', { params: {
-        passbook_id: passbookId
+        passbook_id: passbookId,
+        ...filterParams
     }});
 };
 

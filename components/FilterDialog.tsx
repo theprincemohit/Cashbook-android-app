@@ -4,9 +4,9 @@ import { Chip, Divider, Modal, PaperProvider, Portal, RadioButton, useTheme } fr
 import { MaterialButton } from './MaterialButton';
 
 const filterOptions = {
-    'Date': ['Today', 'This Week', 'This Month', 'This Year', 'Custom Range'],
+    'date_from': ['All Time', 'Today', 'This Week', 'This Month', 'This Year', 'Custom Range'],
     // 'Amount': ['< $100', '$100 - $500', '> $500'],
-    'Type': ['All', 'Income', 'Expense']
+    'type': ['All', 'credit', 'debit']
 }
 interface FilterDialogProps {
     handleSave: (data: any) => void;
@@ -20,8 +20,8 @@ const FilterDialog = ({
     setShow
 }: FilterDialogProps) => {
     const theme = useTheme();
-    const [selectedFilter, setSelectedFilter] = React.useState<keyof typeof filterOptions>('Date');
-    const [filterData, setFilterData] = React.useState({Date: 'Today', Type: 'All'});
+    const [selectedFilter, setSelectedFilter] = React.useState<keyof typeof filterOptions>('date_from');
+    const [filterData, setFilterData] = React.useState({date_from: 'All Time', type: 'All'});
 
     const containerStyle = {
         backgroundColor: 'white',
@@ -44,16 +44,16 @@ const FilterDialog = ({
                     <Modal style={modalStyle} visible={show} onDismiss={() => setShow(false)} contentContainerStyle={containerStyle}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', padding: 8 }}>
                             <Chip
-                                icon={selectedFilter === 'Date' ? 'check' : undefined}
+                                icon={selectedFilter === 'date_from' ? 'check' : undefined}
                                 mode='outlined'
-                                onPress={() => setSelectedFilter('Date')}
+                                onPress={() => setSelectedFilter('date_from')}
                             >
                                 Date
                             </Chip>
                             <Chip
-                                icon={selectedFilter === 'Type' ? 'check' : undefined}
+                                icon={selectedFilter === 'type' ? 'check' : undefined}
                                 mode='outlined'
-                                onPress={() => setSelectedFilter('Type')}
+                                onPress={() => setSelectedFilter('type')}
                             >
                                 Entry Type
                             </Chip>
@@ -89,7 +89,7 @@ const FilterDialog = ({
                             label="Apply Filters"
                             onPress={() => {
                                 handleSave(filterData);
-                                setFilterData({Date: 'Today', Type: 'All'});
+                                setFilterData({date_from: 'Today', type: 'All'});
                                 setShow(false)
                             }}
                             style={{ backgroundColor: theme.colors.primary }}
