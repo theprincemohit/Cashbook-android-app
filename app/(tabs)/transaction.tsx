@@ -9,12 +9,14 @@ import {
   Appbar,
   Button,
   Card,
+  Chip,
   Dialog,
   Divider,
   IconButton,
   Menu,
   Portal,
   Text,
+  TextInput,
   useTheme
 } from 'react-native-paper';
 
@@ -42,6 +44,7 @@ export default function TransactionScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const openMenu = (id: any) => setVisible(id);
   const closeMenu = (id: any) => setVisible(id);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const deleteTransaction = async (id: string) => {
     setIsLoading(true);
@@ -88,6 +91,38 @@ export default function TransactionScreen() {
    
   }, {total: 0, credit: 0, debit: 0}); 
   summary.total = summary.credit - summary.debit;
+
+  const searchFilteredTransactions = (query: string) => {
+    if (!query.trim()) {
+      return transactions;
+    }
+    const lowerCaseQuery = query.toLowerCase();
+    return transactions.filter((txn) =>
+      txn.description.toLowerCase().includes(lowerCaseQuery)
+    );
+  };
+
+  const SearchField = () => (
+    <View style={{ padding: 8 }}>
+      <TextInput  
+        label='Search'
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        mode="outlined"
+        left={<TextInput.Icon icon="magnify" onPress={() => searchFilteredTransactions(searchQuery)} />}
+      />
+    </View>
+  );
+
+  const FilterRow = () => (
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 8 }}>
+       <Chip mode='outlined' onPress={() => console.log('Pressed')}>Date</Chip>
+       <Chip mode='outlined' onPress={() => console.log('Pressed')}>Payment Mode</Chip>
+       <Chip mode='outlined' onPress={() => console.log('Pressed')}>Entry Type</Chip>
+       
+    </View>
+  );
+
   const SummaryCard = () => (
     <MaterialCard title={t('transactionHistory')}>
       <View style={styles.statsRow}>
@@ -220,6 +255,8 @@ export default function TransactionScreen() {
       </Appbar.Header>
 
       <ScrollView style={styles.scrollView}>
+        <SearchField />
+        <FilterRow />
         <SummaryCard />
         {isLoading ? <Loader /> : transactions.length === 0 ? (
           <MaterialCard title="No transactions" subtitle="Get started by adding one">

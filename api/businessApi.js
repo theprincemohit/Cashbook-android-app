@@ -6,6 +6,7 @@ export const getBusinessById = (businessId) => {
   return fetchy.get(`/businesses/${businessId}`);
 };
 
+
 // Update business profile
 export const updateBusinessById = (businessId, data) => {
   return fetchy.patch(`/businesses/${businessId}`, data);
@@ -19,6 +20,11 @@ export const getBusinesses = () => {
 // Create a new business
 export const createBusiness = (data) => {
   return fetchy.post('/businesses/', data);
+};
+
+// Create a first business
+export const createFirstBusiness = (data) => {
+  return fetchy.post('/businesses/create-first-business', data);
 };
 
 // Delete a business

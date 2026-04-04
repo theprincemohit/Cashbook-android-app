@@ -6,7 +6,7 @@ interface BusinessContextType {
   // addTeamMember: (member: Omit<Business, 'id' | 'createdAt'>) => void;
   // removeTeamMember: (memberId: string) => void;
   // updateTeamMember: (memberId: string, updates: Partial<Business>) => void;
-  addBusiness: (name: string, description: string) => void;
+  addBusiness: (data: Business ) => void;
   updateBusiness: (id: string, name: string, description: string) => void;
   deleteBusiness: (id: string) => void;
   setBusinesses: React.Dispatch<React.SetStateAction<Business[]>>;
@@ -46,14 +46,8 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   //   loadData();
   // }, []);
 
-   const addBusiness = useCallback((name: string, description: string) => {
-     const newBusiness: Business = {
-       id: Date.now().toString(),
-       name,
-       description,
-       created_at: new Date(),
-       updated_at: new Date(),
-     };
+   const addBusiness = useCallback((data: Business) => {
+     const newBusiness: Business = data;
      setBusinesses((prev) => [newBusiness, ...prev]);
      return newBusiness;
    }, []);

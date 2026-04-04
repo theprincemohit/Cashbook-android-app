@@ -204,16 +204,16 @@ export default function PassbookScreen() {
                   params: {},
                 })} /> */}
         <Appbar.Content
-          
+
           title={
             <Pressable onPress={() => setShowBottomSheet(true)}>
-            <View
-            
-             style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Avatar.Icon size={34} icon="bank" />
-              <Text style={{ marginLeft: 8, color: '#ffffff'  }}>{Number(activeBusinessId)}</Text>
-              <Avatar.Icon size={14} icon="triangle-down" />
-            </View>
+              <View
+
+                style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Avatar.Icon size={34} icon="bank" />
+                <Text style={{ marginLeft: 8, color: '#ffffff' }}>{Number(activeBusinessId)}</Text>
+                <Avatar.Icon size={14} icon="triangle-down" />
+              </View>
             </Pressable>
           }
         />
@@ -229,97 +229,115 @@ export default function PassbookScreen() {
         }
         } />
       </Appbar.Header>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <Button
-            icon="plus"
-            mode="outlined"
-            onPress={() => {
-              setFormVisible(true);
-              setFormMode('add');
-              setFormInitialValue('');
-            }
-            }
+      {businesses.length === 1 ?
+        <ScrollView contentContainerStyle={styles.addBusinessButton}>
+          <Button mode="contained"
+            onPress={() => { 
+              router.push({
+                pathname: '/add-business',
+                params: {},
+              }) 
+            }}
+            
           >
-            Add New Passbook
+            Create Business
           </Button>
-        </View>
-        {isLoading ? <Loader /> : entries.length === 0 ? (
-          <MaterialCard title={t('noPassbook')} subtitle={t('getStartedBusiness')}>
-            <Text variant="bodyMedium" style={{ textAlign: 'center', paddingVertical: 16 }}>
-              {t('notCreatedBusiness')}
-            </Text>
-          </MaterialCard>
-        ) : (
-          <><View style={styles.listContainer}>
-            {isLoading ? <Loader />
-              : (
-                <FlatList
-                  data={entries}
-                  renderItem={renderBusinessItem}
-                  keyExtractor={(item) => item.id}
-                  scrollEnabled={false}
-                  ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
-                  contentContainerStyle={{ paddingHorizontal: 5 }}
-                />
-              )
-            }
-          </View>
-            <Portal>
-              <Dialog visible={showModal} onDismiss={() => setShowModal(false)}>
-                {/* <Dialog.Title>Login Error</Dialog.Title> */}
-                <Dialog.Content>
-                  <Text variant="bodyMedium">Are you sure you want to delete this Passbook id: {selectedPassbookId}?</Text>
-                </Dialog.Content>
-                <Dialog.Actions>
-                  <Button onPress={() => {
-                    setIsLoading(true);
-                    deletePassbookByIdHandler();
+        </ScrollView>
+        : (
+          <ScrollView style={styles.scrollView}>
+            <View style={styles.header}>
+              <Button
+                icon="plus"
+                mode="outlined"
+                onPress={() => {
+                  setFormVisible(true);
+                  setFormMode('add');
+                  setFormInitialValue('');
+                }
+                }
+              >
+                Add New Passbook
+              </Button>
+            </View>
+            {isLoading ? <Loader /> : entries.length === 0 ? (
+              <MaterialCard title={t('noPassbook')} subtitle={t('getStartedBusiness')}>
+                <Text variant="bodyMedium" style={{ textAlign: 'center', paddingVertical: 16 }}>
+                  {t('notCreatedBusiness')}
+                </Text>
+              </MaterialCard>
+            ) : (
+              <><View style={styles.listContainer}>
+                {isLoading ? <Loader />
+                  : (
+                    <FlatList
+                      data={entries}
+                      renderItem={renderBusinessItem}
+                      keyExtractor={(item) => item.id}
+                      scrollEnabled={false}
+                      ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
+                      contentContainerStyle={{ paddingHorizontal: 5 }}
+                    />
+                  )
+                }
+              </View>
+                <Portal>
+                  <Dialog visible={showModal} onDismiss={() => setShowModal(false)}>
+                    {/* <Dialog.Title>Login Error</Dialog.Title> */}
+                    <Dialog.Content>
+                      <Text variant="bodyMedium">Are you sure you want to delete this Passbook id: {selectedPassbookId}?</Text>
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                      <Button onPress={() => {
+                        setIsLoading(true);
+                        deletePassbookByIdHandler();
 
-                    setShowModal(false);
-                  }}>Yes</Button>
-                  <Button onPress={() => {
-                    setShowModal(false);
-                  }}>No</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
+                        setShowModal(false);
+                      }}>Yes</Button>
+                      <Button onPress={() => {
+                        setShowModal(false);
+                      }}>No</Button>
+                    </Dialog.Actions>
+                  </Dialog>
+                </Portal>
 
-          </>
+              </>
 
-        )}
-        <FormDialog
-          visible={formVisible}
-          onDismiss={() => {
-            setFormVisible(false);
-            setFormInitialValue('');
-          }}
-          title={`${formMode === 'add' ? 'Add' : 'Rename'} Passbook`}
-          label="Passbook Name"
-          initialValue={formInitialValue}
-          onSubmit={(data) => {
-            setIsLoading(true);
-            if (formMode === 'add') {
-              handleSubmitAdd(data);
-            } else {
-              handleSubmitUpdate(data);
-            }
-          }}
-          mode={formMode}
-          isLoading={isLoading}
-        />
+            )}
+           
 
-         
-          <BottomDrawer
-            business={businesses}
-            setActiveBusinessId={setActiveBusinessId}
-            activeBusinessId={String(activeBusinessId)}
-            handleChange={() => { }}
-            showBottomSheet={showBottomSheet}
-            setShowBottomSheet={() => setShowBottomSheet(false)}
-          />
-         
-      </ScrollView>
+          </ScrollView>
+        )
+      }
+       <FormDialog
+              visible={formVisible}
+              onDismiss={() => {
+                setFormVisible(false);
+                setFormInitialValue('');
+              }}
+              title={`${formMode === 'add' ? 'Add' : 'Rename'} Passbook`}
+              label="Passbook Name"
+              initialValue={formInitialValue}
+              onSubmit={(data) => {
+                setIsLoading(true);
+                if (formMode === 'add') {
+                  handleSubmitAdd(data);
+                } else {
+                  handleSubmitUpdate(data);
+                }
+              }}
+              mode={formMode}
+              isLoading={isLoading}
+            />
+
+
+            <BottomDrawer
+              business={businesses}
+              setActiveBusinessId={setActiveBusinessId}
+              activeBusinessId={String(activeBusinessId)}
+              handleChange={() => { }}
+              showBottomSheet={showBottomSheet}
+              setShowBottomSheet={() => setShowBottomSheet(false)}
+            />
     </View>
   );
 }
@@ -331,6 +349,11 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     marginTop: 8,
+  },
+  addBusinessButton: {
+    flex: 1,                 // Takes up the whole screen
+    justifyContent: 'center', // Centers children vertically (along the main axis)
+    alignItems: 'center', 
   },
   header: {
     paddingHorizontal: 16,

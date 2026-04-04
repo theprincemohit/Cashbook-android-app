@@ -34,12 +34,14 @@ const darkTheme = {
   ...MD3DarkTheme,
   colors: {
     ...MD3DarkTheme.colors,
-     "primary": "rgb(23, 24, 25)",
+     "primary": "rgb(5, 7, 14)",
     "onPrimary": "rgb(223, 224, 255)",
     "primaryContainer": "rgb(45, 60, 156)",
     "onPrimaryContainer": "rgb(223, 224, 255)",
     "background": "rgb(23, 24, 25)",
+    "onBackground": "rgb(236, 237, 238)",
     "surface": "rgb(28, 28, 28)",
+    "onSurface": "rgb(236, 237, 238)",
   },
 };
 
