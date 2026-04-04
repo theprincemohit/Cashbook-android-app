@@ -21,6 +21,7 @@ import {
 } from 'react-native-paper';
 
 import { deleteTransactionById, getTransactionByPassbookId } from '@/api/transactionApi';
+import FilterDialog from '@/components/FilterDialog';
 import Loader from '@/components/Loader';
 import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
@@ -45,6 +46,8 @@ export default function TransactionScreen() {
   const openMenu = (id: any) => setVisible(id);
   const closeMenu = (id: any) => setVisible(id);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFilterDialog, setShowFilterDialog] = useState(false);
+  const [filterParams, setFilterParams] = useState('');
 
   const deleteTransaction = async (id: string) => {
     setIsLoading(true);
@@ -92,14 +95,16 @@ export default function TransactionScreen() {
   }, {total: 0, credit: 0, debit: 0}); 
   summary.total = summary.credit - summary.debit;
 
-  const searchFilteredTransactions = (query: string) => {
-    if (!query.trim()) {
+  const searchFilteredTransactions = (query: any) => {
+
+    if (Object.keys(query).length === 0) {
       return transactions;
     }
-    const lowerCaseQuery = query.toLowerCase();
-    return transactions.filter((txn) =>
-      txn.description.toLowerCase().includes(lowerCaseQuery)
-    );
+
+    query.inputText = searchQuery.toLowerCase();
+
+    const params = new URLSearchParams(query as any);
+    setFilterParams(params.toString());
   };
 
   const SearchField = () => (
@@ -109,16 +114,17 @@ export default function TransactionScreen() {
         value={searchQuery}
         onChangeText={setSearchQuery}
         mode="outlined"
-        left={<TextInput.Icon icon="magnify" onPress={() => searchFilteredTransactions(searchQuery)} />}
+        left={<TextInput.Icon icon="magnify" onPress={() => {}} />}
+        right={searchQuery ? <TextInput.Icon icon="close" onPress={() => setSearchQuery('')} /> : null}
       />
     </View>
   );
 
   const FilterRow = () => (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 8 }}>
-       <Chip mode='outlined' onPress={() => console.log('Pressed')}>Date</Chip>
-       <Chip mode='outlined' onPress={() => console.log('Pressed')}>Payment Mode</Chip>
-       <Chip mode='outlined' onPress={() => console.log('Pressed')}>Entry Type</Chip>
+       <Chip mode='outlined' onPress={() => setShowFilterDialog(true)}>Date</Chip>
+       {/* <Chip mode='outlined' onPress={() => console.log('Pressed')}>Payment Mode</Chip> */}
+       <Chip mode='outlined' onPress={() => setShowFilterDialog(true)}>Entry Type</Chip>
        
     </View>
   );
@@ -240,7 +246,12 @@ export default function TransactionScreen() {
           params: {},
         })} />
         <Appbar.Content title="Transaction" />
-         <Appbar.Action icon="file" onPress={() => router.push('/report')} />
+         <Appbar.Action icon="file" onPress={() => router.push({
+          pathname: '/report',
+          params: {
+            filterData: filterParams,
+          },
+         })} />
         <Appbar.Action icon="plus" onPress={() => router.push({
           pathname: '/add-transaction',
           params: {
@@ -299,6 +310,11 @@ export default function TransactionScreen() {
             </Portal>
           </>
         )}
+        <FilterDialog
+          handleSave={(data) => searchFilteredTransactions(data)}
+          show={showFilterDialog}
+          setShow={setShowFilterDialog}
+         />
       </ScrollView>
     </View>
   );

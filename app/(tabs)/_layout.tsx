@@ -115,7 +115,6 @@ export function BottomTabLayout() {
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="compass" color={color} />,
         }}
       />
-      
     </Tabs>
   );
 }
