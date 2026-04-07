@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ScrollView, Text } from 'react-native';
+import { ScrollView, Text, ViewStyle } from 'react-native';
 import { Divider, Modal, PaperProvider, Portal, RadioButton, useTheme } from 'react-native-paper';
 import { MaterialButton } from './MaterialButton';
 
@@ -12,47 +12,54 @@ interface BottomDrawerProps {
     setShowBottomSheet: (show: boolean) => void;
 }
 
-const BottomDrawer = ({ 
-    business, 
-    setActiveBusinessId, 
+const BottomDrawer = ({
+    business,
+    setActiveBusinessId,
     activeBusinessId,
     handleChange,
     showBottomSheet,
     setShowBottomSheet
-    }: BottomDrawerProps) => {
-        const theme = useTheme();
+}: BottomDrawerProps) => {
+    const theme = useTheme();
     const [visible, setVisible] = React.useState(true);
 
     const showModal = () => setVisible(true);
     const hideModal = () => setVisible(false);
-    const containerStyle = {
+    const containerStyle: ViewStyle = {
         backgroundColor: 'white',
         padding: 20,
-
-        // width: '100%',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        minHeight: 200,
+        justifyContent: 'flex-end',
+       
 
     };
 
-    const modalStyle = {
-        // justifyContent: 'flex-end', // Positions the modal at the bottom
-        margin: 0, // Removes default wrapper margins to allow full width
-        paddingBottom: 0
+    const modalStyle: ViewStyle = {
+        justifyContent: 'flex-end',
+        
     };
 
     return (
         <Portal>
             <PaperProvider>
                 <Portal>
-                    <Modal style={modalStyle} visible={showBottomSheet} onDismiss={() => setShowBottomSheet(false)} contentContainerStyle={containerStyle}>
-                        <Text style={{padding: 20}}>
+                    <Modal
+                        style={modalStyle}
+                        visible={showBottomSheet}
+                        onDismiss={() => setShowBottomSheet(false)}
+                        contentContainerStyle={containerStyle}
+                    >
+                        <Text style={{ padding: 20 }}>
                             Choose Business {activeBusinessId}
                         </Text>
                         <Divider />
-                        <ScrollView>
+                        <ScrollView style={{ maxHeight: 300, justifyContent: 'flex-end' }}>
 
                             <RadioButton.Group
                                 onValueChange={value => {
-                                    
+
                                     handleChange(Number(value))
                                     setActiveBusinessId(Number(value))
                                     hideModal()
@@ -60,7 +67,7 @@ const BottomDrawer = ({
 
                                 }}
                                 value={activeBusinessId}
-                                
+
                             >
                                 {business.map((item) => (
                                     <React.Fragment key={item.id}>
@@ -68,7 +75,7 @@ const BottomDrawer = ({
                                             label={`${item.name} - ${item.id}`}
                                             onPress={() => {
                                                 if (activeBusinessId != item.id) {
-                                                setActiveBusinessId(Number(item.id))
+                                                    setActiveBusinessId(Number(item.id))
                                                 }
                                             }}
                                             value={item.id}
@@ -78,13 +85,13 @@ const BottomDrawer = ({
                                     </React.Fragment>
                                 ))}
                             </RadioButton.Group>
-                            
+
                         </ScrollView>
-                                <MaterialButton
-                                    label="Create New Business"
-                                    onPress={() => {}}
-                                    style={{backgroundColor: theme.colors.primary}}
-                                 />
+                        <MaterialButton
+                            label="Create New Business"
+                            onPress={() => { }}
+                            style={{ backgroundColor: theme.colors.primary }}
+                        />
                     </Modal>
                 </Portal>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
   Pressable,
@@ -103,6 +103,14 @@ export default function PassbookScreen() {
     }
 
   };
+
+   // ref
+  // const bottomSheetRef = useRef<BottomSheet>(null);
+
+  // callbacks
+  const handleSnapPress = useCallback((index: number) => {
+    console.log('handleSnapPress', index);
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -245,7 +253,9 @@ export default function PassbookScreen() {
         </ScrollView>
         : (
           <ScrollView style={styles.scrollView}>
+            
             <View style={styles.header}>
+             
               <Button
                 icon="plus"
                 mode="outlined"
@@ -338,6 +348,7 @@ export default function PassbookScreen() {
               showBottomSheet={showBottomSheet}
               setShowBottomSheet={() => setShowBottomSheet(false)}
             />
+              {/* <BottomSheetComponent /> */}
     </View>
   );
 }

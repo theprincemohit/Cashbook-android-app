@@ -96,20 +96,9 @@ export default function TransactionScreen() {
   summary.total = summary.credit - summary.debit;
 
   const createParam = () => {
-    let params: any = {};
-    if (filterParams.date_from && filterParams.date_from != 'All Time') {
-      params.date_from = filterDate(filterParams.date_from);
-    }
-    if (filterParams.type != 'All') {
-      params.type = filterParams.type;
-    }
-    if (searchQuery) {
-      params.search = searchQuery;
-    }
-    if (filterParams.date_to) {
-      params.date_to = filterParams.date_to;
-    }
-    return params;
+    const dateRange = filterDate(filterParams.date_from);
+    console.log('Date range from filterDate:', dateRange);
+    return;
   }
 
   useEffect(() => {
@@ -144,8 +133,8 @@ export default function TransactionScreen() {
   );
 
   const FilterRow = () => (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 8 }}>
-      <Chip mode='outlined' onPress={() => setShowFilterDialog(true)}>Date</Chip>
+    <View style={{ flexDirection: 'row', justifyContent: 'flex-start', padding: 8 }}>
+      <Chip mode='outlined' style={{ marginRight: 8 }} onPress={() => setShowFilterDialog(true)}>Date</Chip>
       {/* <Chip mode='outlined' onPress={() => console.log('Pressed')}>Payment Mode</Chip> */}
       <Chip mode='outlined' onPress={() => setShowFilterDialog(true)}>Entry Type</Chip>
 
@@ -339,6 +328,7 @@ export default function TransactionScreen() {
           setShow={setShowFilterDialog}
         />
       </ScrollView>
+      {/* <BottomSheetComponent /> */}
     </View>
   );
 }

@@ -13,7 +13,7 @@ export const formatDateTime = (dateString) => {
     dateStyle: 'medium', // 'medium' provides a format like Mar 25, 2026
     timeStyle: 'medium', // 'medium' provides a format like 2:34:56 AM
     hour12: true
-}).format(new Date(dateString));
+  }).format(new Date(dateString));
 };
 
 export const formatDateForInput = (dateString) => {
@@ -36,27 +36,31 @@ export const formatDateForDisplayWithTime = (dateString) => {
   return date.toLocaleDateString(undefined, options);
 };
 
-export const filterDate = (dateString) => {
-        switch (dateString) {
-            case 'Today':
-                const today = new Date();
-                return today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-            case 'This Week': {
-                const today = new Date();
-                const firstDayOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-                return firstDayOfWeek;
-            }
-            case 'This Month': {
-                const today = new Date();
-                const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-                return firstDayOfMonth;
-            }
-            case 'This Year': {
-                const today = new Date();
-                const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
-                return firstDayOfYear;
-            }
-            default:
-                return new Date(dateString);
-        }
+export const filterDate = (dateString, endDate=undefined) => {
+  switch (dateString) {
+    case 'Today':
+      const today = new Date();
+      const todayFormatted = formatDateForInput(today);
+      return { date_from: todayFormatted, date_to: todayFormatted };
+    case 'This Week': {
+      const today = new Date();
+      const todayFormatted = formatDateForInput(today);
+      const sevenDaysAgo = formatDateForInput(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
+      return { date_from: sevenDaysAgo, date_to: todayFormatted };
+    }
+    case 'This Month': {
+      const today = new Date();
+      const todayFormatted = formatDateForInput(today);
+      const firstDay = formatDateForInput(new Date(today.getFullYear(), today.getMonth(), 1));
+      return { date_from: firstDay, date_to: todayFormatted };
+    }
+    case 'This Year': {
+      const today = new Date();
+      const todayFormatted = formatDateForInput(today);
+      const firstDayOfYear = formatDateForInput(new Date(today.getFullYear(), 0, 1));
+      return { date_from: firstDayOfYear, date_to: todayFormatted };
+    }
+    default:
+      return { date_from: new Date(dateString), date_to: new Date(endDate) };
+  }
 }

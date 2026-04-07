@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ScrollView, View } from 'react-native';
-import { Chip, Divider, Modal, PaperProvider, Portal, RadioButton, useTheme } from 'react-native-paper';
+import { Divider, Modal, PaperProvider, Portal, RadioButton, SegmentedButtons, Text, useTheme } from 'react-native-paper';
 import { MaterialButton } from './MaterialButton';
 
 const filterOptions = {
@@ -21,7 +21,7 @@ const FilterDialog = ({
 }: FilterDialogProps) => {
     const theme = useTheme();
     const [selectedFilter, setSelectedFilter] = React.useState<keyof typeof filterOptions>('date_from');
-    const [filterData, setFilterData] = React.useState({date_from: 'All Time', type: 'All'});
+    const [filterData, setFilterData] = React.useState({ date_from: 'All Time', type: 'All' });
 
     const containerStyle = {
         backgroundColor: 'white',
@@ -42,22 +42,22 @@ const FilterDialog = ({
             <PaperProvider>
                 <Portal>
                     <Modal style={modalStyle} visible={show} onDismiss={() => setShow(false)} contentContainerStyle={containerStyle}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', padding: 8 }}>
-                            <Chip
-                                icon={selectedFilter === 'date_from' ? 'check' : undefined}
-                                mode='outlined'
-                                onPress={() => setSelectedFilter('date_from')}
-                            >
-                                Date
-                            </Chip>
-                            <Chip
-                                icon={selectedFilter === 'type' ? 'check' : undefined}
-                                mode='outlined'
-                                onPress={() => setSelectedFilter('type')}
-                            >
-                                Entry Type
-                            </Chip>
+                        <View style={{ padding: 8 }}>
 
+                            <SegmentedButtons
+                                value={selectedFilter}
+                                onValueChange={setSelectedFilter}
+                                buttons={[
+                                    {
+                                        value: 'date_from',
+                                        label: 'Date',
+                                    },
+                                    {
+                                        value: 'type',
+                                        label: 'Type',
+                                    },
+                                ]}
+                            />
                         </View>
                         <Divider />
                         <ScrollView>
@@ -65,7 +65,7 @@ const FilterDialog = ({
                             <RadioButton.Group
                                 onValueChange={value => {
 
-                                    console.log('onpress ----',`${value}`);
+                                    console.log('onpress ----', `${value}`);
                                     setFilterData(prev => ({ ...prev, [selectedFilter]: value }))
 
 
@@ -79,6 +79,12 @@ const FilterDialog = ({
                                             label={item}
                                             value={item}
                                         />
+                                        {item == 'Custom Range' && filterData[selectedFilter] == 'Custom Range' && <View style={{ height: 80,  }} >
+                                            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, paddingLeft: 8 }}>
+                                                {item}
+                                            </Text>
+                                        </View>
+                                        }
                                         <Divider />
                                     </React.Fragment>
                                 ))}
@@ -89,7 +95,7 @@ const FilterDialog = ({
                             label="Apply Filters"
                             onPress={() => {
                                 handleSave(filterData);
-                                setFilterData({date_from: 'Today', type: 'All'});
+                                setFilterData({ date_from: 'Today', type: 'All' });
                                 setShow(false)
                             }}
                             style={{ backgroundColor: theme.colors.primary }}
