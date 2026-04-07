@@ -12,6 +12,7 @@ import {
   Chip,
   Dialog,
   Divider,
+  Icon,
   IconButton,
   Menu,
   Portal,
@@ -97,10 +98,10 @@ export default function TransactionScreen() {
 
   const createParam = () => {
     let param = {};
-    if(filterParams.date_from != 'All Time')      param = { ...param, date_from: filterParams.date_from };
-    if(filterParams.type != 'All')                param = { ...param, type: filterParams.type };
-    if(searchQuery)                               param = { ...param, search: searchQuery };
-    if(filterParams.date_to)                      param = { ...param, date_to: filterParams.date_to };
+    if (filterParams.date_from != 'All Time') param = { ...param, date_from: filterParams.date_from };
+    if (filterParams.type != 'All') param = { ...param, type: filterParams.type };
+    if (searchQuery) param = { ...param, search: searchQuery };
+    if (filterParams.date_to) param = { ...param, date_to: filterParams.date_to };
     console.log('Created params:', param);
     return param;
   }
@@ -123,9 +124,10 @@ export default function TransactionScreen() {
   }, [searchQuery, filterParams]);
 
   const SearchField = () => (
-    <View style={{ padding: 8 }}>
+    <View style={{ padding: 8, paddingTop: 0 }}>
       <TextInput
         label='Search'
+        style={{ height: 40 }}
         value={searchQuery}
         onChangeText={setSearchQuery}
         mode="outlined"
@@ -136,16 +138,39 @@ export default function TransactionScreen() {
   );
 
   const FilterRow = () => (
-    <View style={{ flexDirection: 'row', justifyContent: 'flex-start', padding: 8 }}>
-      <Chip mode='outlined' style={{ marginRight: 8 }} onPress={() => setShowFilterDialog(true)}>Date</Chip>
-      {/* <Chip mode='outlined' onPress={() => console.log('Pressed')}>Payment Mode</Chip> */}
-      <Chip mode='outlined' onPress={() => setShowFilterDialog(true)}>Entry Type</Chip>
+    <View style={{ flexDirection: 'row', justifyContent: 'flex-start', padding: 8, paddingTop: 0 }}>
+      <Chip
+
+        mode='outlined'
+        textStyle={{ color: 'white', fontStyle: 'normal' }}
+        style={{ marginRight: 8, backgroundColor: filterParams.date_from !== 'All Time' ? theme.colors.primary : 'transparent' }}
+        onPress={() => setShowFilterDialog(true)}
+      >
+        {filterParams.date_from !== 'All Time' ? `${filterParams.date_from} - ${filterParams.date_to}` : 'Date'}
+        <Icon
+          source="triangle-small-down"
+          size={15}
+          color='white'
+        />
+      </Chip>
+      <Chip mode='outlined'
+        textStyle={{ color: 'white' }}
+        onPress={() => setShowFilterDialog(true)}
+        style={{ marginRight: 8, backgroundColor: filterParams.type !== 'All' ? theme.colors.primary : 'transparent' }}
+      >
+        {filterParams.type !== 'All' ? filterParams.type : 'Entry Type'}
+        <Icon
+          source="triangle-small-down"
+          size={15}
+          color='white'
+        />
+      </Chip>
 
     </View>
   );
 
   const SummaryCard = () => (
-    <MaterialCard title={t('transactionHistory')}>
+    <MaterialCard title={t('transactionHistory')} style={{ paddingTop: 0 }}>
       <View style={styles.statsRow}>
         <View style={styles.statItem}>
           <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
