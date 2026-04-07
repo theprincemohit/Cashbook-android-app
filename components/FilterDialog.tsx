@@ -1,3 +1,4 @@
+import { filterDate } from '@/utils';
 import * as React from 'react';
 import { ScrollView, View } from 'react-native';
 import { Divider, Modal, PaperProvider, Portal, RadioButton, SegmentedButtons, Text, useTheme } from 'react-native-paper';
@@ -21,7 +22,7 @@ const FilterDialog = ({
 }: FilterDialogProps) => {
     const theme = useTheme();
     const [selectedFilter, setSelectedFilter] = React.useState<keyof typeof filterOptions>('date_from');
-    const [filterData, setFilterData] = React.useState({ date_from: 'All Time', type: 'All' });
+    const [filterData, setFilterData] = React.useState({ date_from: 'All Time', type: 'All', date_to: '' });
 
     const containerStyle = {
         backgroundColor: 'white',
@@ -94,8 +95,8 @@ const FilterDialog = ({
                         <MaterialButton
                             label="Apply Filters"
                             onPress={() => {
-                                handleSave(filterData);
-                                setFilterData({ date_from: 'Today', type: 'All' });
+                                handleSave({ ...filterData, ...filterDate(filterData.date_from) });
+                                setFilterData({ date_from: 'Today', type: 'All', date_to: '' });
                                 setShow(false)
                             }}
                             style={{ backgroundColor: theme.colors.primary }}

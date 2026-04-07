@@ -27,7 +27,7 @@ import { MaterialCard } from '@/components/MaterialCard';
 import { useBusinessContext } from '@/context/BusinessContext';
 import { useLanguageContext } from '@/context/LanguageContext';
 import { useProtectedRoute } from '@/hooks/useAuthRoute';
-import { currencyFormat, filterDate, formatDate } from '@/utils';
+import { currencyFormat, formatDate } from '@/utils';
 import { router, useLocalSearchParams } from 'expo-router';
 
 export default function TransactionScreen() {
@@ -96,9 +96,13 @@ export default function TransactionScreen() {
   summary.total = summary.credit - summary.debit;
 
   const createParam = () => {
-    const dateRange = filterDate(filterParams.date_from);
-    console.log('Date range from filterDate:', dateRange);
-    return;
+    let param = {};
+    if(filterParams.date_from != 'All Time')      param = { ...param, date_from: filterParams.date_from };
+    if(filterParams.type != 'All')                param = { ...param, type: filterParams.type };
+    if(searchQuery)                               param = { ...param, search: searchQuery };
+    if(filterParams.date_to)                      param = { ...param, date_to: filterParams.date_to };
+    console.log('Created params:', param);
+    return param;
   }
 
   useEffect(() => {
@@ -107,7 +111,6 @@ export default function TransactionScreen() {
       try {
         let params = createParam();
         const filteredTransactions = await getTransactionByPassbookId(activePassbookId, params);
-        console.log('Filtered transactions:', filteredTransactions.data, params, filterParams);
         setTransactions(filteredTransactions.data);
       } catch (error) {
         console.error('Error fetching filtered transactions:', error);
